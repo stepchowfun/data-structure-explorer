@@ -48,3 +48,6 @@ end
 group :development, :test do
   gem 'sqlite3'
 end
+
+# Ruby version
+ruby "2.1.1"
