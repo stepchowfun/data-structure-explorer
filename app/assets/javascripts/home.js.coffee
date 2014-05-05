@@ -1,4 +1,5 @@
-
+# initialize Foundation
+$ -> $(document).foundation()
 
 get_root = () ->
 
