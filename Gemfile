@@ -38,4 +38,13 @@ gem 'spring',        group: :development
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
+# For Heroku
 gem 'rails_12factor', group: :production
+
+# Databases
+group :production do
+  gem 'pg'
+end
+group :development, :test do
+  gem 'sqlite3'
+end
