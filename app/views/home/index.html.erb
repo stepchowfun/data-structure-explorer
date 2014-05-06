@@ -13,6 +13,7 @@
           <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Define</a>
           <ul class="dropdown">
             <li data-ng-repeat="data_structure in data_structures"><a href="#" data-ng-click="activateDataStructure(data_structure, $event)">{{ data_structure.name }}</a></li>
+            <li class="divider"></li>
             <li><a href="#" data-ng-click="newDataStructure($event)">New data structure</a></li>
           </ul>
         </li>
@@ -24,7 +25,7 @@
 
 <div data-ng-show="active_page == 0">
   <div data-ng-repeat="data_structure in data_structures">
-    <div data-ng-show="active_data_structure == data_structure.name" data-ng-init="data_structure.new_field_name = null; data_structure.new_field_error = null;">
+    <div data-ng-show="active_data_structure == data_structure" data-ng-init="data_structure.new_field_name = null; data_structure.new_field_error = null;">
       <div class="row">
         <div class="small-12 column">
           <h2>Define a data structure</h2>
@@ -34,7 +35,7 @@
       <div class="row">
         <div class="small-4 column">
           <label>Name
-            <input type="text" placeholder="e.g., Binary search tree" value="{{ data_structure.name }}" />
+            <input type="text" placeholder="e.g., Binary search tree" data-ng-model="data_structure.name" />
           </label>
 
           <fieldset>
@@ -93,7 +94,7 @@
         <div class="small-8 column">
           <div data-ng-repeat="operation in data_structure.operations">
             <label>{{ operation.name }}
-              <textarea id="definition" placeholder="Define the operations in JavaScript. Refer to the documentation below.">{{ operation.code }}</textarea>
+              <textarea id="definition" data-ng-model="operation.code" placeholder="Define the operations in JavaScript."></textarea>
             </label>
           </div>
         </div>
