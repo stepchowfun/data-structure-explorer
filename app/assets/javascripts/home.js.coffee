@@ -12,10 +12,13 @@ window.CherriesController = ($scope) ->
 
   $scope.addField = () ->
     if !$scope.new_field_name? || $scope.new_field_name == ''
-      $scope.new_field_error = 'Please enter a name for the field.'
+      $scope.new_field_error = 'Please enter a name.'
       return
     if $scope.new_field_name in $scope.fields
-      $scope.new_field_error = 'That field already exists.'
+      $scope.new_field_error = 'Already exists.'
+      return
+    if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_field_name))
+      $scope.new_field_error = 'Invalid name.'
       return
     $scope.fields.push($scope.new_field_name)
     $scope.new_field_name = ''
