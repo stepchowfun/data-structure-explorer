@@ -1,0 +1,58 @@
+<div class="fixed">
+  <nav class="top-bar" data-topbar>
+    <ul class="title-area">
+      <li class="name">
+        <h1><a href="#">Data Structure Explorer</a></h1>
+      </li>
+      <li class="toggle-topbar menu-icon"><a href="#"></a></li>
+    </ul>
+
+    <section class="top-bar-section">
+      <ul class="right">
+        <li data-ng-class="{active: active_page == 0}"><a href="#" data-ng-click="active_page = 0; $event.preventDefault(); $event.stopPropagation();">Define</a></li>
+        <li data-ng-class="{active: active_page == 1}"><a href="#" data-ng-click="active_page = 1; $event.preventDefault(); $event.stopPropagation();">Explore</a></li>
+      </ul>
+    </section>
+  </nav>
+</div>
+
+<div data-ng-show="active_page == 0">
+  <div class="row">
+    <div class="small-12 column">
+      <h2>Define a data structure</h2>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="small-4 column">
+      <label>Name
+        <input type="text" placeholder="e.g., Binary search tree" />
+      </label>
+
+      <fieldset>
+        <legend>Node fields</legend>
+          <ul class="square" data-ng-show="fields.length > 0">
+            <li data-ng-repeat="field in fields">{{ field }}&nbsp;&nbsp;<a href="#" data-ng-click="removeField(field); $event.preventDefault(); $event.stopPropagation();"><i class="fi-minus-circle"></i></a></li>
+          </ul>
+
+          <form class="no-bottom-margin" data-ng-submit="addField()">
+            <div class="row collapse">
+              <div class="small-8 column">
+                <input data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" type="text" class="no-bottom-margin" placeholder="e.g., left_child" />
+              </div>
+              <div class="small-4 column end">
+                <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearAddFieldError()" value="Add field" />
+              </div>
+            </div>
+            <small class="error no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error }}</small>
+          </form>
+      </fieldset>
+    </div>
+
+    <div class="small-8 column">
+      <label>Definition
+        <textarea id="definition" placeholder="Define the operations in JavaScript. Refer to the documentation below."></textarea>
+      </label>
+    </div>
+  </div>
+</div>

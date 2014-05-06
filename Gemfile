@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+# Ruby version
+ruby "2.1.1"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.1.0'
@@ -47,5 +49,5 @@ group :development, :test do
   gem 'sqlite3'
 end
 
-# Ruby version
-ruby "2.1.1"
+# Font Awesome
+gem 'font-awesome-sass'
