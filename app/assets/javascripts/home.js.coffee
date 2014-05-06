@@ -54,6 +54,7 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     if event?
       event.preventDefault()
       event.stopPropagation()
+      setTimeout((() -> $('#dropdown_define_link').click()), 1)
 
   $scope.clearAddFieldError = (data_structure) ->
     data_structure.new_field_error = null
