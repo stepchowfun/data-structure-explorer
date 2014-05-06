@@ -5,6 +5,12 @@ $ -> $(document).foundation()
 cherries = angular.module('cherries', [])
 
 cherries.controller('CherriesController', ['$scope', ($scope) ->
+  # models of computation
+  $scope.models = {
+    'POINTER_MACHINE': 'Pointer machine',
+    'BST': 'Binary search tree'
+  }
+
   $scope.data_structures = [
     {
       name: 'Binary search tree',
@@ -14,7 +20,8 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
           name: 'make_bst',
           code: 'Hello'
         }
-      ]
+      ],
+      model: 'POINTER_MACHINE'
     },
     {
       name: 'Splay tree',
@@ -24,10 +31,19 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
           name: 'make_splay_tree',
           code: 'World'
         }
-      ]
+      ],
+      model: 'BST'
     }
   ]
+
+  get_arguments = (code) ->
+    return []
+
   window.data_structures = $scope.data_structures
+  for data_structure in data_structures
+    data_structure.new_field_name = null
+    data_structure.new_field_error = null
+    data_structure.arguments = get_arguments(operation.code) for operation in data_structure.operations
 
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]

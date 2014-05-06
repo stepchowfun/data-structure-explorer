@@ -10,8 +10,9 @@
     <section class="top-bar-section">
       <ul class="right">
         <li data-ng-class="{active: active_page == 0}" class="has-dropdown">
-          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Define</a>
+          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Editor</a>
           <ul class="dropdown">
+            <li><label>Data Structures</label></li>
             <li data-ng-repeat="data_structure in data_structures"><a href="#" data-ng-click="activateDataStructure(data_structure, $event)">{{ data_structure.name }}</a></li>
             <li class="divider"></li>
             <li><a href="#" data-ng-click="newDataStructure($event)">New data structure</a></li>
@@ -25,10 +26,11 @@
 
 <div data-ng-show="active_page == 0">
   <div data-ng-repeat="data_structure in data_structures">
-    <div data-ng-show="active_data_structure == data_structure" data-ng-init="data_structure.new_field_name = null; data_structure.new_field_error = null;">
+    <div data-ng-show="active_data_structure == data_structure">
       <div class="row">
         <div class="small-12 column">
-          <h2>Define a data structure</h2>
+          <h2>Data structure editor</h2>
+          <hr />
         </div>
       </div>
 
@@ -38,7 +40,12 @@
             <input type="text" placeholder="e.g., Binary search tree" data-ng-model="data_structure.name" />
           </label>
 
-          <fieldset>
+          <label>Model of computation
+            <select data-ng-model="data_structure.model" data-ng-options="key as value for (key, value) in models">
+            </select>
+          </label>
+
+          <fieldset data-ng-show="data_structure.model == 'POINTER_MACHINE'">
             <legend>Node fields</legend>
             <ul data-ng-show="data_structure.fields.length > 0">
               <li data-ng-repeat="field in data_structure.fields">
@@ -99,6 +106,15 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div data-ng-show="active_page == 1">
+  <div class="row">
+    <div class="small-12 column">
+      <h2>Data structure explorer</h2>
+      <hr />
     </div>
   </div>
 </div>
