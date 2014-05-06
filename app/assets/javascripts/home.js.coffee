@@ -22,6 +22,7 @@ window.CherriesController = ($scope) ->
       return
     $scope.fields.push($scope.new_field_name)
     $scope.new_field_name = ''
+    $scope.clearAddFieldError()
 
   $scope.removeField = (field) ->
     index = null
