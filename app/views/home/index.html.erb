@@ -1,5 +1,5 @@
 <div class="fixed">
-  <nav class="top-bar" data-topbar>
+  <nav class="top-bar" data-topbar data-options="is_hover: false">
     <ul class="title-area">
       <li class="name">
         <h1><a href="#">Data Structure Explorer</a></h1>
@@ -10,7 +10,7 @@
     <section class="top-bar-section">
       <ul class="right">
         <li data-ng-class="{active: active_page == 0}" class="has-dropdown">
-          <a href="#" data-ng-click="$event.preventDefault()">Define</a>
+          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Define</a>
           <ul class="dropdown">
             <li data-ng-repeat="data_structure in data_structures"><a href="#" data-ng-click="activateDataStructure(data_structure, $event)">{{ data_structure.name }}</a></li>
             <li><a href="#" data-ng-click="newDataStructure($event)">New data structure</a></li>
