@@ -31,11 +31,18 @@
 
       <fieldset>
         <legend>Node fields</legend>
-          <ul class="square" data-ng-show="fields.length > 0">
-            <li data-ng-repeat="field in fields">{{ field }}&nbsp;&nbsp;<a href="#" data-ng-click="removeField(field); $event.preventDefault(); $event.stopPropagation();"><i class="fi-minus-circle"></i></a></li>
+          <ul data-ng-show="fields.length > 0" data-compile="fields">
+            <li data-ng-repeat="field in fields">
+              <a href="#" id="dropdown_link_{{ field }}" data-dropdown="dropdown_{{ field }}">{{ field }}</a>
+              <ul id="dropdown_{{ field }}" class="f-dropdown" data-dropdown-content>
+                <li><a href="#" data-ng-click="moveFieldUp(field, $event)" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
+                <li><a href="#" data-ng-click="moveFieldDown(field, $event)" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
+                <li><a href="#" data-ng-click="removeField(field, $event)"><i class="fi-minus-circle"></i> Delete</a></li>
+              </ul>
+            </li>
           </ul>
 
-          <form class="no-bottom-margin" data-ng-submit="addField()">
+          <form class="no-bottom-margin" data-ng-submit="addField($event)">
             <div class="row collapse">
               <div class="small-8 column">
                 <input data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" type="text" class="no-bottom-margin" placeholder="e.g., left_child" />
