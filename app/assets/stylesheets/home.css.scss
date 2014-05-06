@@ -1,3 +1,29 @@
-// Place all the styles related to the home controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: http://sass-lang.com/
+body {
+    .top-bar .name h1 a {
+    font-weight: 300;
+    font-size: 0.9em;
+  }
+
+  h2 {
+    margin-top: 32px;
+  }
+
+  #definition {
+    font-family: 'consolas', monospace;
+    resize: vertical;
+    height: 300px;
+  }
+
+  .no-top-margin {
+    margin-top: 0;
+  }
+
+  .no-bottom-margin {
+    margin-bottom: 0;
+  }
+
+  .no-vertical-margin {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
