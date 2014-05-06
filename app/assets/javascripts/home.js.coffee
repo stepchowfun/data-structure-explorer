@@ -5,9 +5,6 @@ $ -> $(document).foundation()
 cherries = angular.module('cherries', [])
 
 cherries.controller('CherriesController', ['$scope', ($scope) ->
-  $scope.active_page = 0
-  $scope.active_data_structure = 'Binary search tree'
-
   $scope.data_structures = [
     {
       name: 'Binary search tree',
@@ -32,6 +29,9 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
   ]
   window.data_structures = $scope.data_structures
 
+  $scope.active_page = 0
+  $scope.active_data_structure = $scope.data_structures[0]
+
   $scope.newDataStructure = (event) ->
     name = 'Untitled'
     counter = 1
@@ -50,7 +50,7 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
 
   $scope.activateDataStructure = (data_structure, event) ->
     $scope.active_page = 0
-    $scope.active_data_structure = data_structure.name
+    $scope.active_data_structure = data_structure
     if event?
       event.preventDefault()
       event.stopPropagation()
