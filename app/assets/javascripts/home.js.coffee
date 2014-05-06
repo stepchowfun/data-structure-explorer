@@ -1,7 +1,10 @@
 # initialize Foundation
 $ -> $(document).foundation()
 
-window.CherriesController = ($scope) ->
+# application module
+cherries = angular.module('cherries', [])
+
+cherries.controller('CherriesController', ['$scope', ($scope) ->
   $scope.active_page = 0
 
   $scope.fields = []
@@ -10,7 +13,7 @@ window.CherriesController = ($scope) ->
   $scope.clearAddFieldError = () ->
     $scope.new_field_error = null
 
-  $scope.addField = () ->
+  $scope.addField = (event) ->
     if !$scope.new_field_name? || $scope.new_field_name == ''
       $scope.new_field_error = 'Please enter a name.'
       return
@@ -23,8 +26,41 @@ window.CherriesController = ($scope) ->
     $scope.fields.push($scope.new_field_name)
     $scope.new_field_name = ''
     $scope.clearAddFieldError()
+    setTimeout((() -> $(document).foundation()), 1)
+    if event?
+      event.preventDefault()
 
-  $scope.removeField = (field) ->
+  $scope.moveFieldUp = (field, event) ->
+    index = null
+    for name, i in $scope.fields
+      if name == field
+        index = i
+        break
+    if index? && index > 0
+      $scope.fields.splice(index, 1)
+      $scope.fields.splice(index - 1, 0, field)
+      setTimeout((() -> $(document).foundation()), 1)
+    if event?
+      event.preventDefault()
+      event.stopPropagation()
+      setTimeout((() -> $('#dropdown_link_' + field).click()), 1)
+
+  $scope.moveFieldDown = (field, event) ->
+    index = null
+    for name, i in $scope.fields
+      if name == field
+        index = i
+        break
+    if index? && index < $scope.fields.length - 1
+      $scope.fields.splice(index, 1)
+      $scope.fields.splice(index + 1, 0, field)
+      setTimeout((() -> $(document).foundation()), 1)
+    if event?
+      event.preventDefault()
+      event.stopPropagation()
+      setTimeout((() -> $('#dropdown_link_' + field).click()), 1)
+
+  $scope.removeField = (field, event) ->
     index = null
     for name, i in $scope.fields
       if name == field
@@ -32,6 +68,11 @@ window.CherriesController = ($scope) ->
         break
     if index?
       $scope.fields.splice(index, 1)
+      setTimeout((() -> $(document).foundation()), 1)
+    if event?
+      event.preventDefault()
+      event.stopPropagation()
+])
 
 get_root = () ->
 
