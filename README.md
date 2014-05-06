@@ -1,0 +1,1 @@
+A web-based pedagogical tool for exploring data structures. Installation follows the typical procedure for a Ruby on Rails application.
