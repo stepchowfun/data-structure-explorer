@@ -74,6 +74,17 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
   $scope.active_page = 1
   $scope.active_data_structure = $scope.data_structures[0]
 
+  # switch to the editor
+  $scope.editDataStructure = (data_structure) ->
+    $scope.active_page = 0
+    $scope.active_data_structure = data_structure
+
+  # switch to the explorer
+  $scope.exploreDataStructure = (data_structure) ->
+    $scope.active_page = 1
+    $scope.active_data_structure = data_structure
+    $scope.resetState()
+
   # a helper to be called on click
   $scope.stopClick = (event) ->
     event.preventDefault()
@@ -147,14 +158,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       else
         $scope.editDataStructure(data_structures[0])
       setTimeout((() -> $(document).foundation()), 1)
-
-  $scope.editDataStructure = (data_structure) ->
-    $scope.active_page = 0
-    $scope.active_data_structure = data_structure
-
-  $scope.exploreDataStructure = (data_structure) ->
-    $scope.active_page = 1
-    $scope.active_data_structure = data_structure
 
   # fields
 
