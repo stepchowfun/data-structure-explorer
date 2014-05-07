@@ -121,7 +121,7 @@
 
       <div class="small-8 column">
         <div data-ng-repeat="operation in active_data_structure.operations">
-          <label>{{ operation.name }}(<span data-ng-hide="operation.arguments">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)
+          <label><code>{{ operation.name }}(<span data-ng-hide="operation.arguments">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
             <textarea id="definition" data-ng-model="operation.code" placeholder="Define the operation in JavaScript."></textarea>
           </label>
         </div>
