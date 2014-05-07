@@ -1,9 +1,17 @@
 # initialize Foundation
-$ -> $(document).foundation()
+$ ->
+  # foundationify the page
+  $(document).foundation()
+
+  # close dropdowns automatically
+  $('.dropdown, .f-dropdown').click(() ->
+    setTimeout((() -> $('body').click()), 1)
+  )
 
 # application module
 cherries = angular.module('cherries', ['api'])
 
+# application controller
 cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   ############################################################################
   # global
@@ -66,10 +74,6 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   # other global application state
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
-
-  # a helper to close any open dropdowns
-  $scope.closeDropdowns = () ->
-    setTimeout((() -> $('#menu-clearing-monster').click()), 1)
 
   # a helper to be called on click
   $scope.stopClick = (event) ->
