@@ -5,12 +5,6 @@ get_data_structure = (name) ->
     if data_structure.name == name
       return data_structure
 
-class Node
-  constructor: () ->
-    @fields = {}
-    for field in get_data_structure(active_data_structure).fields
-      @fields[field] = null
-
 root = null
 
 get_root = () ->
@@ -19,22 +13,26 @@ get_root = () ->
 set_root = (node) ->
   root = node
 
-make_node = (fields) ->
-  if fields?
-    node = new Node()
-    for field in fields
-      set_field(node, field, fields[field])
-  else
-    return new Node()
+class Node
+  constructor: (fields) ->
+    @fields = { }
+    for field in get_data_structure(active_data_structure).fields
+      @fields[field] = null
+    if fields?
+      for key, value of fields
+        @set_field(key, value)
 
-get_field = (node, field) ->
-  if field in get_data_structure(active_data_structure).fields
-    return node.fields[field]
-  else
-    throw 'Unknown field: ' + String(field)
+  get_field: (field) ->
+    if field in get_data_structure(active_data_structure).fields
+      return @fields[field]
+    else
+      throw Error('Unknown field: ' + String(field))
 
-set_field = (node, field, value) ->
-  if field in get_data_structure(active_data_structure).fields
-    node.fields[field] = value
-  else
-    throw 'Unknown field: ' + String(field)
+  set_field: (field, value) ->
+    if field in get_data_structure(active_data_structure).fields
+      @fields[field] = value
+    else
+      throw 'Unknown field: ' + String(field)
+
+$ ->
+  node = new Node { left_child: null }

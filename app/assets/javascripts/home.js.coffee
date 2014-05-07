@@ -15,11 +15,27 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
   $scope.data_structures = [
     {
       name: 'Binary search tree',
-      fields: ['test', 'hello'],
+      fields: ['value', 'left_child', 'right_child'],
       operations: [
         {
           name: 'make_bst',
-          code: 'Hello'
+          code: 'function make_bst() {\n\n}'
+        },
+        {
+          name: 'insert',
+          code: 'function insert(bst, key, value) {\n\n}'
+        },
+        {
+          name: 'delete',
+          code: 'function delete(bst, key) {\n\n}'
+        },
+        {
+          name: 'find',
+          code: 'function find(bst, key) {\n\n}'
+        },
+        {
+          name: 'traverse',
+          code: 'function traverse(bst, callback) {\n\n}'
         }
       ],
       model: 'POINTER_MACHINE'
