@@ -92,7 +92,7 @@
           <legend>Operations</legend>
           <ul data-ng-show="active_data_structure.operations.length > 0">
             <li data-ng-repeat="operation in active_data_structure.operations">
-              <a href="#" data-dropdown="dropdown_operation_{{ operation.name }}">{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</a>
+              <a href="#" data-dropdown="dropdown_operation_{{ operation.name }}">{{ operation.name }}(<span data-ng-hide="operation.arguments">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</a>
               <ul id="dropdown_operation_{{ operation.name }}" class="f-dropdown" data-dropdown-content>
                 <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                 <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
@@ -119,7 +119,7 @@
 
       <div class="small-8 column">
         <div data-ng-repeat="operation in active_data_structure.operations">
-          <label>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)
+          <label>{{ operation.name }}(<span data-ng-hide="operation.arguments">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)
             <textarea id="definition" data-ng-model="operation.code" placeholder="Define the operation in JavaScript."></textarea>
           </label>
         </div>
