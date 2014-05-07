@@ -2,7 +2,7 @@
   <nav class="top-bar" data-topbar data-options="is_hover: false">
     <ul class="title-area">
       <li class="name">
-        <h1><a href="#">Data Structure Explorer</a></h1>
+        <h1><a href="#">Data Structure Explorer</a><span id="menu-clearing-monster"> </span></h1>
       </li>
       <li class="toggle-topbar menu-icon"><a href="#"></a></li>
     </ul>
@@ -13,9 +13,9 @@
           <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Edit</a>
           <ul class="dropdown">
             <li><label>Data Structures</label></li>
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 0 && active_data_structure == data_structure}"><a href="#" data-ng-click="editDataStructure(data_structure, $event); closeTopBarMenu();">{{ data_structure.name || 'Untitled' }}</a></li>
+            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 0 && active_data_structure == data_structure}"><a href="#" data-ng-click="editDataStructure(data_structure); closeDropdowns(); stopClick($event);">{{ data_structure.name || 'Untitled' }}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-ng-click="newDataStructure($event); closeTopBarMenu();">New data structure</a></li>
+            <li><a href="#" data-ng-click="newDataStructure(); closeDropdowns(); stopClick($event);">New data structure</a></li>
           </ul>
         </li>
 
@@ -23,7 +23,7 @@
           <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Explore</a>
           <ul class="dropdown">
             <li><label>Data Structures</label></li>
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 1 && active_data_structure == data_structure}"><a href="#" data-ng-click="exploreDataStructure(data_structure, $event); closeTopBarMenu();">{{ data_structure.name || 'Untitled' }}</a></li>
+            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 1 && active_data_structure == data_structure}"><a href="#" data-ng-click="exploreDataStructure(data_structure); closeDropdowns(); stopClick($event);">{{ data_structure.name || 'Untitled' }}</a></li>
           </ul>
         </li>
       </ul>
@@ -40,7 +40,7 @@
   </div>
   <div class="row" ng-hide="active_data_structure">
     <div class="small-4 column">
-      <a href="#" class="button" data-ng-click="newDataStructure($event)">New data structure</a>
+      <a href="#" class="button" data-ng-click="newDataStructure(); stopClick($event);">New data structure</a>
     </div>
   </div>
 
@@ -66,16 +66,16 @@
           <legend>Node fields</legend>
           <ul data-ng-show="active_data_structure.fields.length > 0">
             <li data-ng-repeat="field in active_data_structure.fields">
-              <a href="#" id="dropdown_field_link_{{ field }}" data-dropdown="dropdown_field_{{ field }}">{{ field }}</a>
+              <a href="#" data-dropdown="dropdown_field_{{ field }}">{{ field }}</a>
               <ul id="dropdown_field_{{ field }}" class="f-dropdown" data-dropdown-content>
-                <li><a href="#" data-ng-click="moveFieldUp(active_data_structure, field, $event)" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
-                <li><a href="#" data-ng-click="moveFieldDown(active_data_structure, field, $event)" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                <li><a href="#" data-ng-click="deleteField(active_data_structure, field, $event)"><i class="fi-minus-circle"></i> Delete</a></li>
+                <li><a href="#" data-ng-click="moveFieldUp(active_data_structure, field); closeDropdowns(); stopClick($event);" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
+                <li><a href="#" data-ng-click="moveFieldDown(active_data_structure, field); closeDropdowns(); stopClick($event);" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
+                <li><a href="#" data-ng-click="deleteField(active_data_structure, field); closeDropdowns(); stopClick($event);"><i class="fi-minus-circle"></i> Delete</a></li>
               </ul>
             </li>
           </ul>
 
-          <form class="no-bottom-margin" data-ng-submit="addField(active_data_structure, $event)">
+          <form class="no-bottom-margin" data-ng-submit="addField(active_data_structure); stopClick($event);">
             <div class="row collapse">
               <div class="small-7 column">
                 <input data-ng-model="new_field_name" data-ng-focus="clearAddFieldError(active_data_structure)" data-ng-blur="clearAddFieldError(active_data_structure)" type="text" class="no-bottom-margin" placeholder="e.g., left_child" />
@@ -92,16 +92,16 @@
           <legend>Operations</legend>
           <ul data-ng-show="active_data_structure.operations.length > 0">
             <li data-ng-repeat="operation in active_data_structure.operations">
-              <a href="#" id="dropdown_operation_link_{{ operation.name }}" data-dropdown="dropdown_operation_{{ operation.name }}">{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</a>
+              <a href="#" data-dropdown="dropdown_operation_{{ operation.name }}">{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</a>
               <ul id="dropdown_operation_{{ operation.name }}" class="f-dropdown" data-dropdown-content>
-                <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation, $event)" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
-                <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation, $event)" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                <li><a href="#" data-ng-click="deleteOperation(active_data_structure, operation, $event)"><i class="fi-minus-circle"></i> Delete</a></li>
+                <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); closeDropdowns(); stopClick($event);" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
+                <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); closeDropdowns(); stopClick($event);" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
+                <li><a href="#" data-ng-click="deleteOperation(active_data_structure, operation); closeDropdowns(); stopClick($event);"><i class="fi-minus-circle"></i> Delete</a></li>
               </ul>
             </li>
           </ul>
 
-          <form class="no-bottom-margin" data-ng-submit="addOperation(active_data_structure, $event)">
+          <form class="no-bottom-margin" data-ng-submit="addOperation(active_data_structure); stopClick($event);">
             <div class="row collapse">
               <div class="small-7 column">
                 <input data-ng-model="active_data_structure.new_operation_name" data-ng-focus="clearAddOperationError(active_data_structure)" data-ng-blur="clearAddOperationError(active_data_structure)" type="text" class="no-bottom-margin" placeholder="e.g., insert" />
@@ -114,7 +114,7 @@
           </form>
         </fieldset>
 
-        <a href="#" class="button tiny alert" data-ng-click="deleteDataStructure(active_data_structure, $event)">Delete data structure</a>
+        <a href="#" class="button tiny alert" data-ng-click="deleteDataStructure(active_data_structure); stopClick($event);">Delete data structure</a>
       </div>
 
       <div class="small-8 column">

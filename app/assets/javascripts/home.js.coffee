@@ -5,6 +5,10 @@ $ -> $(document).foundation()
 cherries = angular.module('cherries', ['api'])
 
 cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
+  ############################################################################
+  # global
+  ############################################################################
+
   # models of computation
   $scope.models = {
     'POINTER_MACHINE': {
@@ -59,9 +63,23 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     }
   ]
 
-  # other application state
+  # other global application state
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
+
+  # a helper to close any open dropdowns
+  $scope.closeDropdowns = () ->
+    setTimeout((() -> $('#menu-clearing-monster').click()), 1)
+
+  # a helper to be called on click
+  $scope.stopClick = (event) ->
+    event.preventDefault()
+    event.stopPropagation()
+
+  ############################################################################
+  # editor
+  ############################################################################
+
   $scope.new_field_name = null
   $scope.new_field_error = null
 
@@ -103,7 +121,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
 
   # data structures
 
-  $scope.newDataStructure = (event) ->
+  $scope.newDataStructure = () ->
     data_structure = {
       name: '',
       fields: [],
@@ -112,9 +130,9 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     }
     initialize_data_structure(data_structure)
     $scope.data_structures.push(data_structure)
-    $scope.editDataStructure(data_structure, event)
+    $scope.editDataStructure(data_structure)
 
-  $scope.deleteDataStructure = (data_structure, event) ->
+  $scope.deleteDataStructure = (data_structure) ->
     index = null
     for ds, i in data_structures
       if ds == data_structure
@@ -125,34 +143,25 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
         active_data_structure = null
       data_structures.splice(index, 1)
       if data_structures.length == 0
-        $scope.editDataStructure(null, null)
+        $scope.editDataStructure(null)
       else
-        $scope.editDataStructure(data_structures[0], null)
+        $scope.editDataStructure(data_structures[0])
       setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
 
-  $scope.editDataStructure = (data_structure, event) ->
+  $scope.editDataStructure = (data_structure) ->
     $scope.active_page = 0
     $scope.active_data_structure = data_structure
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
 
-  $scope.exploreDataStructure = (data_structure, event) ->
+  $scope.exploreDataStructure = (data_structure) ->
     $scope.active_page = 1
     $scope.active_data_structure = data_structure
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
 
   # fields
 
   $scope.clearAddFieldError = (data_structure) ->
     $scope.new_field_error = null
 
-  $scope.addField = (data_structure, event) ->
+  $scope.addField = (data_structure) ->
     if !$scope.new_field_name? || $scope.new_field_name == ''
       $scope.new_field_error = 'Please enter a name.'
       return
@@ -166,10 +175,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     $scope.new_field_name = ''
     $scope.clearAddFieldError(data_structure)
     setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
 
-  $scope.moveFieldUp = (data_structure, field, event) ->
+  $scope.moveFieldUp = (data_structure, field) ->
     index = null
     for name, i in data_structure.fields
       if name == field
@@ -179,12 +186,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       data_structure.fields.splice(index, 1)
       data_structure.fields.splice(index - 1, 0, field)
       setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
-      setTimeout((() -> $('#dropdown_field_link_' + field).click()), 1)
 
-  $scope.moveFieldDown = (data_structure, field, event) ->
+  $scope.moveFieldDown = (data_structure, field) ->
     index = null
     for name, i in data_structure.fields
       if name == field
@@ -194,12 +197,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       data_structure.fields.splice(index, 1)
       data_structure.fields.splice(index + 1, 0, field)
       setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
-      setTimeout((() -> $('#dropdown_field_link_' + field).click()), 1)
 
-  $scope.deleteField = (data_structure, field, event) ->
+  $scope.deleteField = (data_structure, field) ->
     index = null
     for name, i in data_structure.fields
       if name == field
@@ -208,16 +207,13 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     if index?
       data_structure.fields.splice(index, 1)
       setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
 
   # operations
 
   $scope.clearAddOperationError = (data_structure) ->
     data_structure.new_operation_error = null
 
-  $scope.addOperation = (data_structure, event) ->
+  $scope.addOperation = (data_structure) ->
     if !data_structure.new_operation_name? || data_structure.new_operation_name == ''
       data_structure.new_operation_error = 'Please enter a name.'
       return
@@ -234,10 +230,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     data_structure.new_operation_name = ''
     $scope.clearAddOperationError(data_structure)
     setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
 
-  $scope.moveOperationUp = (data_structure, operation, event) ->
+  $scope.moveOperationUp = (data_structure, operation) ->
     index = null
     for op, i in data_structure.operations
       if op.name == operation.name
@@ -247,12 +241,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       data_structure.operations.splice(index, 1)
       data_structure.operations.splice(index - 1, 0, operation)
       setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
-      setTimeout((() -> $('#dropdown_operation_link_' + operation.name).click()), 1)
 
-  $scope.moveOperationDown = (data_structure, operation, event) ->
+  $scope.moveOperationDown = (data_structure, operation) ->
     index = null
     for op, i in data_structure.operations
       if op.name == operation.name
@@ -262,12 +252,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       data_structure.operations.splice(index, 1)
       data_structure.operations.splice(index + 1, 0, operation)
       setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
-      setTimeout((() -> $('#dropdown_operation_link_' + operation.name).click()), 1)
 
-  $scope.deleteOperation = (data_structure, operation, event) ->
+  $scope.deleteOperation = (data_structure, operation) ->
     index = null
     for op, i in data_structure.operations
       if op.name == operation.name
@@ -276,12 +262,9 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     if index?
       data_structure.operations.splice(index, 1)
       setTimeout((() -> $(document).foundation()), 1)
-    if event?
-      event.preventDefault()
-      event.stopPropagation()
 
-  # helpers
+  ############################################################################
+  # explorer
+  ############################################################################
 
-  $scope.closeTopBarMenu = () ->
-    setTimeout((() -> $('.top-bar-section li.has-dropdown.hover > a').click()), 1)
 ])
