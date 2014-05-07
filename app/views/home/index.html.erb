@@ -58,7 +58,7 @@
         </label>
 
         <label>Model of computation
-          <select data-ng-model="active_data_structure.model" data-ng-options="key as value for (key, value) in models">
+          <select data-ng-model="active_data_structure.model" data-ng-options="key as value.name for (key, value) in models" class="no-bottom-margin">
           </select>
         </label>
 
@@ -129,10 +129,47 @@
 </div>
 
 <div data-ng-show="active_page == 1">
-  <div class="row">
+  <div class="row" ng-hide="active_data_structure">
     <div class="small-12 column">
       <h2>Data structure explorer</h2>
       <hr />
+    </div>
+  </div>
+  <div class="row" ng-hide="active_data_structure">
+    <div class="small-4 column">
+      <p>Go to the <strong>Edit</strong> view and define a data structure.</p>
+    </div>
+  </div>
+
+  <div data-ng-show="active_data_structure">
+    <div class="row">
+      <div class="small-12 column">
+        <h2>Explore: {{ active_data_structure.name || 'Untitled' }}</h2>
+        <hr />
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-4 column">
+        <p>Model of computation: {{ models[active_data_structure.model].name }}</p>
+
+        <fieldset data-ng-show="active_data_structure.model == 'POINTER_MACHINE'">
+          <legend>Node fields</legend>
+          <ul data-ng-show="active_data_structure.fields.length > 0" class="no-bottom-margin">
+            <li data-ng-repeat="field in active_data_structure.fields">
+              {{ field }}
+            </li>
+          </ul>
+        </fieldset>
+
+        <fieldset>
+          <legend>Operations</legend>
+          <ul data-ng-show="active_data_structure.operations.length > 0" class="no-bottom-margin">
+            <li data-ng-repeat="operation in active_data_structure.operations">
+              {{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)
+            </li>
+          </ul>
+        </fieldset>
+      </div>
     </div>
   </div>
 </div>

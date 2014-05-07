@@ -2,13 +2,19 @@
 $ -> $(document).foundation()
 
 # application module
-cherries = angular.module('cherries', [])
+cherries = angular.module('cherries', ['api'])
 
-cherries.controller('CherriesController', ['$scope', ($scope) ->
+cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   # models of computation
   $scope.models = {
-    'POINTER_MACHINE': 'Pointer machine',
-    'BST': 'Binary search tree'
+    'POINTER_MACHINE': {
+      name: 'Pointer machine',
+      api: api.pointer_machine
+    },
+    'BST': {
+      name: 'Binary search tree',
+      api: api.bst
+    }
   }
 
   # list of data structures
