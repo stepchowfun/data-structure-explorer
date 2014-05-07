@@ -44,5 +44,14 @@ body {
     * {
       font-size: 0.8rem;
     }
+
+    .command-active {
+      font-weight: bold;
+    }
+
+    .command-step-active {
+      font-weight: bold;
+      color: #090;
+    }
   }
 }
