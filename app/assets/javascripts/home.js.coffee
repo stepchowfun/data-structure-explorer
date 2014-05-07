@@ -76,6 +76,8 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
         operation.arguments = get_arguments(operation.code, operation.name)
   ), true)
 
+  # data structures
+
   $scope.newDataStructure = (event) ->
     name = 'Untitled'
     counter = 1
@@ -90,6 +92,25 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     $scope.data_structures.push(data_structure)
     $scope.activateDataStructure(data_structure, event)
 
+  $scope.deleteDataStructure = (data_structure, event) ->
+    index = null
+    for ds, i in data_structures
+      if ds == data_structure
+        index = i
+        break
+    if index?
+      if active_data_structure == data_structure
+        active_data_structure = null
+      data_structures.splice(index, 1)
+      if data_structures.length == 0
+        $scope.activateDataStructure(null, null)
+      else
+        $scope.activateDataStructure(data_structures[0], null)
+      setTimeout((() -> $(document).foundation()), 1)
+    if event?
+      event.preventDefault()
+      event.stopPropagation()
+
   # fields
 
   $scope.activateDataStructure = (data_structure, event) ->
@@ -98,7 +119,6 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     if event?
       event.preventDefault()
       event.stopPropagation()
-      setTimeout((() -> $('#dropdown_define_link').click()), 1)
 
   $scope.clearAddFieldError = (data_structure) ->
     data_structure.new_field_error = null
@@ -150,7 +170,7 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
       event.stopPropagation()
       setTimeout((() -> $('#dropdown_field_link_' + field).click()), 1)
 
-  $scope.removeField = (data_structure, field, event) ->
+  $scope.deleteField = (data_structure, field, event) ->
     index = null
     for name, i in data_structure.fields
       if name == field
@@ -218,7 +238,7 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
       event.stopPropagation()
       setTimeout((() -> $('#dropdown_operation_link_' + operation.name).click()), 1)
 
-  $scope.removeOperation = (data_structure, operation, event) ->
+  $scope.deleteOperation = (data_structure, operation, event) ->
     index = null
     for op, i in data_structure.operations
       if op.name == operation.name
@@ -230,4 +250,9 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     if event?
       event.preventDefault()
       event.stopPropagation()
+
+  # helpers
+
+  $scope.closeTopBarMenu = () ->
+    setTimeout((() -> $('.top-bar-section li.has-dropdown.hover > a').click()), 1)
 ])

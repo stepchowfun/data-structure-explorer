@@ -13,27 +13,31 @@
           <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Editor</a>
           <ul class="dropdown">
             <li><label>Data Structures</label></li>
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 0 && active_data_structure == data_structure}"><a href="#" data-ng-click="activateDataStructure(data_structure, $event)">{{ data_structure.name }}</a></li>
+            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 0 && active_data_structure == data_structure}"><a href="#" data-ng-click="activateDataStructure(data_structure, $event); closeTopBarMenu();">{{ data_structure.name }}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-ng-click="newDataStructure($event)">New data structure</a></li>
+            <li><a href="#" data-ng-click="newDataStructure($event); closeTopBarMenu();">New data structure</a></li>
           </ul>
         </li>
-        <li data-ng-class="{active: active_page == 1}"><a href="#" data-ng-click="active_page = 1; $event.preventDefault(); $event.stopPropagation();">Explore</a></li>
+        <li data-ng-class="{active: active_page == 1}"><a href="#" data-ng-click="active_page = 1; active_data_structure = null; closeTopBarMenu(); $event.preventDefault(); $event.stopPropagation();">Explore</a></li>
       </ul>
     </section>
   </nav>
 </div>
 
 <div data-ng-show="active_page == 0">
+  <div class="row">
+    <div class="small-12 column">
+      <h2>Data structure editor</h2>
+      <hr />
+    </div>
+  </div>
+  <div class="row" ng-show="data_structures.length == 0">
+    <div class="small-4 column">
+      <a href="#" class="button" data-ng-click="newDataStructure($event)">New data structure</a>
+    </div>
+  </div>
   <div data-ng-repeat="data_structure in data_structures">
     <div data-ng-show="active_data_structure == data_structure">
-      <div class="row">
-        <div class="small-12 column">
-          <h2>Data structure editor</h2>
-          <hr />
-        </div>
-      </div>
-
       <div class="row">
         <div class="small-4 column">
           <label>Name
@@ -53,7 +57,7 @@
                 <ul id="dropdown_field_{{ field }}" class="f-dropdown" data-dropdown-content>
                   <li><a href="#" data-ng-click="moveFieldUp(data_structure, field, $event)" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                   <li><a href="#" data-ng-click="moveFieldDown(data_structure, field, $event)" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                  <li><a href="#" data-ng-click="removeField(data_structure, field, $event)"><i class="fi-minus-circle"></i> Delete</a></li>
+                  <li><a href="#" data-ng-click="deleteField(data_structure, field, $event)"><i class="fi-minus-circle"></i> Delete</a></li>
                 </ul>
               </li>
             </ul>
@@ -79,7 +83,7 @@
                 <ul id="dropdown_operation_{{ operation.name }}" class="f-dropdown" data-dropdown-content>
                   <li><a href="#" data-ng-click="moveOperationUp(data_structure, operation, $event)" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                   <li><a href="#" data-ng-click="moveOperationDown(data_structure, operation, $event)" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                  <li><a href="#" data-ng-click="removeOperation(data_structure, operation, $event)"><i class="fi-minus-circle"></i> Delete</a></li>
+                  <li><a href="#" data-ng-click="deleteOperation(data_structure, operation, $event)"><i class="fi-minus-circle"></i> Delete</a></li>
                 </ul>
               </li>
             </ul>
@@ -96,6 +100,8 @@
               <small class="error no-bottom-margin" data-ng-show="data_structure.new_operation_error">{{ data_structure.new_operation_error }}</small>
             </form>
           </fieldset>
+
+          <a href="#" class="button tiny alert" data-ng-click="deleteDataStructure(data_structure, $event)">Delete data structure</a>
         </div>
 
         <div class="small-8 column">
