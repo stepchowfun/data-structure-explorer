@@ -11,6 +11,7 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     'BST': 'Binary search tree'
   }
 
+  # list of data structures
   $scope.data_structures = [
     {
       name: 'Binary search tree',
@@ -35,6 +36,10 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
       model: 'BST'
     }
   ]
+
+  # other application state
+  $scope.active_page = 0
+  $scope.active_data_structure = $scope.data_structures[0]
 
   get_arguments = (code, function_name) ->
     regex = new RegExp('function(\\s)*' + function_name + '\\(', 'g')
@@ -70,9 +75,6 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
       for operation in data_structure.operations
         operation.arguments = get_arguments(operation.code, operation.name)
   ), true)
-
-  $scope.active_page = 0
-  $scope.active_data_structure = $scope.data_structures[0]
 
   $scope.newDataStructure = (event) ->
     name = 'Untitled'
