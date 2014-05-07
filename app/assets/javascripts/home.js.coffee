@@ -284,8 +284,17 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
 
   $scope.new_command_str = null
   $scope.new_command_error = null
+  $scope.command_history = []
 
   $scope.clearNewCommandError = () ->
     $scope.new_command_error = null
+
+  $scope.newCommand = () ->
+    if !$scope.new_command_str? || $scope.new_command_str == ''
+      $scope.new_command_error = 'Please enter a command.'
+      return
+    #
+    $scope.new_command_str = ''
+    $scope.clearNewCommandError()
 
 ])
