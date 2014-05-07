@@ -46,7 +46,7 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     result = regex.exec(code)
     if !result?
       return null
-    if result.index > 0 and /[\$_a-zA-Z0-9]/g.test(result[0][result.index - 1])
+    if result.index > 0 and /[\$_a-zA-Z0-9]/g.test(code[result.index - 1])
       return null
     args_pos = result.index + result[0].length
     args = []
