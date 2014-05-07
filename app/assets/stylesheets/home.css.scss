@@ -8,17 +8,6 @@ body {
     margin-top: 32px;
   }
 
-  .top-bar-section ul.dropdown li.active:not(.has-form) a:not(.button):not(:hover) {
-    background-color: #008cba;
-  }
-
-  #definition {
-    font-family: 'consolas', monospace;
-    resize: vertical;
-    height: 300px;
-    min-height: 300px;
-  }
-
   .no-top-margin {
     margin-top: 0;
   }
@@ -30,5 +19,26 @@ body {
   .no-vertical-margin {
     margin-top: 0;
     margin-bottom: 0;
+  }
+
+  .top-bar-section ul.dropdown li.active:not(.has-form) a:not(.button):not(:hover) {
+    background-color: #008cba;
+  }
+
+  #definition {
+    font-family: 'consolas', monospace;
+    resize: vertical;
+    height: 300px;
+    min-height: 300px;
+  }
+
+  #command-history {
+    font-family: 'consolas', monospace;
+    max-height: 250px;
+    overflow: auto;
+    
+    * {
+      font-size: 0.8rem;
+    }
   }
 }

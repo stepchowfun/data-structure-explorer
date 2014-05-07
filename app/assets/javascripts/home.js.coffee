@@ -18,16 +18,16 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   ############################################################################
 
   # models of computation
-  $scope.models = {
-    'POINTER_MACHINE': {
+  $scope.models = [
+    {
       name: 'Pointer machine',
       api: api.pointer_machine
     },
-    'BST': {
+    {
       name: 'Binary search tree',
       api: api.bst
     }
-  }
+  ]
 
   # list of data structures
   $scope.data_structures = [
@@ -52,7 +52,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
           code: 'function traverse(bst, callback) {\n\n}'
         }
       ],
-      model: 'POINTER_MACHINE'
+      model: $scope.models[0]
     },
     {
       name: 'Splay tree',
@@ -75,12 +75,12 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
           code: 'function traverse(st, callback) {\n\n}'
         }
       ],
-      model: 'BST'
+      model: $scope.models[1]
     }
   ]
 
   # other global application state
-  $scope.active_page = 0
+  $scope.active_page = 1
   $scope.active_data_structure = $scope.data_structures[0]
 
   # a helper to be called on click
@@ -285,6 +285,9 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   $scope.new_command_str = null
   $scope.new_command_error = null
   $scope.command_history = []
+  $scope.computationState = null
+  if $scope.active_data_structure?
+    $scope.computationState = $scope.active_data_structure.model.api.getInitialState()
 
   $scope.clearNewCommandError = () ->
     $scope.new_command_error = null
@@ -293,8 +296,14 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     if !$scope.new_command_str? || $scope.new_command_str == ''
       $scope.new_command_error = 'Please enter a command.'
       return
-    #
+    $scope.command_history.push({
+      str: $scope.new_command_str,
+      steps: $scope.active_data_structure.model.api.getCommandSteps($scope.computationState, $scope.new_command_str)
+    })
     $scope.new_command_str = ''
     $scope.clearNewCommandError()
+    setTimeout((() ->
+      $('#command-history').scrollTop($('#command-history').prop('scrollHeight'))
+    ), 1)
 
 ])
