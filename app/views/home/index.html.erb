@@ -10,7 +10,7 @@
     <section class="top-bar-section">
       <ul class="right">
         <li data-ng-class="{active: active_page == 0}" class="has-dropdown">
-          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault();">Edit</a>
+          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Edit</a>
           <ul class="dropdown">
             <li><label>Data Structures</label></li>
             <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 0 && active_data_structure == data_structure}"><a href="#" data-ng-click="editDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
@@ -20,7 +20,7 @@
         </li>
 
         <li data-ng-class="{active: active_page == 1}" class="has-dropdown">
-          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault();">Explore</a>
+          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Explore</a>
           <ul class="dropdown">
             <li><label>Data Structures</label></li>
             <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 1 && active_data_structure == data_structure}"><a href="#" data-ng-click="exploreDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
