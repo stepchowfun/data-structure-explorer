@@ -63,12 +63,15 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
         break
     return args
 
-  window.data_structures = $scope.data_structures
-  for data_structure in data_structures
+  initialize_data_structure = (data_structure) ->
     data_structure.new_field_name = null
     data_structure.new_field_error = null
     for operation in data_structure.operations
       operation.arguments = get_arguments(operation.code, operation.name)
+
+  window.data_structures = $scope.data_structures
+  for data_structure in data_structures
+    initialize_data_structure(data_structure)
 
   $scope.$watch('data_structures', (() ->
     for data_structure in data_structures
@@ -87,8 +90,10 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     data_structure = {
       name: name,
       fields: [],
-      operations: []
+      operations: [],
+      model: 'POINTER_MACHINE'
     }
+    initialize_data_structure(data_structure)
     $scope.data_structures.push(data_structure)
     $scope.activateDataStructure(data_structure, event)
 
