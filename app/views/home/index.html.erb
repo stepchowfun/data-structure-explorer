@@ -78,10 +78,10 @@
           <form class="no-bottom-margin" data-ng-submit="addField(active_data_structure); stopClick($event);">
             <div class="row collapse">
               <div class="small-7 column">
-                <input data-ng-model="new_field_name" data-ng-focus="clearAddFieldError(active_data_structure)" data-ng-blur="clearAddFieldError(active_data_structure)" type="text" class="no-bottom-margin" placeholder="e.g., left_child" />
+                <input data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" type="text" class="no-bottom-margin" placeholder="e.g., left_child" />
               </div>
               <div class="small-5 column end">
-                <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearAddFieldError(active_data_structure)" value="Add field" />
+                <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearAddFieldError()" value="Add field" />
               </div>
             </div>
             <small class="error no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error }}</small>
@@ -104,10 +104,10 @@
           <form class="no-bottom-margin" data-ng-submit="addOperation(active_data_structure); stopClick($event);">
             <div class="row collapse">
               <div class="small-7 column">
-                <input data-ng-model="new_operation_name" data-ng-focus="clearAddOperationError(active_data_structure)" data-ng-blur="clearAddOperationError(active_data_structure)" type="text" class="no-bottom-margin" placeholder="e.g., insert" />
+                <input data-ng-model="new_operation_name" data-ng-focus="clearAddOperationError()" data-ng-blur="clearAddOperationError()" type="text" class="no-bottom-margin" placeholder="e.g., insert" />
               </div>
               <div class="small-5 column end">
-                <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearAddOperationError(active_data_structure)" value="Add Operation" />
+                <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearAddOperationError()" value="Add Operation" />
               </div>
             </div>
             <small class="error no-bottom-margin" data-ng-show="new_operation_error">{{ new_operation_error }}</small>
@@ -166,10 +166,10 @@
           <form class="no-bottom-margin" data-ng-submit="">
             <div class="row collapse">
               <div class="small-9 column">
-                <input data-ng-model="new_command_str" type="text" class="no-bottom-margin" placeholder="e.g., insert(5, 'foo')" />
+                <input data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" type="text" class="no-bottom-margin" placeholder="e.g., insert(5, 'foo')" />
               </div>
               <div class="small-3 column end">
-                <input type="submit" class="button postfix no-bottom-margin" value="Submit" />
+                <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearNewCommandError()" value="Submit" />
               </div>
               <small class="error no-bottom-margin" data-ng-show="new_command_error">{{ new_command_error }}</small>
             </div>
