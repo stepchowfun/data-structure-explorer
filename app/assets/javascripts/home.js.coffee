@@ -95,7 +95,7 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     }
     initialize_data_structure(data_structure)
     $scope.data_structures.push(data_structure)
-    $scope.activateDataStructure(data_structure, event)
+    $scope.editDataStructure(data_structure, event)
 
   $scope.deleteDataStructure = (data_structure, event) ->
     index = null
@@ -108,22 +108,29 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
         active_data_structure = null
       data_structures.splice(index, 1)
       if data_structures.length == 0
-        $scope.activateDataStructure(null, null)
+        $scope.editDataStructure(null, null)
       else
-        $scope.activateDataStructure(data_structures[0], null)
+        $scope.editDataStructure(data_structures[0], null)
       setTimeout((() -> $(document).foundation()), 1)
     if event?
       event.preventDefault()
       event.stopPropagation()
 
-  # fields
-
-  $scope.activateDataStructure = (data_structure, event) ->
+  $scope.editDataStructure = (data_structure, event) ->
     $scope.active_page = 0
     $scope.active_data_structure = data_structure
     if event?
       event.preventDefault()
       event.stopPropagation()
+
+  $scope.exploreDataStructure = (data_structure, event) ->
+    $scope.active_page = 1
+    $scope.active_data_structure = data_structure
+    if event?
+      event.preventDefault()
+      event.stopPropagation()
+
+  # fields
 
   $scope.clearAddFieldError = (data_structure) ->
     data_structure.new_field_error = null
