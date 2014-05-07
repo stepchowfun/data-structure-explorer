@@ -78,13 +78,13 @@
           <form class="no-bottom-margin" data-ng-submit="addField(active_data_structure, $event)">
             <div class="row collapse">
               <div class="small-7 column">
-                <input data-ng-model="active_data_structure.new_field_name" data-ng-focus="clearAddFieldError(active_data_structure)" data-ng-blur="clearAddFieldError(active_data_structure)" type="text" class="no-bottom-margin" placeholder="e.g., left_child" />
+                <input data-ng-model="new_field_name" data-ng-focus="clearAddFieldError(active_data_structure)" data-ng-blur="clearAddFieldError(active_data_structure)" type="text" class="no-bottom-margin" placeholder="e.g., left_child" />
               </div>
               <div class="small-5 column end">
                 <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearAddFieldError(active_data_structure)" value="Add field" />
               </div>
             </div>
-            <small class="error no-bottom-margin" data-ng-show="active_data_structure.new_field_error">{{ active_data_structure.new_field_error }}</small>
+            <small class="error no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error }}</small>
           </form>
         </fieldset>
 
@@ -137,7 +137,7 @@
   </div>
   <div class="row" ng-hide="active_data_structure">
     <div class="small-4 column">
-      <p>Go to the <strong>Edit</strong> view and define a data structure.</p>
+      <p>Switch to the <em>Edit</em> view and define a data structure.</p>
     </div>
   </div>
 
@@ -150,16 +150,7 @@
     </div>
     <div class="row">
       <div class="small-4 column">
-        <p>Model of computation: {{ models[active_data_structure.model].name }}</p>
-
-        <fieldset data-ng-show="active_data_structure.model == 'POINTER_MACHINE'">
-          <legend>Node fields</legend>
-          <ul data-ng-show="active_data_structure.fields.length > 0" class="no-bottom-margin">
-            <li data-ng-repeat="field in active_data_structure.fields">
-              {{ field }}
-            </li>
-          </ul>
-        </fieldset>
+        <p>Model of computation: <em>{{ models[active_data_structure.model].name }}</em></p>
 
         <fieldset>
           <legend>Operations</legend>
@@ -168,6 +159,20 @@
               {{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)
             </li>
           </ul>
+        </fieldset>
+
+        <fieldset>
+          <legend>Command history</legend>
+          <form class="no-bottom-margin" data-ng-submit="">
+            <div class="row collapse">
+              <div class="small-9 column">
+                <input type="text" class="no-bottom-margin" placeholder="e.g., insert(5, 'foo')" />
+              </div>
+              <div class="small-3 column end">
+                <input type="submit" class="button postfix no-bottom-margin" value="Submit" />
+              </div>
+            </div>
+          </form>
         </fieldset>
       </div>
     </div>

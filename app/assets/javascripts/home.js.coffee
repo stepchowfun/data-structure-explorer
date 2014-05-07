@@ -62,6 +62,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   # other application state
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
+  $scope.new_field_name = null
+  $scope.new_field_error = null
 
   get_arguments = (code, function_name) ->
     regex = new RegExp('function(\\s)+' + function_name + '(\\s)*\\(', 'g')
@@ -86,8 +88,6 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     return args
 
   initialize_data_structure = (data_structure) ->
-    data_structure.new_field_name = null
-    data_structure.new_field_error = null
     for operation in data_structure.operations
       operation.arguments = get_arguments(operation.code, operation.name)
 
@@ -150,20 +150,20 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   # fields
 
   $scope.clearAddFieldError = (data_structure) ->
-    data_structure.new_field_error = null
+    $scope.new_field_error = null
 
   $scope.addField = (data_structure, event) ->
-    if !data_structure.new_field_name? || data_structure.new_field_name == ''
-      data_structure.new_field_error = 'Please enter a name.'
+    if !$scope.new_field_name? || $scope.new_field_name == ''
+      $scope.new_field_error = 'Please enter a name.'
       return
-    if data_structure.new_field_name in data_structure.fields
-      data_structure.new_field_error = 'Already exists.'
+    if $scope.new_field_name in data_structure.fields
+      $scope.new_field_error = 'Already exists.'
       return
-    if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test(data_structure.new_field_name))
-      data_structure.new_field_error = 'Invalid name.'
+    if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_field_name))
+      $scope.new_field_error = 'Invalid name.'
       return
-    data_structure.fields.push(data_structure.new_field_name)
-    data_structure.new_field_name = ''
+    data_structure.fields.push($scope.new_field_name)
+    $scope.new_field_name = ''
     $scope.clearAddFieldError(data_structure)
     setTimeout((() -> $(document).foundation()), 1)
     if event?
