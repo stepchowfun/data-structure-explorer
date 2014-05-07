@@ -275,10 +275,20 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
 
   $scope.new_command_str = null
   $scope.new_command_error = null
-  $scope.command_history = []
-  $scope.computationState = null
-  if $scope.active_data_structure?
-    $scope.computationState = $scope.active_data_structure.model.getInitialState()
+
+  $scope.resetState = () ->
+    if $scope.active_data_structure?
+      switch $scope.active_data_structure.model
+        when models[0]
+          $scope.computationState = $scope.active_data_structure.model.getInitialState({ fields: $scope.active_data_structure.fields })
+        when models[1]
+          $scope.computationState = $scope.active_data_structure.model.getInitialState({ })
+      $scope.command_history = []
+    else
+      $scope.computationState = null
+      $scope.command_history = null
+
+  $scope.resetState()
 
   $scope.clearNewCommandError = () ->
     $scope.new_command_error = null

@@ -180,7 +180,13 @@
                 <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearNewCommandError()" value="Submit" />
               </div>
             </div>
-            <small class="error no-bottom-margin" data-ng-show="new_command_error">{{ new_command_error }}</small>
+            <div class="error-container"><small class="error no-bottom-margin" data-ng-show="new_command_error">{{ new_command_error }}</small></div>
+
+            <ul class="button-group no-bottom-margin">
+              <li><a href="#" class="button tiny no-bottom-margin">Prev</a></li>
+              <li><a href="#" class="button tiny no-bottom-margin alert" data-ng-click="resetState(); $event.preventDefault();">Reset</a></li>
+              <li><a href="#" class="button tiny no-bottom-margin">Next</a></li>
+            </ul>
           </form>
         </fieldset>
       </div>
