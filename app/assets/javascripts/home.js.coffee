@@ -36,14 +36,40 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
     }
   ]
 
-  get_arguments = (code) ->
-    return []
+  get_arguments = (code, function_name) ->
+    regex = new RegExp('function(\\s)*' + function_name + '\\(', 'g')
+    result = regex.exec(code)
+    if !result?
+      return null
+    if result.index > 0 and /[\$_a-zA-Z0-9]/g.test(result[0][result.index - 1])
+      return null
+    args_pos = result.index + result[0].length
+    args = []
+    code = code.slice(args_pos)
+    while true
+      arg_regex = /^(\s)*[\$_a-zA-Z][\$_a-zA-Z0-9]*(\s)*(,|\))/g
+      result = arg_regex.exec(code)
+      if !result?
+        break
+      arg = result[0].slice(0, result[0].length - 1).replace(/^\s+|\s+$/g, '')
+      args.push(arg)
+      code = code.slice(result[0].length)
+      if result[0][result[0].length - 1] == ')'
+        break
+    return args
 
   window.data_structures = $scope.data_structures
   for data_structure in data_structures
     data_structure.new_field_name = null
     data_structure.new_field_error = null
-    data_structure.arguments = get_arguments(operation.code) for operation in data_structure.operations
+    for operation in data_structure.operations
+      operation.arguments = get_arguments(operation.code, operation.name)
+
+  $scope.$watch('data_structures', (() ->
+    for data_structure in data_structures
+      for operation in data_structure.operations
+        operation.arguments = get_arguments(operation.code, operation.name)
+  ), true)
 
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
