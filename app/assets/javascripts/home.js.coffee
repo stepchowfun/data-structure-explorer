@@ -69,7 +69,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
 
   # a helper to close any open dropdowns
   $scope.closeDropdowns = () ->
-    setTimeout((() -> $('#menu-clearing-monster').click()), 1)
+    setTimeout((() -> $('#menu-clearing-monster').click()), 100)
 
   # a helper to be called on click
   $scope.stopClick = (event) ->
