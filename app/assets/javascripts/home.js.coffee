@@ -36,10 +36,6 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       fields: ['value', 'left_child', 'right_child'],
       operations: [
         {
-          name: 'make_bst',
-          code: 'function make_bst() {\n\n}'
-        },
-        {
           name: 'insert',
           code: 'function insert(bst, key, value) {\n\n}'
         },
@@ -60,11 +56,23 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
     },
     {
       name: 'Splay tree',
-      fields: ['foo', 'bar', 'baz'],
+      fields: [],
       operations: [
         {
-          name: 'make_splay_tree',
-          code: 'World'
+          name: 'insert',
+          code: 'function insert(st, key, value) {\n\n}'
+        },
+        {
+          name: 'delete',
+          code: 'function delete(st, key) {\n\n}'
+        },
+        {
+          name: 'find',
+          code: 'function find(st, key) {\n\n}'
+        },
+        {
+          name: 'traverse',
+          code: 'function traverse(st, callback) {\n\n}'
         }
       ],
       model: 'BST'
