@@ -170,7 +170,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   $scope.new_field_name = null
   $scope.new_field_error = null
 
-  $scope.clearAddFieldError = (data_structure) ->
+  $scope.clearAddFieldError = () ->
     $scope.new_field_error = null
 
   $scope.addField = (data_structure) ->
@@ -185,7 +185,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       return
     data_structure.fields.push($scope.new_field_name)
     $scope.new_field_name = ''
-    $scope.clearAddFieldError(data_structure)
+    $scope.clearAddFieldError()
     setTimeout((() -> $(document).foundation()), 1)
 
   $scope.moveFieldUp = (data_structure, field) ->
@@ -225,7 +225,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   $scope.new_operation_name = null
   $scope.new_operation_error = null
 
-  $scope.clearAddOperationError = (data_structure) ->
+  $scope.clearAddOperationError = () ->
     $scope.new_operation_error = null
 
   $scope.addOperation = (data_structure) ->
@@ -243,7 +243,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       code: '',
     })
     $scope.new_operation_name = ''
-    $scope.clearAddOperationError(data_structure)
+    $scope.clearAddOperationError()
     setTimeout((() -> $(document).foundation()), 1)
 
   $scope.moveOperationUp = (data_structure, operation) ->
@@ -284,5 +284,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
 
   $scope.new_command_str = null
   $scope.new_command_error = null
+
+  $scope.clearNewCommandError = () ->
+    $scope.new_command_error = null
 
 ])
