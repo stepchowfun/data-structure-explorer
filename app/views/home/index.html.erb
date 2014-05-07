@@ -75,7 +75,7 @@
             </li>
           </ul>
 
-          <form class="no-bottom-margin" data-ng-submit="addField(active_data_structure); stopClick($event);">
+          <form class="no-bottom-margin" data-ng-submit="addField(active_data_structure); $event.preventDefault();">
             <div class="row collapse">
               <div class="small-7 column">
                 <input data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" type="text" class="no-bottom-margin" placeholder="e.g., left_child" />
@@ -101,7 +101,7 @@
             </li>
           </ul>
 
-          <form class="no-bottom-margin" data-ng-submit="addOperation(active_data_structure); stopClick($event);">
+          <form class="no-bottom-margin" data-ng-submit="addOperation(active_data_structure); $event.preventDefault();">
             <div class="row collapse">
               <div class="small-7 column">
                 <input data-ng-model="new_operation_name" data-ng-focus="clearAddOperationError()" data-ng-blur="clearAddOperationError()" type="text" class="no-bottom-margin" placeholder="e.g., insert" />
@@ -163,7 +163,7 @@
 
         <fieldset>
           <legend>Command history</legend>
-          <form class="no-bottom-margin" data-ng-submit="">
+          <form class="no-bottom-margin" data-ng-submit="newCommand(); $event.preventDefault();">
             <div class="row collapse">
               <div class="small-9 column">
                 <input data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" type="text" class="no-bottom-margin" placeholder="e.g., insert(5, 'foo')" />
