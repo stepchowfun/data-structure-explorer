@@ -80,9 +80,6 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   # editor
   ############################################################################
 
-  $scope.new_field_name = null
-  $scope.new_field_error = null
-
   get_arguments = (code, function_name) ->
     regex = new RegExp('function(\\s)+' + function_name + '(\\s)*\\(', 'g')
     result = regex.exec(code)
@@ -158,6 +155,9 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
 
   # fields
 
+  $scope.new_field_name = null
+  $scope.new_field_error = null
+
   $scope.clearAddFieldError = (data_structure) ->
     $scope.new_field_error = null
 
@@ -210,24 +210,27 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
 
   # operations
 
+  $scope.new_operation_name = null
+  $scope.new_operation_error = null
+
   $scope.clearAddOperationError = (data_structure) ->
-    data_structure.new_operation_error = null
+    $scope.new_operation_error = null
 
   $scope.addOperation = (data_structure) ->
-    if !data_structure.new_operation_name? || data_structure.new_operation_name == ''
-      data_structure.new_operation_error = 'Please enter a name.'
+    if !$scope.new_operation_name? || $scope.new_operation_name == ''
+      $scope.new_operation_error = 'Please enter a name.'
       return
-    if data_structure.new_operation_name in (operation.name for operation in data_structure.operations)
-      data_structure.new_operation_error = 'Already exists.'
+    if $scope.new_operation_name in (operation.name for operation in data_structure.operations)
+      $scope.new_operation_error = 'Already exists.'
       return
-    if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test(data_structure.new_operation_name))
-      data_structure.new_operation_error = 'Invalid name.'
+    if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_operation_name))
+      $scope.new_operation_error = 'Invalid name.'
       return
     data_structure.operations.push({
-      name: data_structure.new_operation_name,
+      name: $scope.new_operation_name,
       code: '',
     })
-    data_structure.new_operation_name = ''
+    $scope.new_operation_name = ''
     $scope.clearAddOperationError(data_structure)
     setTimeout((() -> $(document).foundation()), 1)
 
@@ -266,5 +269,8 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   ############################################################################
   # explorer
   ############################################################################
+
+  $scope.new_command_str = null
+  $scope.new_command_error = null
 
 ])
