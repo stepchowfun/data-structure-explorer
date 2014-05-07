@@ -1,7 +1,8 @@
-api = angular.module('api', [])
+models = angular.module('models', [])
 
-api.value('api', {
-  pointer_machine: {
+models.value('models', [
+  {
+    name: 'Pointer machine',
     getInitialState: (() ->
       return null
     ),
@@ -20,7 +21,8 @@ api.value('api', {
       ]
     )
   },
-  bst: {
+  {
+    name: 'Binary search tree',
     getInitialState: (() ->
       return null
     ),
@@ -28,4 +30,4 @@ api.value('api', {
       return []
     )
   }
-})
+])
