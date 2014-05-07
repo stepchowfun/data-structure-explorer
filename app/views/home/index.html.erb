@@ -75,7 +75,7 @@
             <legend>Operations</legend>
             <ul data-ng-show="data_structure.operations.length > 0">
               <li data-ng-repeat="operation in data_structure.operations">
-                <a href="#" id="dropdown_operation_link_{{ operation.name }}" data-dropdown="dropdown_operation_{{ operation.name }}">{{ operation.name }}</a>
+                <a href="#" id="dropdown_operation_link_{{ operation.name }}" data-dropdown="dropdown_operation_{{ operation.name }}">{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</a>
                 <ul id="dropdown_operation_{{ operation.name }}" class="f-dropdown" data-dropdown-content>
                   <li><a href="#" data-ng-click="moveOperationUp(data_structure, operation, $event)" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                   <li><a href="#" data-ng-click="moveOperationDown(data_structure, operation, $event)" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
