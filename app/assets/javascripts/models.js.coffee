@@ -3,8 +3,10 @@ models = angular.module('models', [])
 models.value('models', [
   {
     name: 'Pointer machine',
-    getInitialState: (() ->
-      return null
+    getInitialState: ((options) ->
+      return {
+        options: options
+      }
     ),
     getCommandSteps: ((state, command) ->
       return [
@@ -23,8 +25,10 @@ models.value('models', [
   },
   {
     name: 'Binary search tree',
-    getInitialState: (() ->
-      return null
+    getInitialState: ((options) ->
+      return {
+        options: options
+      }
     ),
     getCommandSteps: ((state, command) ->
       return []

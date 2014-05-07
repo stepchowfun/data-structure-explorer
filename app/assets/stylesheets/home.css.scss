@@ -21,6 +21,10 @@ body {
     margin-bottom: 0;
   }
 
+  .error-container {
+    margin-bottom: 1rem;
+  }
+
   .top-bar-section ul.dropdown li.active:not(.has-form) a:not(.button):not(:hover) {
     background-color: #008cba;
   }
@@ -36,7 +40,7 @@ body {
     font-family: 'consolas', monospace;
     max-height: 250px;
     overflow: auto;
-    
+
     * {
       font-size: 0.8rem;
     }
