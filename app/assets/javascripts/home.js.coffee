@@ -98,13 +98,8 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
   # data structures
 
   $scope.newDataStructure = (event) ->
-    name = 'Untitled'
-    counter = 1
-    while name in (data_structure.name for data_structure in $scope.data_structures)
-      counter += 1
-      name = 'Untitled ' + String(counter)
     data_structure = {
-      name: name,
+      name: '',
       fields: [],
       operations: [],
       model: 'POINTER_MACHINE'
