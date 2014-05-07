@@ -12,13 +12,13 @@ models.value('models', [
       return [
         {
           repr: 'x.foo = 5',
-          up: ((state) -> ),
-          down: ((state) -> )
+          up: ((state) -> console.log state),
+          down: ((state) -> console.log state)
         },
         {
           repr: 'y.bar = 7',
-          up: ((state) -> ),
-          down: ((state) -> )
+          up: ((state) -> console.log state),
+          down: ((state) -> console.log state)
         }
       ]
     )

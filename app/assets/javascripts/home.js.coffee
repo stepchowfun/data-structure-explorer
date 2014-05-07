@@ -168,7 +168,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     $scope.new_field_error = null
 
   $scope.addField = (data_structure) ->
-    if !$scope.new_field_name? || $scope.new_field_name == ''
+    if !$scope.new_field_name? or $scope.new_field_name == ''
       $scope.new_field_error = 'Please enter a name.'
       return
     if $scope.new_field_name in data_structure.fields
@@ -188,7 +188,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       if name == field
         index = i
         break
-    if index? && index > 0
+    if index? and index > 0
       data_structure.fields.splice(index, 1)
       data_structure.fields.splice(index - 1, 0, field)
       setTimeout((() -> $(document).foundation()), 1)
@@ -199,7 +199,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       if name == field
         index = i
         break
-    if index? && index < data_structure.fields.length - 1
+    if index? and index < data_structure.fields.length - 1
       data_structure.fields.splice(index, 1)
       data_structure.fields.splice(index + 1, 0, field)
       setTimeout((() -> $(document).foundation()), 1)
@@ -223,7 +223,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     $scope.new_operation_error = null
 
   $scope.addOperation = (data_structure) ->
-    if !$scope.new_operation_name? || $scope.new_operation_name == ''
+    if !$scope.new_operation_name? or $scope.new_operation_name == ''
       $scope.new_operation_error = 'Please enter a name.'
       return
     if $scope.new_operation_name in (operation.name for operation in data_structure.operations)
@@ -246,7 +246,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       if op.name == operation.name
         index = i
         break
-    if index? && index > 0
+    if index? and index > 0
       data_structure.operations.splice(index, 1)
       data_structure.operations.splice(index - 1, 0, operation)
       setTimeout((() -> $(document).foundation()), 1)
@@ -257,7 +257,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       if op.name == operation.name
         index = i
         break
-    if index? && index < data_structure.operations.length - 1
+    if index? and index < data_structure.operations.length - 1
       data_structure.operations.splice(index, 1)
       data_structure.operations.splice(index + 1, 0, operation)
       setTimeout((() -> $(document).foundation()), 1)
@@ -290,6 +290,8 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     else
       $scope.computationState = null
       $scope.command_history = null
+    $scope.command_history_cursor = null
+    $scope.command_history_step_cursor = null
 
   $scope.resetState()
 
@@ -297,17 +299,84 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     $scope.new_command_error = null
 
   $scope.newCommand = () ->
-    if !$scope.new_command_str? || $scope.new_command_str == ''
+    if !$scope.new_command_str? or $scope.new_command_str == ''
       $scope.new_command_error = 'Please enter a command.'
       return
-    $scope.command_history.push({
+    command = {
       str: $scope.new_command_str,
       steps: $scope.active_data_structure.model.getCommandSteps($scope.computationState, $scope.new_command_str)
-    })
+    }
+    $scope.command_history.push(command)
     $scope.new_command_str = ''
     $scope.clearNewCommandError()
+    while $scope.stepForward()
+      null
     setTimeout((() ->
       $('#command-history').scrollTop($('#command-history').prop('scrollHeight'))
     ), 1)
+
+  $scope.stepBackward = () ->
+    if $scope.command_history? and $scope.command_history.length > 0
+      if $scope.command_history_cursor == null
+        return false
+      cursor = $scope.command_history_cursor
+      step_cursor = $scope.command_history_step_cursor - 1
+      while step_cursor == -1
+        cursor -= 1
+        if cursor == -1
+          cursor = null
+          step_cursor = null
+          break
+        step_cursor = $scope.command_history[cursor].steps.length - 1
+      $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computationState)
+      $scope.command_history_cursor = cursor
+      $scope.command_history_step_cursor = step_cursor
+      return true
+    return false
+
+  $scope.stepForward = () ->
+    if $scope.command_history? and $scope.command_history.length > 0
+      if $scope.command_history_cursor == null
+        cursor = 0
+        step_cursor = 0
+      else
+        cursor = $scope.command_history_cursor
+        step_cursor = $scope.command_history_step_cursor + 1
+      while step_cursor == $scope.command_history[cursor].steps.length
+        cursor += 1
+        step_cursor = 0
+        if cursor == $scope.command_history.length
+          return false
+      $scope.command_history_cursor = cursor
+      $scope.command_history_step_cursor = step_cursor
+      $scope.command_history[cursor].steps[step_cursor].up($scope.computationState)
+      return true
+    return false
+
+  $scope.haveCommandHistory = () ->
+    return $scope.command_history? and $scope.command_history.length > 0
+
+  $scope.canStepBackward = () ->
+    if $scope.command_history? and $scope.command_history.length > 0
+      if $scope.command_history_cursor == null
+        return false
+      return true
+    return false
+
+  $scope.canStepForward = () ->
+    if $scope.command_history? and $scope.command_history.length > 0
+      if $scope.command_history_cursor == null
+        cursor = 0
+        step_cursor = 0
+      else
+        cursor = $scope.command_history_cursor
+        step_cursor = $scope.command_history_step_cursor + 1
+      while step_cursor == $scope.command_history[cursor].steps.length
+        cursor += 1
+        step_cursor = 0
+        if cursor == $scope.command_history.length
+          return false
+      return true
+    return false
 
 ])
