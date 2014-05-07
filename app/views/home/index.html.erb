@@ -100,7 +100,7 @@
 
         <div class="small-8 column">
           <div data-ng-repeat="operation in data_structure.operations">
-            <label>{{ operation.name }}
+            <label>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)
               <textarea id="definition" data-ng-model="operation.code" placeholder="Define the operation in JavaScript."></textarea>
             </label>
           </div>
