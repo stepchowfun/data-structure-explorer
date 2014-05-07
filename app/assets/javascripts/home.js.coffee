@@ -4,8 +4,8 @@ $ ->
   $(document).foundation()
 
   # close dropdowns automatically
-  $('.dropdown, .f-dropdown').click(() ->
-    setTimeout((() -> $('body').click()), 1)
+  $('.dropdown, .f-dropdown').click((event) ->
+    Foundation.libs.dropdown.close($(event.target).closest('.dropdown, .f-dropdown'))
   )
 
 # application module
