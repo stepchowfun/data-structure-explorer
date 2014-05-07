@@ -8,6 +8,10 @@ body {
     margin-top: 32px;
   }
 
+  code {
+    font-size: 0.9rem;
+  }
+
   .no-top-margin {
     margin-top: 0;
   }
@@ -34,6 +38,11 @@ body {
     resize: vertical;
     height: 300px;
     min-height: 300px;
+  }
+
+  #command {
+    font-family: 'consolas', monospace;
+    font-size: 0.8rem;
   }
 
   #command-history {
