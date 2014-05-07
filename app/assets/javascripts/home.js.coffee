@@ -135,7 +135,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       name: '',
       fields: [],
       operations: [],
-      model: 'POINTER_MACHINE'
+      model: $scope.models[0]
     }
     initialize_data_structure(data_structure)
     $scope.data_structures.push(data_structure)

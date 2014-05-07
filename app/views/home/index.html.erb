@@ -62,7 +62,7 @@
           </select>
         </label>
 
-        <fieldset data-ng-show="active_data_structure.model == 'POINTER_MACHINE'">
+        <fieldset data-ng-show="active_data_structure.model == models[0]">
           <legend>Node fields</legend>
           <ul data-ng-show="active_data_structure.fields.length > 0">
             <li data-ng-repeat="field in active_data_structure.fields">
