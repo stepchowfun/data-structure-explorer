@@ -58,7 +58,7 @@
         </label>
 
         <label>Model of computation
-          <select data-ng-model="active_data_structure.model" data-ng-options="key as value.name for (key, value) in models" class="no-bottom-margin">
+          <select data-ng-model="active_data_structure.model" data-ng-options="model as model.name for model in models" class="no-bottom-margin">
           </select>
         </label>
 
@@ -150,7 +150,7 @@
     </div>
     <div class="row">
       <div class="small-4 column">
-        <p>Model of computation: <em>{{ models[active_data_structure.model].name }}</em></p>
+        <p>Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
 
         <fieldset>
           <legend>Operations</legend>
@@ -163,6 +163,14 @@
 
         <fieldset>
           <legend>Command history</legend>
+          <ul id="command-history" class="no-bullet" data-ng-show="command_history.length > 0">
+            <li class="command" data-ng-repeat="command in command_history">
+              {{ command.str }}
+              <ul>
+                <li data-ng-repeat="step in command.steps">{{ step.repr }}</li>
+              </ul>
+            </li>
+          </ul>
           <form class="no-bottom-margin" data-ng-submit="newCommand(); $event.preventDefault();">
             <div class="row collapse">
               <div class="small-9 column">
@@ -171,8 +179,8 @@
               <div class="small-3 column end">
                 <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearNewCommandError()" value="Submit" />
               </div>
-              <small class="error no-bottom-margin" data-ng-show="new_command_error">{{ new_command_error }}</small>
             </div>
+            <small class="error no-bottom-margin" data-ng-show="new_command_error">{{ new_command_error }}</small>
           </form>
         </fieldset>
       </div>
