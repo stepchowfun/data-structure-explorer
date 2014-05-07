@@ -2,7 +2,7 @@
   <nav class="top-bar" data-topbar data-options="is_hover: false">
     <ul class="title-area">
       <li class="name">
-        <h1><a href="/">Data Structure Explorer</a></h1>
+        <h1><a href="/"><i class="fi-compass"></i> Data Structure Explorer</a></h1>
       </li>
       <li class="toggle-topbar menu-icon"><a href="#"></a></li>
     </ul>
@@ -10,7 +10,7 @@
     <section class="top-bar-section">
       <ul class="right">
         <li data-ng-class="{ active: active_page == 0 }" class="has-dropdown">
-          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Edit</a>
+          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()"><i class="fi-crop"></i> Edit</a>
           <ul class="dropdown">
             <li><label>Data Structures</label></li>
             <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page == 0 && active_data_structure == data_structure }"><a href="#" data-ng-click="editDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
@@ -20,7 +20,7 @@
         </li>
 
         <li data-ng-class="{ active: active_page == 1 }" class="has-dropdown">
-          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Explore</a>
+          <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()"><i class="fi-trees"></i> Explore</a>
           <ul class="dropdown">
             <li><label>Data Structures</label></li>
             <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page == 1 && active_data_structure == data_structure }"><a href="#" data-ng-click="exploreDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
@@ -66,7 +66,7 @@
           <legend>Node fields</legend>
           <ul data-ng-show="active_data_structure.fields.length > 0">
             <li data-ng-repeat="field in active_data_structure.fields">
-              <a href="#" data-dropdown="dropdown_field_{{ field }}">{{ field }}</a>
+              <a href="#" data-dropdown="dropdown_field_{{ field }}"><code>{{ field }}</code></a>
               <ul id="dropdown_field_{{ field }}" class="f-dropdown" data-dropdown-content>
                 <li><a href="#" data-ng-click="moveFieldUp(active_data_structure, field); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                 <li><a href="#" data-ng-click="moveFieldDown(active_data_structure, field); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
@@ -92,7 +92,9 @@
           <legend>Operations</legend>
           <ul data-ng-show="active_data_structure.operations.length > 0">
             <li data-ng-repeat="operation in active_data_structure.operations">
-              <a href="#" data-dropdown="dropdown_operation_{{ operation.name }}">{{ operation.name }}(<span data-ng-hide="operation.arguments">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</a>
+              <a href="#" data-dropdown="dropdown_operation_{{ operation.name }}">
+                <code>{{ operation.name }}(<span data-ng-hide="operation.arguments">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
+              </a>
               <ul id="dropdown_operation_{{ operation.name }}" class="f-dropdown" data-dropdown-content>
                 <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                 <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
@@ -156,7 +158,7 @@
           <legend>Operations</legend>
           <ul data-ng-show="active_data_structure.operations.length > 0" class="no-bottom-margin">
             <li data-ng-repeat="operation in active_data_structure.operations">
-              {{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)
+              <code>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
             </li>
           </ul>
         </fieldset>
@@ -174,7 +176,7 @@
           <form class="no-bottom-margin" data-ng-submit="newCommand(); $event.preventDefault();">
             <div class="row collapse">
               <div class="small-9 column">
-                <input data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" type="text" class="no-bottom-margin" placeholder="e.g., insert(5, 'foo')" />
+                <input id="command" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" type="text" class="no-bottom-margin" placeholder="e.g., insert(5, 'foo')" />
               </div>
               <div class="small-3 column end">
                 <input type="submit" class="button postfix no-bottom-margin" data-ng-blur="clearNewCommandError()" value="Submit" />
