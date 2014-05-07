@@ -8,6 +8,10 @@ body {
     margin-top: 32px;
   }
 
+  .top-bar-section ul.dropdown li.active:not(.has-form) a:not(.button):not(:hover) {
+    background-color: #008cba;
+  }
+
   #definition {
     font-family: 'consolas', monospace;
     resize: vertical;

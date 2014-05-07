@@ -13,7 +13,7 @@
           <a id="dropdown_define_link" href="#" data-ng-click="$event.preventDefault()">Editor</a>
           <ul class="dropdown">
             <li><label>Data Structures</label></li>
-            <li data-ng-repeat="data_structure in data_structures"><a href="#" data-ng-click="activateDataStructure(data_structure, $event)">{{ data_structure.name }}</a></li>
+            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{active: active_page == 0 && active_data_structure == data_structure}"><a href="#" data-ng-click="activateDataStructure(data_structure, $event)">{{ data_structure.name }}</a></li>
             <li class="divider"></li>
             <li><a href="#" data-ng-click="newDataStructure($event)">New data structure</a></li>
           </ul>
