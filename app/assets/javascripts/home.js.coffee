@@ -42,7 +42,7 @@ cherries.controller('CherriesController', ['$scope', ($scope) ->
   $scope.active_data_structure = $scope.data_structures[0]
 
   get_arguments = (code, function_name) ->
-    regex = new RegExp('function(\\s)+' + function_name + '\\(', 'g')
+    regex = new RegExp('function(\\s)+' + function_name + '(\\s)*\\(', 'g')
     result = regex.exec(code)
     if !result?
       return null
