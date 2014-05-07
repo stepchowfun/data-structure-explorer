@@ -9,25 +9,16 @@ $ ->
   )
 
 # application module
-cherries = angular.module('cherries', ['api'])
+cherries = angular.module('cherries', ['models'])
 
 # application controller
-cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
+cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) ->
   ############################################################################
   # global
   ############################################################################
 
   # models of computation
-  $scope.models = [
-    {
-      name: 'Pointer machine',
-      api: api.pointer_machine
-    },
-    {
-      name: 'Binary search tree',
-      api: api.bst
-    }
-  ]
+  $scope.models = models
 
   # list of data structures
   $scope.data_structures = [
@@ -52,7 +43,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
           code: 'function traverse(bst, callback) {\n\n}'
         }
       ],
-      model: $scope.models[0]
+      model: models[0]
     },
     {
       name: 'Splay tree',
@@ -75,7 +66,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
           code: 'function traverse(st, callback) {\n\n}'
         }
       ],
-      model: $scope.models[1]
+      model: models[1]
     }
   ]
 
@@ -135,7 +126,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       name: '',
       fields: [],
       operations: [],
-      model: $scope.models[0]
+      model: models[0]
     }
     initialize_data_structure(data_structure)
     $scope.data_structures.push(data_structure)
@@ -287,7 +278,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
   $scope.command_history = []
   $scope.computationState = null
   if $scope.active_data_structure?
-    $scope.computationState = $scope.active_data_structure.model.api.getInitialState()
+    $scope.computationState = $scope.active_data_structure.model.getInitialState()
 
   $scope.clearNewCommandError = () ->
     $scope.new_command_error = null
@@ -298,7 +289,7 @@ cherries.controller('CherriesController', ['$scope', 'api', ($scope, api) ->
       return
     $scope.command_history.push({
       str: $scope.new_command_str,
-      steps: $scope.active_data_structure.model.api.getCommandSteps($scope.computationState, $scope.new_command_str)
+      steps: $scope.active_data_structure.model.getCommandSteps($scope.computationState, $scope.new_command_str)
     })
     $scope.new_command_str = ''
     $scope.clearNewCommandError()
