@@ -1,7 +1,7 @@
 # tooltips and code editors
 
 loaded = false
-codemirrors = []
+codemirrors = [ ]
 
 $ ->
   loaded = true
@@ -47,7 +47,7 @@ onDomChange = () ->
 cherries = angular.module('cherries', ['models', 'examples'])
 
 # application controller
-cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine', 'runCommand', 'examples', ($scope, models, pointer_machine, runCommand, examples) ->
+cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine', 'bst', 'runCommand', 'examples', ($scope, models, pointer_machine, bst, runCommand, examples) ->
   ############################################################################
   # global
   ############################################################################
@@ -82,7 +82,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
 
   # a helper that makes a string out of anything
   $scope.stringify = (value) ->
-    return JSON.stringify(value)
+    try
+      return JSON.stringify(value)
+    catch e
+      return ''
 
   ############################################################################
   # editor
@@ -96,7 +99,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
     if result.index > 0 and /[\$_a-zA-Z0-9]/g.test(code[result.index - 1])
       return null
     args_pos = result.index + result[0].length
-    args = []
+    args = [ ]
     code = code.slice(args_pos)
     while true
       arg_regex = /^(\s)*[\$_a-zA-Z][\$_a-zA-Z0-9]*(\s)*(,|\))/g
@@ -111,7 +114,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
     return args
 
   compileOperations = (operations, model) ->
-    compiledOperations = []
+    compiledOperations = [ ]
     context = { }
     for api_fn_name, api_fn of model.api
       eval('var ' + api_fn_name + ' = api_fn;')
@@ -149,18 +152,29 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
       compiledOperations.push(compiledOperation)
     return compiledOperations
 
-  initialize_data_structure = (data_structure) ->
+  cleanDataStructure = (data_structure) ->
     for operation in data_structure.operations
       operation.arguments = get_arguments(operation.code, operation.name)
     data_structure.compiledOperations = compileOperations(data_structure.operations, data_structure.model)
 
+  initializeDataStructure = (data_structure) ->
+    cleanDataStructure(data_structure)
+    if !data_structure.model_options?
+      data_structure.model_options = { }
+    switch data_structure.model
+      when pointer_machine
+        if !data_structure.model_options.fields?
+          data_structure.model_options.fields = [ ]
+      when bst
+        undefined
+
   window.data_structures = $scope.data_structures
   for data_structure in data_structures
-    initialize_data_structure(data_structure)
+    initializeDataStructure(data_structure)
 
   $scope.$watch('data_structures', (() ->
     for data_structure in data_structures
-      initialize_data_structure(data_structure)
+      cleanDataStructure(data_structure)
     setTimeout(onDomChange, 1)
   ), true)
 
@@ -169,11 +183,11 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
   $scope.newDataStructure = () ->
     data_structure = {
       name: '',
-      fields: [],
-      operations: [],
+      fields: [ ],
+      operations: [ ],
       model: pointer_machine
     }
-    initialize_data_structure(data_structure)
+    initializeDataStructure(data_structure)
     $scope.data_structures.push(data_structure)
     $scope.editDataStructure(data_structure)
 
@@ -308,7 +322,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
     if $scope.active_data_structure?
       $scope.computationState = $scope.active_data_structure.model.getInitialState($scope.active_data_structure.model_options)
       $scope.computationModel = $scope.active_data_structure.model
-      $scope.command_history = []
+      $scope.command_history = [ ]
     else
       $scope.computationState = null
       $scope.command_history = null
