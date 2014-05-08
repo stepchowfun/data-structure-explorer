@@ -1,5 +1,7 @@
 loaded = false
 
+codemirrors = []
+
 $ ->
   loaded = true
   $('[data-toggle=tooltip]').tooltip()
@@ -16,6 +18,7 @@ $ ->
       $(textarea).val(editor.getValue())
       $(textarea).change().trigger("input")
     )
+    codemirrors.push(editor)
   )
 
 onDomChange = () ->
@@ -34,7 +37,10 @@ onDomChange = () ->
         $(textarea).val(editor.getValue())
         $(textarea).change().trigger("input")
       )
+      codemirrors.push(editor)
     )
+    for codemirror in codemirrors
+      codemirror.refresh()
 
 # application module
 cherries = angular.module('cherries', ['models'])
