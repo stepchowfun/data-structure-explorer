@@ -15,7 +15,7 @@
           <ul class="dropdown-menu">
             <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page == 0 && active_data_structure == data_structure }"><a href="#" data-ng-click="editDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
             <li class="divider"></li>
-            <li><a href="#" data-ng-click="newDataStructure(); $event.preventDefault();">New data structure</a></li>
+            <li><a href="#" data-ng-click="newDataStructure(); $event.preventDefault();"><span class="glyphicon glyphicon-plus"></span> New data structure</a></li>
           </ul>
         </li>
         <li class="dropdown" data-ng-class="{ active: active_page == 1 }">
@@ -63,12 +63,12 @@
             </div>
 
             <p class="no-bottom-margin">
-              <a href="#" class="btn btn-danger" data-ng-click="deleteDataStructure(active_data_structure); stopClick($event);">Delete data structure</a>
+              <a href="#" class="btn btn-danger" data-ng-click="deleteDataStructure(active_data_structure); stopClick($event);"><span class="glyphicon glyphicon-trash"></span> Delete data structure</a>
             </p>
           </div>
         </div>
 
-        <div class="panel panel-default">
+        <div class="panel panel-default" data-ng-show="active_data_structure.model == models[0]">
           <div class="panel-heading">Node fields</div>
           <div class="panel-body">
             <ul data-ng-show="active_data_structure.fields.length > 0">
@@ -88,7 +88,7 @@
                 <div class="input-group">
                   <input type="text" class="form-control" data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" placeholder="e.g., left_child" />
                   <span class="input-group-btn">
-                    <input type="submit" class="btn btn-default" data-ng-blur="clearAddFieldError()" value="Add field" />
+                    <button type="submit" class="btn btn-default" data-ng-blur="clearAddFieldError()"><span class="glyphicon glyphicon-plus"></span> Add field</button>
                   </span>
                 </div>
                 <p class="no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error }}</p>
@@ -117,7 +117,7 @@
                 <div class="input-group">
                   <input type="text" class="form-control" data-ng-model="new_operation_name" data-ng-focus="clearAddOperationError()" data-ng-blur="clearAddOperationError()" placeholder="e.g., insert" />
                   <span class="input-group-btn">
-                    <input type="submit" class="btn btn-default" data-ng-blur="clearAddOperationError()" value="Add operation" />
+                    <button type="submit" class="btn btn-default" data-ng-blur="clearAddOperationError()"><span class="glyphicon glyphicon-plus"></span> Add operation</button>
                   </span>
                 </div>
                 <p class="no-bottom-margin" data-ng-show="new_operation_error">{{ new_operation_error }}</p>
