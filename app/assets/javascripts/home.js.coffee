@@ -1,5 +1,6 @@
-loaded = false
+# tooltips and code editors
 
+loaded = false
 codemirrors = []
 
 $ ->
@@ -43,58 +44,20 @@ onDomChange = () ->
       codemirror.refresh()
 
 # application module
-cherries = angular.module('cherries', ['models'])
+cherries = angular.module('cherries', ['models', 'examples'])
 
 # application controller
-cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($scope, models, runCommand) ->
+cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine', 'runCommand', 'examples', ($scope, models, pointer_machine, runCommand, examples) ->
   ############################################################################
   # global
   ############################################################################
 
   # models of computation
   $scope.models = models
+  $scope.pointer_machine = pointer_machine
 
   # list of data structures
-  $scope.data_structures = [
-    {
-      name: 'Binary search tree',
-      fields: ['value', 'left_child', 'right_child'],
-      operations: [
-        {
-          name: 'insert',
-          code: 'function insert(value, subtree) {\n  if (global.root == null) {\n    global.root = make_node({ value: value });\n  } else {\n    if (subtree == undefined) {\n      subtree = global.root;\n    }\n    if (value < subtree.value) {\n      if (subtree.left_child == null) {\n        subtree.left_child = make_node({ value: value });\n      } else {\n        insert(value, subtree.left_child);\n      }\n    }\n    else if (value > subtree.value) {\n      if (subtree.right_child == null) {\n        subtree.right_child = make_node({ value: value });\n      } else {\n        insert(value, subtree.right_child);\n      }\n    } else {\n      throw Error("Value already exists: " + JSON.stringify(value) + ".");\n    }\n  }\n}'
-        },
-        {
-          name: 'remove',
-          code: 'function remove(value, subtree) {\n\n}'
-        },
-        {
-          name: 'contains',
-          code: 'function contains(value, subtree) {\n\n}'
-        }
-      ],
-      model: models[0]
-    },
-    {
-      name: 'Splay tree',
-      fields: [],
-      operations: [
-        {
-          name: 'insert',
-          code: 'function insert(value, subtree) {\n\n}'
-        },
-        {
-          name: 'remove',
-          code: 'function remove(value, subtree) {\n\n}'
-        },
-        {
-          name: 'contains',
-          code: 'function contains(value, subtree) {\n\n}'
-        }
-      ],
-      model: models[1]
-    }
-  ]
+  $scope.data_structures = examples
 
   # other global application state
   $scope.active_page = 0
@@ -208,7 +171,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
       name: '',
       fields: [],
       operations: [],
-      model: models[0]
+      model: pointer_machine
     }
     initialize_data_structure(data_structure)
     $scope.data_structures.push(data_structure)
@@ -241,44 +204,44 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
     if !$scope.new_field_name? or $scope.new_field_name == ''
       $scope.new_field_error = 'Please enter a name.'
       return
-    if $scope.new_field_name in data_structure.fields
+    if $scope.new_field_name in data_structure.model_options.fields
       $scope.new_field_error = 'Already exists.'
       return
     if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_field_name))
       $scope.new_field_error = 'Invalid name.'
       return
-    data_structure.fields.push($scope.new_field_name)
+    data_structure.model_options.fields.push($scope.new_field_name)
     $scope.new_field_name = ''
     $scope.clearAddFieldError()
 
   $scope.moveFieldUp = (data_structure, field) ->
     index = null
-    for name, i in data_structure.fields
+    for name, i in data_structure.model_options.fields
       if name == field
         index = i
         break
     if index? and index > 0
-      data_structure.fields.splice(index, 1)
-      data_structure.fields.splice(index - 1, 0, field)
+      data_structure.model_options.fields.splice(index, 1)
+      data_structure.model_options.fields.splice(index - 1, 0, field)
 
   $scope.moveFieldDown = (data_structure, field) ->
     index = null
-    for name, i in data_structure.fields
+    for name, i in data_structure.model_options.fields
       if name == field
         index = i
         break
-    if index? and index < data_structure.fields.length - 1
-      data_structure.fields.splice(index, 1)
-      data_structure.fields.splice(index + 1, 0, field)
+    if index? and index < data_structure.model_options.fields.length - 1
+      data_structure.model_options.fields.splice(index, 1)
+      data_structure.model_options.fields.splice(index + 1, 0, field)
 
   $scope.deleteField = (data_structure, field) ->
     index = null
-    for name, i in data_structure.fields
+    for name, i in data_structure.model_options.fields
       if name == field
         index = i
         break
     if index?
-      data_structure.fields.splice(index, 1)
+      data_structure.model_options.fields.splice(index, 1)
 
   # operations
 
@@ -343,11 +306,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
 
   $scope.resetState = () ->
     if $scope.active_data_structure?
-      switch $scope.active_data_structure.model
-        when models[0]
-          $scope.computationState = $scope.active_data_structure.model.getInitialState({ fields: $scope.active_data_structure.fields })
-        when models[1]
-          $scope.computationState = $scope.active_data_structure.model.getInitialState({ })
+      $scope.computationState = $scope.active_data_structure.model.getInitialState($scope.active_data_structure.model_options)
       $scope.computationModel = $scope.active_data_structure.model
       $scope.command_history = []
     else
