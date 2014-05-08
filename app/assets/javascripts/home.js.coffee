@@ -21,8 +21,8 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
           code: 'function insert(bst, key, value) {\n\n}'
         },
         {
-          name: 'delete',
-          code: 'function delete(bst, key) {\n\n}'
+          name: 'remove',
+          code: 'function remove(bst, key) {\n\n}'
         },
         {
           name: 'find',
@@ -33,6 +33,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
           code: 'function traverse(bst, callback) {\n\n}'
         }
       ],
+      compiledOperations: null,
       model: models[0]
     },
     {
@@ -44,8 +45,8 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
           code: 'function insert(st, key, value) {\n\n}'
         },
         {
-          name: 'delete',
-          code: 'function delete(st, key) {\n\n}'
+          name: 'remove',
+          code: 'function remove(st, key) {\n\n}'
         },
         {
           name: 'find',
@@ -56,6 +57,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
           code: 'function traverse(st, callback) {\n\n}'
         }
       ],
+      compiledOperations: null,
       model: models[1]
     }
   ]
@@ -73,7 +75,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
   $scope.exploreDataStructure = (data_structure) ->
     $scope.active_page = 1
     $scope.active_data_structure = data_structure
-    $scope.resetState()
 
   # a helper to be called on click
   $scope.stopClick = (event) ->
@@ -106,9 +107,37 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
         break
     return args
 
+  compileOperations = (operations, model) ->
+    compiledOperations = []
+    for operation in operations
+      try
+        compiledOperation = {
+          name: operation.name,
+          fn: (() ->
+            context = { }
+            for api_fn_name, api_fn of model.api
+              context[api_fn_name] = api_fn
+            `with (context) {
+              eval(operation.code);
+              return eval(operation.name);
+            }`
+            null
+          )()
+          error: null
+        }
+      catch error
+        compiledOperation = {
+          name: operation.name,
+          fn: null,
+          error: error
+        }
+      compiledOperations.push(compiledOperation)
+    return compiledOperations
+
   initialize_data_structure = (data_structure) ->
     for operation in data_structure.operations
       operation.arguments = get_arguments(operation.code, operation.name)
+    data_structure.compiledOperations = compileOperations(data_structure.operations, data_structure.model)
 
   window.data_structures = $scope.data_structures
   for data_structure in data_structures
@@ -116,8 +145,10 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
 
   $scope.$watch('data_structures', (() ->
     for data_structure in data_structures
-      for operation in data_structure.operations
-        operation.arguments = get_arguments(operation.code, operation.name)
+      initialize_data_structure(data_structure)
+    setTimeout((() ->
+      $('[data-toggle=tooltip]').tooltip('destroy').tooltip()
+    ), 1)
   ), true)
 
   # data structures
@@ -285,7 +316,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       return
     command = {
       str: $scope.new_command_str,
-      steps: $scope.active_data_structure.model.getCommandSteps($scope.computationState, $scope.new_command_str)
+      steps: $scope.active_data_structure.model.getCommandSteps($scope.computationState, $scope.new_command_str, $scope.active_data_structure.compiledOperations)
     }
     $scope.command_history.push(command)
     $scope.new_command_str = ''
