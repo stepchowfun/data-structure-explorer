@@ -290,16 +290,18 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     $scope.command_history.push(command)
     $scope.new_command_str = ''
     $scope.clearNewCommandError()
-    while $scope.stepForward()
-      null
+    $scope.fastForward()
     setTimeout((() ->
       $('#command-history').scrollTop($('#command-history').prop('scrollHeight'))
     ), 1)
 
+  $scope.haveCommandHistory = () ->
+    return $scope.command_history? and $scope.command_history.length > 0
+
   $scope.stepBackward = () ->
     if $scope.command_history? and $scope.command_history.length > 0
       if $scope.command_history_cursor == null
-        return false
+        return
       cursor = $scope.command_history_cursor
       step_cursor = $scope.command_history_step_cursor - 1
       while step_cursor == -1
@@ -312,8 +314,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computationState)
       $scope.command_history_cursor = cursor
       $scope.command_history_step_cursor = step_cursor
-      return true
-    return false
 
   $scope.stepForward = () ->
     if $scope.command_history? and $scope.command_history.length > 0
@@ -327,15 +327,18 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
         cursor += 1
         step_cursor = 0
         if cursor == $scope.command_history.length
-          return false
+          return
       $scope.command_history_cursor = cursor
       $scope.command_history_step_cursor = step_cursor
       $scope.command_history[cursor].steps[step_cursor].up($scope.computationState)
-      return true
-    return false
 
-  $scope.haveCommandHistory = () ->
-    return $scope.command_history? and $scope.command_history.length > 0
+  $scope.fastBackward = () ->
+    while $scope.canStepBackward()
+      $scope.stepBackward()
+
+  $scope.fastForward = () ->
+    while $scope.canStepForward()
+      $scope.stepForward()
 
   $scope.canStepBackward = () ->
     if $scope.command_history? and $scope.command_history.length > 0
