@@ -196,7 +196,7 @@
                 <div class="input-group">
                   <input id="command" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5, 'foo')" />
                   <span class="input-group-btn">
-                    <input class="btn btn-default" type="submit" data-ng-blur="clearNewCommandError()" value="Go" />
+                    <button class="btn btn-default" type="submit" data-ng-blur="clearNewCommandError()">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
                   </span>
                 </div>
                 <p class="no-bottom-margin" data-ng-show="new_command_error">{{ new_command_error }}</p>
