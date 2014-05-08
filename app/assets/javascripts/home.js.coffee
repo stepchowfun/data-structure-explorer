@@ -76,40 +76,20 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
       operations: [
         {
           name: 'insert',
-          code: 'function insert(st, key, value) {\n\n}'
+          code: 'function insert(value, subtree) {\n\n}'
         },
         {
           name: 'remove',
-          code: 'function remove(st, key) {\n\n}'
+          code: 'function remove(bst, key) {\n\n}'
         },
         {
-          name: 'find',
-          code: 'function find(st, key) {\n\n}'
-        },
-        {
-          name: 'traverse',
-          code: 'function traverse(st, callback) {\n\n}'
+          name: 'contains',
+          code: 'function contains(bst, key) {\n\n}'
         }
       ],
       compiledOperations: null,
       model: models[1]
     }
-    {
-      name: 'Test data structure',
-      fields: [],
-      operations: [
-        {
-          name: 'foo',
-          code: 'function foo() {\n  bar();\n}'
-        },
-        {
-          name: 'bar',
-          code: 'function bar() {\n  console.log(10);\n}'
-        }
-      ],
-      compiledOperations: null,
-      model: models[0]
-    },
   ]
 
   # other global application state
