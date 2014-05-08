@@ -18,19 +18,15 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
       operations: [
         {
           name: 'insert',
-          code: 'function insert(bst, key, value) {\n\n}'
+          code: 'function insert(value, bst) {\n  if (get_root() == null) {\n    set_root(make_node({ value: value }));\n  } else {\n    if (bst == undefined) {\n      bst = get_root();\n    }\n    if (value < get_field(bst, "value")) {\n      if (get_field(bst, "left_child") == null) {\n        set_field(bst, "left_child", make_node({ value: value }));\n      } else {\n        insert(value, get_field(bst, "left_child"));\n      }\n    }\n    else if (value > get_field(bst, "value")) {\n      if (get_field(bst, "right_child") == null) {\n        set_field(bst, "right_child", make_node({ value: value }));\n      } else {\n        insert(value, get_field(bst, "right_child"));\n      }\n    } else {\n      throw Error("Key already exists: " + JSON.stringify(value) + ".");\n    }\n  }\n}'
         },
         {
           name: 'remove',
           code: 'function remove(bst, key) {\n\n}'
         },
         {
-          name: 'find',
-          code: 'function find(bst, key) {\n\n}'
-        },
-        {
-          name: 'traverse',
-          code: 'function traverse(bst, callback) {\n\n}'
+          name: 'contains',
+          code: 'function contains(bst, key) {\n\n}'
         }
       ],
       compiledOperations: null,
