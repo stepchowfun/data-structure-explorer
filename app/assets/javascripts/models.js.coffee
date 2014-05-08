@@ -46,6 +46,32 @@ runCommand = (state, command, operations) ->
 
 models.value('runCommand', runCommand)
 
+make_global = () ->
+  global = { }
+  Object.defineProperty(global, 'root', {
+    enumerable: true,
+    get: (() ->
+      if current_state? and current_state.root?
+        return current_state.root
+    ),
+    set: ((root) ->
+      old_root = current_state.root
+      step = {
+        repr: 'global.root = ' + JSON.stringify(root) + '',
+        up: ((state) ->
+          state.root = root
+        ),
+        down: ((state) ->
+          state.root = old_root
+        ),
+      }
+      step.up(current_state)
+      command_steps.push(step)
+      undefined
+    )
+  })
+  return global
+
 class pointer_machine
   constructor: (() ->),
   name: 'Pointer machine',
@@ -58,24 +84,7 @@ class pointer_machine
     }
   ),
   api: {
-    set_root: ((root) ->
-      old_root = current_state.root
-      step = {
-        repr: 'set_root(' + JSON.stringify(root) + ')',
-        up: ((state) ->
-          state.root = root
-        ),
-        down: ((state) ->
-          state.root = old_root
-        ),
-      }
-      step.up(current_state)
-      command_steps.push(step)
-      undefined
-    ),
-    get_root: (() ->
-      return current_state.root
-    ),
+    global: make_global(),
     make_node: ((data) ->
       node = { }
       for field in current_state.fields
@@ -85,21 +94,50 @@ class pointer_machine
           if key not in current_state.fields
             throw Error('Unknown field: ' + key + '.')
           node[key] = value
-      name = 'n' + current_state.index.toString()
+      node_name = 'n' + current_state.index.toString()
       step = {
         repr: 'make_node(' + JSON.stringify(data) + ')',
         up: ((state) ->
           state.index += 1
-          state.nodes[name] = node
+          state.nodes[node_name] = node
         ),
         down: ((state) ->
-          state.nodes[name] = undefined
+          state.nodes[node_name] = undefined
           state.index -= 1
         ),
       }
       step.up(current_state)
       command_steps.push(step)
-      return name
+
+      opaque_node = {}
+      for field in current_state.fields
+        do (field) ->
+          Object.defineProperty(opaque_node, field, {
+            enumerable: true,
+            get: (() ->
+              if !current_state.nodes[node_name]?
+                throw Error('Node ' + node_name + ' does not exist.')
+              return current_state.nodes[node_name][field]
+            ),
+            set: ((value) ->
+              if !current_state.nodes[node_name]?
+                throw Error('Node ' + node_name + ' does not exist.')
+              old_value = current_state.nodes[node_name][field]
+              step = {
+                repr: node_name + '.' + field + ' = ' + JSON.stringify(value),
+                up: ((state) ->
+                  state.nodes[node_name][field] = value
+                ),
+                down: ((state) ->
+                  state.nodes[node_name][field] = old_value
+                ),
+              }
+              step.up(current_state)
+              command_steps.push(step)
+              undefined
+            )
+          })
+      return opaque_node
     ),
     delete_node: ((node) ->
       if !current_state.nodes[node]?
@@ -117,32 +155,6 @@ class pointer_machine
       step.up(current_state)
       command_steps.push(step)
       undefined
-    ),
-    set_field: ((node, field, value) ->
-      if !current_state.nodes[node]?
-        throw Error('Node ' + JSON.stringify(node) + ' does not exist.')
-      if field not in current_state.fields
-        throw Error('Field ' + JSON.stringify(field) + ' does not exist.')
-      old_value = current_state.nodes[node][field]
-      step = {
-        repr: 'set_field(' + JSON.stringify(node) + ', ' + JSON.stringify(field) + ', ' + JSON.stringify(value) + ')',
-        up: ((state) ->
-          state.nodes[node][field] = value
-        ),
-        down: ((state) ->
-          state.nodes[node][field] = old_value
-        ),
-      }
-      step.up(current_state)
-      command_steps.push(step)
-      undefined
-    ),
-    get_field: ((node, field) ->
-      if !current_state.nodes[node]?
-        throw Error('Node ' + JSON.stringify(node) + ' does not exist.')
-      if field not in current_state.fields
-        throw Error('Field ' + JSON.stringify(field) + ' does not exist.')
-      return current_state.nodes[node][field]
     )
   }
 

@@ -56,18 +56,17 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
       operations: [
         {
           name: 'insert',
-          code: 'function insert(value, subtree) {\n  if (get_root() == null) {\n    set_root(make_node({ value: value }));\n  } else {\n    if (subtree == undefined) {\n      subtree = get_root();\n    }\n    if (value < get_field(subtree, "value")) {\n      if (get_field(subtree, "left_child") == null) {\n        set_field(subtree, "left_child", make_node({ value: value }));\n      } else {\n        insert(value, get_field(subtree, "left_child"));\n      }\n    }\n    else if (value > get_field(subtree, "value")) {\n      if (get_field(subtree, "right_child") == null) {\n        set_field(subtree, "right_child", make_node({ value: value }));\n      } else {\n        insert(value, get_field(subtree, "right_child"));\n      }\n    } else {\n      throw Error("Value already exists: " + JSON.stringify(value) + ".");\n    }\n  }\n}'
+          code: 'function insert(value, subtree) {\n  if (global.root == null) {\n    global.root = make_node({ value: value });\n  } else {\n    if (subtree == undefined) {\n      subtree = global.root;\n    }\n    if (value < subtree.value) {\n      if (subtree.left_child == null) {\n        subtree.left_child = make_node({ value: value });\n      } else {\n        insert(value, subtree.left_child);\n      }\n    }\n    else if (value > subtree.value) {\n      if (subtree.right_child == null) {\n        subtree.right_child = make_node({ value: value });\n      } else {\n        insert(value, subtree.right_child);\n      }\n    } else {\n      throw Error("Value already exists: " + JSON.stringify(value) + ".");\n    }\n  }\n}'
         },
         {
           name: 'remove',
-          code: 'function remove(bst, key) {\n\n}'
+          code: 'function remove(value, subtree) {\n\n}'
         },
         {
           name: 'contains',
-          code: 'function contains(bst, key) {\n\n}'
+          code: 'function contains(value, subtree) {\n\n}'
         }
       ],
-      compiledOperations: null,
       model: models[0]
     },
     {
@@ -80,14 +79,13 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
         },
         {
           name: 'remove',
-          code: 'function remove(bst, key) {\n\n}'
+          code: 'function remove(value, subtree) {\n\n}'
         },
         {
           name: 'contains',
-          code: 'function contains(bst, key) {\n\n}'
+          code: 'function contains(value, subtree) {\n\n}'
         }
       ],
-      compiledOperations: null,
       model: models[1]
     }
   ]
@@ -378,7 +376,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
     if $scope.haveCommandHistory() and $scope.computationModel != $scope.active_data_structure.model
       $scope.new_command_error = 'Reset the state or set the model of computation back to: ' + $scope.computationModel.name + '.'
       return
-    $scope.computationModel = $scope.active_data_structure.model
+    if !$scope.haveCommandHistory()
+      $scope.resetState()
 
     $scope.fastForward(true)
     result = runCommand($scope.computationState, $scope.new_command_str, $scope.active_data_structure.compiledOperations)
