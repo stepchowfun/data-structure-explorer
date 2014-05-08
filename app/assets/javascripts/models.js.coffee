@@ -3,76 +3,7 @@ models = angular.module('models', [])
 command_steps = []
 current_state = null
 
-runCommand = (state, command, operations) ->
-  current_state = state
-  command_steps = []
-  try
-    return_value = (() ->
-      context = { }
-      context.command_steps = undefined;
-      for api_fn_name, api_fn of pointer_machine.prototype.api
-        context[api_fn_name] = api_fn
-      for operation in operations
-        context[operation.name] = operation.fn
-      `with (context) {
-        return eval(command);
-      }`
-      undefined
-    )()
-    return {
-      steps: command_steps,
-      return_value: return_value,
-      error: null
-    }
-  catch error
-    if error == null or typeof error != 'object'
-      error = {
-        name: 'Error',
-        message: 'Unexpected error: ' + JSON.stringify(error) + '.'
-      }
-    if !error.name?
-      error.name = 'Error'
-    if !error.message?
-      error.message = 'Unexpected error.'
-    command_steps.reverse()
-    for command in command_steps
-      command.down(current_state)
-    return {
-      steps: null,
-      return_value: null,
-      error: error
-    }
-  undefined
-
-models.value('runCommand', runCommand)
-
-make_global = () ->
-  global = { }
-  Object.defineProperty(global, 'root', {
-    enumerable: true,
-    get: (() ->
-      if current_state? and current_state.root?
-        return current_state.root
-    ),
-    set: ((root) ->
-      old_root = current_state.root
-      step = {
-        repr: 'global.root = ' + JSON.stringify(root) + '',
-        up: ((state) ->
-          state.root = root
-        ),
-        down: ((state) ->
-          state.root = old_root
-        ),
-      }
-      step.up(current_state)
-      command_steps.push(step)
-      undefined
-    )
-  })
-  return global
-
-class pointer_machine
+pointer_machine = {
   constructor: (() ->),
   name: 'Pointer machine',
   getInitialState: ((options) ->
@@ -84,7 +15,32 @@ class pointer_machine
     }
   ),
   api: {
-    global: make_global(),
+    global: (() ->
+      global = { }
+      Object.defineProperty(global, 'root', {
+        enumerable: true,
+        get: (() ->
+          if current_state? and current_state.root?
+            return current_state.root
+        ),
+        set: ((root) ->
+          old_root = current_state.root
+          step = {
+            repr: 'global.root = ' + JSON.stringify(root) + '',
+            up: ((state) ->
+              state.root = root
+            ),
+            down: ((state) ->
+              state.root = old_root
+            ),
+          }
+          step.up(current_state)
+          command_steps.push(step)
+          undefined
+        )
+      })
+      return global
+    )(),
     make_node: ((data) ->
       node = { }
       for field in current_state.fields
@@ -157,8 +113,9 @@ class pointer_machine
       undefined
     )
   }
+}
 
-class bst
+bst = {
   constructor: (() ->),
   name: 'Binary search tree',
   getInitialState: ((options) ->
@@ -166,8 +123,50 @@ class bst
   ),
   api: {
   }
+}
 
-models.value('models', [
-  new pointer_machine(),
-  new bst(),
-])
+runCommand = (state, command, operations) ->
+  current_state = state
+  command_steps = []
+  try
+    return_value = (() ->
+      context = { }
+      context.command_steps = undefined;
+      for api_fn_name, api_fn of pointer_machine.api
+        context[api_fn_name] = api_fn
+      for operation in operations
+        context[operation.name] = operation.fn
+      `with (context) {
+        return eval(command);
+      }`
+      undefined
+    )()
+    return {
+      steps: command_steps,
+      return_value: return_value,
+      error: null
+    }
+  catch error
+    if error == null or typeof error != 'object'
+      error = {
+        name: 'Error',
+        message: 'Unexpected error: ' + JSON.stringify(error) + '.'
+      }
+    if !error.name?
+      error.name = 'Error'
+    if !error.message?
+      error.message = 'Unexpected error.'
+    command_steps.reverse()
+    for command in command_steps
+      command.down(current_state)
+    return {
+      steps: null,
+      return_value: null,
+      error: error
+    }
+  undefined
+
+models.value('pointer_machine', pointer_machine)
+models.value('bst', bst)
+models.value('models', [pointer_machine, bst])
+models.value('runCommand', runCommand)
