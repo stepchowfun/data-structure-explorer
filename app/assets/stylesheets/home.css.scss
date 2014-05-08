@@ -1,4 +1,10 @@
 body {
+  .form-control:focus {
+    -webkit-box-shadow: rgba(0, 0, 0, 0.0745098) 0px 2px 0px 0px inset !important;
+    box-shadow: rgba(0, 0, 0, 0.0745098) 0px 2px 0px 0px inset !important;
+    border-color: #ccc;
+  }
+
   .no-top-margin {
     margin-top: 0;
   }
