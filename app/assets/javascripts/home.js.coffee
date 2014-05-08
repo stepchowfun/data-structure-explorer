@@ -1,3 +1,12 @@
+# make textareas autoresize
+$ ->
+  $('[data-toggle=tooltip]').tooltip()
+  $('textarea').autosize()
+
+onDomChange = () ->
+  $('[data-toggle=tooltip]').tooltip('destroy').tooltip()
+  $('textarea').trigger('autosize.destroy').autosize()
+
 # application module
 cherries = angular.module('cherries', ['models'])
 
@@ -18,7 +27,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
       operations: [
         {
           name: 'insert',
-          code: 'function insert(value, bst) {\n  if (get_root() == null) {\n    set_root(make_node({ value: value }));\n  } else {\n    if (bst == undefined) {\n      bst = get_root();\n    }\n    if (value < get_field(bst, "value")) {\n      if (get_field(bst, "left_child") == null) {\n        set_field(bst, "left_child", make_node({ value: value }));\n      } else {\n        insert(value, get_field(bst, "left_child"));\n      }\n    }\n    else if (value > get_field(bst, "value")) {\n      if (get_field(bst, "right_child") == null) {\n        set_field(bst, "right_child", make_node({ value: value }));\n      } else {\n        insert(value, get_field(bst, "right_child"));\n      }\n    } else {\n      throw Error("Key already exists: " + JSON.stringify(value) + ".");\n    }\n  }\n}'
+          code: 'function insert(value, subtree) {\n  if (get_root() == null) {\n    set_root(make_node({ value: value }));\n  } else {\n    if (subtree == undefined) {\n      subtree = get_root();\n    }\n    if (value < get_field(subtree, "value")) {\n      if (get_field(subtree, "left_child") == null) {\n        set_field(subtree, "left_child", make_node({ value: value }));\n      } else {\n        insert(value, get_field(subtree, "left_child"));\n      }\n    }\n    else if (value > get_field(subtree, "value")) {\n      if (get_field(subtree, "right_child") == null) {\n        set_field(subtree, "right_child", make_node({ value: value }));\n      } else {\n        insert(value, get_field(subtree, "right_child"));\n      }\n    } else {\n      throw Error("Key already exists: " + JSON.stringify(value) + ".");\n    }\n  }\n}'
         },
         {
           name: 'remove',
@@ -82,11 +91,13 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
   $scope.editDataStructure = (data_structure) ->
     $scope.active_page = 0
     $scope.active_data_structure = data_structure
+    setTimeout(onDomChange, 1)
 
   # switch to the explorer
   $scope.exploreDataStructure = (data_structure) ->
     $scope.active_page = 1
     $scope.active_data_structure = data_structure
+    setTimeout(onDomChange, 1)
 
   # a helper to be called on click
   $scope.stopClick = (event) ->
@@ -174,9 +185,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
   $scope.$watch('data_structures', (() ->
     for data_structure in data_structures
       initialize_data_structure(data_structure)
-    setTimeout((() ->
-      $('[data-toggle=tooltip]').tooltip('destroy').tooltip()
-    ), 1)
+    setTimeout(onDomChange, 1)
   ), true)
 
   # data structures
@@ -350,7 +359,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
       return
 
     if $scope.haveCommandHistory() and $scope.computationModel != $scope.active_data_structure.model
-      $scope.new_command_error = 'Set the model of computation to: ' + $scope.computationModel.name + '.'
+      $scope.new_command_error = 'Reset the state or set the model of computation back to: ' + $scope.computationModel.name + '.'
       return
     $scope.computationModel = $scope.active_data_structure.model
 
