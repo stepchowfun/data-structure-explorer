@@ -109,22 +109,25 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
 
   compileOperations = (operations, model) ->
     compiledOperations = []
+    context = { }
+    for api_fn_name, api_fn of model.api
+      eval('var ' + api_fn_name + ' = api_fn;')
+    for operation in operations
+      eval('var ' + operation.name + ' = undefined;')
     for operation in operations
       try
         compiledOperation = {
           name: operation.name,
           fn: (() ->
-            context = { }
-            for api_fn_name, api_fn of model.api
-              context[api_fn_name] = api_fn
-            `with (context) {
-              eval(operation.code);
-              return eval(operation.name);
-            }`
-            null
+            eval(operation.code)
+            return eval(operation.name)
           )()
           error: null
         }
+        if !compiledOperation.fn?
+          throw Error(operation.name + ' is not defined.')
+        else
+          eval(operation.name + ' = compiledOperation.fn;')
       catch error
         compiledOperation = {
           name: operation.name,
@@ -250,7 +253,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       return
     data_structure.operations.push({
       name: $scope.new_operation_name,
-      code: '',
+      code: 'function ' + $scope.new_operation_name + '() {\n\n}',
     })
     $scope.new_operation_name = ''
     $scope.clearAddOperationError()
