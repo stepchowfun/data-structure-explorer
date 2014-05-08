@@ -2,7 +2,7 @@
 cherries = angular.module('cherries', ['models'])
 
 # application controller
-cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) ->
+cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($scope, models, runCommand) ->
   ############################################################################
   # global
   ############################################################################
@@ -60,6 +60,22 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       compiledOperations: null,
       model: models[1]
     }
+    {
+      name: 'Test data structure',
+      fields: [],
+      operations: [
+        {
+          name: 'foo',
+          code: 'function foo() {\n  bar();\n}'
+        },
+        {
+          name: 'bar',
+          code: 'function bar() {\n  console.log(10);\n}'
+        }
+      ],
+      compiledOperations: null,
+      model: models[0]
+    },
   ]
 
   # other global application state
@@ -80,6 +96,10 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
   $scope.stopClick = (event) ->
     event.preventDefault()
     event.stopPropagation()
+
+  # a helper that makes a string out of anything
+  $scope.stringify = (value) ->
+    return JSON.stringify(value)
 
   ############################################################################
   # editor
@@ -129,6 +149,15 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
         else
           eval(operation.name + ' = compiledOperation.fn;')
       catch error
+        if error == null or typeof error != 'object'
+          error = {
+            name: 'Error',
+            message: 'Unexpected error: ' + JSON.stringify(error) + '.'
+          }
+        if !error.name?
+          error.name = 'Error'
+        if !error.message?
+          error.message = 'Unexpected error.'
         compiledOperation = {
           name: operation.name,
           fn: null,
@@ -301,10 +330,12 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
           $scope.computationState = $scope.active_data_structure.model.getInitialState({ fields: $scope.active_data_structure.fields })
         when models[1]
           $scope.computationState = $scope.active_data_structure.model.getInitialState({ })
+      $scope.computationModel = $scope.active_data_structure.model
       $scope.command_history = []
     else
       $scope.computationState = null
       $scope.command_history = null
+      $scope.computationModel = null
     $scope.command_history_cursor = null
     $scope.command_history_step_cursor = null
 
@@ -314,17 +345,35 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     $scope.new_command_error = null
 
   $scope.newCommand = () ->
+    if !$scope.active_data_structure?
+      $scope.new_command_error = 'Select a data structure first.'
+      return
+
     if !$scope.new_command_str? or $scope.new_command_str == ''
       $scope.new_command_error = 'Please enter a command.'
       return
+
+    if $scope.haveCommandHistory() and $scope.computationModel != $scope.active_data_structure.model
+      $scope.new_command_error = 'Set the model of computation to: ' + $scope.computationModel.name + '.'
+      return
+    $scope.computationModel = $scope.active_data_structure.model
+
+    $scope.fastForward(true)
+    result = runCommand($scope.computationState, $scope.new_command_str, $scope.active_data_structure.compiledOperations)
+    if result.error?
+      $scope.new_command_error = result.error.name + ': ' + result.error.message
+      return
     command = {
       str: $scope.new_command_str,
-      steps: $scope.active_data_structure.model.getCommandSteps($scope.computationState, $scope.new_command_str, $scope.active_data_structure.compiledOperations)
+      steps: result.steps,
+      return_value: result.return_value
     }
     $scope.command_history.push(command)
+    if command.steps.length > 0
+      $scope.command_history_cursor = $scope.command_history.length - 1
+      $scope.command_history_step_cursor = command.steps.length - 1
     $scope.new_command_str = ''
     $scope.clearNewCommandError()
-    $scope.fastForward(true)
 
   $scope.haveCommandHistory = () ->
     return $scope.command_history? and $scope.command_history.length > 0
