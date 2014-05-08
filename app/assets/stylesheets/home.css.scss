@@ -3,6 +3,17 @@ body {
     padding-left: 40px;
   }
 
+  .CodeMirror {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 1.1em;
+    height: auto;
+  }
+
+  .CodeMirror-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
   .return-value {
     color: #31708f;
   }
@@ -32,12 +43,6 @@ body {
 
   .compile-error {
     color: #bd5755;
-  }
-
-  .operation-code {
-    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-    resize: vertical;
-    min-height: 150px;
   }
 
   #command {
