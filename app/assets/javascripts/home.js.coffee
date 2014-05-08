@@ -1,11 +1,40 @@
-# make textareas autoresize
+loaded = false
+
 $ ->
+  loaded = true
   $('[data-toggle=tooltip]').tooltip()
-  $('textarea').autosize()
+  $('.replace-with-codemirror').each((index, element) ->
+    textarea = $(element).parent().find('textarea')
+    editor = CodeMirror(((e) ->
+      $(element).replaceWith(e)
+    ), {
+      tabSize: 2,
+      lineNumbers: true,
+      value: $(textarea).val()
+    })
+    editor.on('change', (args) ->
+      $(textarea).val(editor.getValue())
+      $(textarea).change().trigger("input")
+    )
+  )
 
 onDomChange = () ->
-  $('[data-toggle=tooltip]').tooltip('destroy').tooltip()
-  $('textarea').trigger('autosize.destroy').autosize()
+  if loaded
+    $('[data-toggle=tooltip]').tooltip('destroy').tooltip()
+    $('.replace-with-codemirror').each((index, element) ->
+      textarea = $(element).parent().find('textarea')
+      editor = CodeMirror(((e) ->
+        $(element).replaceWith(e)
+      ), {
+        tabSize: 2,
+        lineNumbers: true,
+        value: $(textarea).val()
+      })
+      editor.on('change', (args) ->
+        $(textarea).val(editor.getValue())
+        $(textarea).change().trigger("input")
+      )
+    )
 
 # application module
 cherries = angular.module('cherries', ['models'])
@@ -357,6 +386,14 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', ($s
     if !$scope.new_command_str? or $scope.new_command_str == ''
       $scope.new_command_error = 'Please enter a command.'
       return
+
+    if !$scope.active_data_structure.compiledOperations?
+      $scope.new_command_error = 'Your code does not compile. Switch to the Edit view and fix it.'
+      return
+    for operation in $scope.active_data_structure.compiledOperations
+      if operation.error?
+        $scope.new_command_error = operation.error.name + ' (' + operation.name + '): ' + operation.error.message
+        return
 
     if $scope.haveCommandHistory() and $scope.computationModel != $scope.active_data_structure.model
       $scope.new_command_error = 'Reset the state or set the model of computation back to: ' + $scope.computationModel.name + '.'

@@ -130,7 +130,8 @@
         <div data-ng-repeat="operation in active_data_structure.operations">
           <div class="form-group">
             <label for="ds-code-{{ operation.name }}"><code>{{ operation.name }}(<span data-ng-show="operation.arguments == null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></label>
-            <textarea id="ds-code-{{ operation.name }}" class="form-control operation-code" data-ng-model="operation.code" placeholder="Define the operation in JavaScript."></textarea>
+            <div class="replace-with-codemirror"></div>
+            <textarea id="ds-code-{{ operation.name }}" class="hidden" data-ng-model="operation.code"></textarea>
           </div>
         </div>
       </div>
