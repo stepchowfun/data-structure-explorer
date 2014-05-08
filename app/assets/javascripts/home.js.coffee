@@ -290,15 +290,12 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     $scope.command_history.push(command)
     $scope.new_command_str = ''
     $scope.clearNewCommandError()
-    $scope.fastForward()
-    setTimeout((() ->
-      $('#command-history').scrollTop($('#command-history').prop('scrollHeight'))
-    ), 1)
+    $scope.fastForward(true)
 
   $scope.haveCommandHistory = () ->
     return $scope.command_history? and $scope.command_history.length > 0
 
-  $scope.stepBackward = () ->
+  $scope.stepBackward = (scroll) ->
     if $scope.command_history? and $scope.command_history.length > 0
       if $scope.command_history_cursor == null
         return
@@ -314,8 +311,15 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computationState)
       $scope.command_history_cursor = cursor
       $scope.command_history_step_cursor = step_cursor
+      if scroll
+        setTimeout((() ->
+          if $scope.command_history_cursor? and $scope.command_history_step_cursor?
+            elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
+            if elements.length > 0
+              elements[0].scrollIntoView()
+        ), 1)
 
-  $scope.stepForward = () ->
+  $scope.stepForward = (scroll) ->
     if $scope.command_history? and $scope.command_history.length > 0
       if $scope.command_history_cursor == null
         cursor = 0
@@ -331,14 +335,32 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
       $scope.command_history_cursor = cursor
       $scope.command_history_step_cursor = step_cursor
       $scope.command_history[cursor].steps[step_cursor].up($scope.computationState)
+      if scroll
+        setTimeout((() ->
+          if $scope.command_history_cursor? and $scope.command_history_step_cursor?
+            elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
+            if elements.length > 0
+              elements[0].scrollIntoView()
+        ), 1)
 
-  $scope.fastBackward = () ->
+  $scope.fastBackward = (scroll) ->
     while $scope.canStepBackward()
-      $scope.stepBackward()
+      $scope.stepBackward(false)
+    if scroll
+      setTimeout((() ->
+        $('#command-history').scrollTop(0)
+      ), 1)
 
-  $scope.fastForward = () ->
+  $scope.fastForward = (scroll) ->
     while $scope.canStepForward()
-      $scope.stepForward()
+      $scope.stepForward(false)
+    if scroll
+      setTimeout((() ->
+        if $scope.command_history_cursor? and $scope.command_history_step_cursor?
+          elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
+          if elements.length > 0
+            elements[0].scrollIntoView()
+      ), 1)
 
   $scope.canStepBackward = () ->
     if $scope.command_history? and $scope.command_history.length > 0
