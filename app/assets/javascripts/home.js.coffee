@@ -1,13 +1,3 @@
-# initialize Foundation
-$ ->
-  # foundationify the page
-  $(document).foundation()
-
-  # close dropdowns automatically
-  $('.dropdown, .f-dropdown').click((event) ->
-    Foundation.libs.dropdown.close($(event.target).closest('.dropdown, .f-dropdown'))
-  )
-
 # application module
 cherries = angular.module('cherries', ['models'])
 
@@ -71,7 +61,7 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
   ]
 
   # other global application state
-  $scope.active_page = 1
+  $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
 
   # switch to the editor
@@ -157,7 +147,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
         $scope.editDataStructure(null)
       else
         $scope.editDataStructure(data_structures[0])
-      setTimeout((() -> $(document).foundation()), 1)
 
   # fields
 
@@ -180,7 +169,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     data_structure.fields.push($scope.new_field_name)
     $scope.new_field_name = ''
     $scope.clearAddFieldError()
-    setTimeout((() -> $(document).foundation()), 1)
 
   $scope.moveFieldUp = (data_structure, field) ->
     index = null
@@ -191,7 +179,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     if index? and index > 0
       data_structure.fields.splice(index, 1)
       data_structure.fields.splice(index - 1, 0, field)
-      setTimeout((() -> $(document).foundation()), 1)
 
   $scope.moveFieldDown = (data_structure, field) ->
     index = null
@@ -202,7 +189,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     if index? and index < data_structure.fields.length - 1
       data_structure.fields.splice(index, 1)
       data_structure.fields.splice(index + 1, 0, field)
-      setTimeout((() -> $(document).foundation()), 1)
 
   $scope.deleteField = (data_structure, field) ->
     index = null
@@ -212,7 +198,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
         break
     if index?
       data_structure.fields.splice(index, 1)
-      setTimeout((() -> $(document).foundation()), 1)
 
   # operations
 
@@ -238,7 +223,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     })
     $scope.new_operation_name = ''
     $scope.clearAddOperationError()
-    setTimeout((() -> $(document).foundation()), 1)
 
   $scope.moveOperationUp = (data_structure, operation) ->
     index = null
@@ -249,7 +233,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     if index? and index > 0
       data_structure.operations.splice(index, 1)
       data_structure.operations.splice(index - 1, 0, operation)
-      setTimeout((() -> $(document).foundation()), 1)
 
   $scope.moveOperationDown = (data_structure, operation) ->
     index = null
@@ -260,7 +243,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
     if index? and index < data_structure.operations.length - 1
       data_structure.operations.splice(index, 1)
       data_structure.operations.splice(index + 1, 0, operation)
-      setTimeout((() -> $(document).foundation()), 1)
 
   $scope.deleteOperation = (data_structure, operation) ->
     index = null
@@ -270,7 +252,6 @@ cherries.controller('CherriesController', ['$scope', 'models', ($scope, models) 
         break
     if index?
       data_structure.operations.splice(index, 1)
-      setTimeout((() -> $(document).foundation()), 1)
 
   ############################################################################
   # explorer

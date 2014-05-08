@@ -1,17 +1,4 @@
 body {
-  .top-bar .name h1 a {
-    font-weight: 300;
-    font-size: 0.9em;
-  }
-
-  h2 {
-    margin-top: 32px;
-  }
-
-  code {
-    font-size: 0.9rem;
-  }
-
   .no-top-margin {
     margin-top: 0;
   }
@@ -25,34 +12,25 @@ body {
     margin-bottom: 0;
   }
 
-  .error-container {
-    margin-bottom: 1rem;
+  .panel-body {
+    overflow: auto;
   }
 
-  .top-bar-section ul.dropdown li.active:not(.has-form) a:not(.button):not(:hover) {
-    background-color: #008cba;
-  }
-
-  #definition {
-    font-family: 'consolas', monospace;
+  .operation-code {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     resize: vertical;
     height: 300px;
     min-height: 300px;
   }
 
   #command {
-    font-family: 'consolas', monospace;
-    font-size: 0.8rem;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   }
 
   #command-history {
-    font-family: 'consolas', monospace;
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     max-height: 250px;
     overflow: auto;
-
-    * {
-      font-size: 0.8rem;
-    }
 
     .command-active {
       font-weight: bold;
