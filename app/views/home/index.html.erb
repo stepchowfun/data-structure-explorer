@@ -62,38 +62,36 @@
               </select>
             </div>
 
+            <div class="form-group" data-ng-show="active_data_structure.model == models[0]">
+              <label>Node fields</label>
+              <ul data-ng-show="active_data_structure.fields.length > 0">
+                <li data-ng-repeat="field in active_data_structure.fields">
+                  <div class="dropdown">
+                    <a data-toggle="dropdown" href="#"><code>{{ field }}</code></a>
+                    <ul class="dropdown-menu">
+                      <li><a href="#" data-ng-click="moveFieldUp(active_data_structure, field); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
+                      <li><a href="#" data-ng-click="moveFieldDown(active_data_structure, field); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
+                      <li><a href="#" data-ng-click="deleteField(active_data_structure, field); $event.preventDefault();"><i class="fi-minus-circle"></i> Delete</a></li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
+              <form data-ng-submit="addField(active_data_structure); $event.preventDefault();">
+                <div class="form-group no-bottom-margin" data-ng-class="{ 'has-error': new_field_error }">
+                  <div class="input-group">
+                    <input type="text" class="form-control" data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" placeholder="e.g., left_child" />
+                    <span class="input-group-btn">
+                      <button type="submit" class="btn btn-default" data-ng-blur="clearAddFieldError()"><span class="glyphicon glyphicon-plus"></span> Add field</button>
+                    </span>
+                  </div>
+                  <p class="no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error }}</p>
+                </div>
+              </form>
+            </div>
+
             <p class="no-bottom-margin">
               <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#confirm-ds-delete-modal"><span class="glyphicon glyphicon-trash"></span> Delete data structure</a>
             </p>
-          </div>
-        </div>
-
-        <div class="panel panel-default" data-ng-show="active_data_structure.model == models[0]">
-          <div class="panel-heading">Node fields</div>
-          <div class="panel-body">
-            <ul data-ng-show="active_data_structure.fields.length > 0">
-              <li data-ng-repeat="field in active_data_structure.fields">
-                <div class="dropdown">
-                  <a data-toggle="dropdown" href="#"><code>{{ field }}</code></a>
-                  <ul class="dropdown-menu">
-                    <li><a href="#" data-ng-click="moveFieldUp(active_data_structure, field); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
-                    <li><a href="#" data-ng-click="moveFieldDown(active_data_structure, field); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                    <li><a href="#" data-ng-click="deleteField(active_data_structure, field); $event.preventDefault();"><i class="fi-minus-circle"></i> Delete</a></li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-            <form data-ng-submit="addField(active_data_structure); $event.preventDefault();">
-              <div class="form-group no-bottom-margin" data-ng-class="{ 'has-error': new_field_error }">
-                <div class="input-group">
-                  <input type="text" class="form-control" data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" placeholder="e.g., left_child" />
-                  <span class="input-group-btn">
-                    <button type="submit" class="btn btn-default" data-ng-blur="clearAddFieldError()"><span class="glyphicon glyphicon-plus"></span> Add field</button>
-                  </span>
-                </div>
-                <p class="no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error }}</p>
-              </div>
-            </form>
           </div>
         </div>
 
@@ -162,7 +160,18 @@
         <div class="panel panel-default">
           <div class="panel-heading">Basic properties</div>
           <div class="panel-body">
-            <p class="no-bottom-margin">Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
+            <p>Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
+
+            <div class="form-group" data-ng-show="active_data_structure.model == models[0]">
+              <label>Node fields</label>
+              <ul data-ng-show="active_data_structure.fields.length > 0">
+                <li data-ng-repeat="field in active_data_structure.fields">
+                  <div class="dropdown">
+                    <code>{{ field }}</code>
+                  </div>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
@@ -177,7 +186,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-6"> 
+      <div class="col-sm-6">
 
       </div>
       <div class="col-sm-3"> 
@@ -199,7 +208,7 @@
             <form data-ng-submit="newCommand(); $event.preventDefault();">
               <div class="form-group" data-ng-class="{ 'has-error': new_command_error }">
                 <div class="input-group">
-                  <input id="command" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5, 'foo')" />
+                  <input id="command" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5)" />
                   <span class="input-group-btn">
                     <button class="btn btn-default" type="submit" data-ng-blur="clearNewCommandError()">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
                   </span>
