@@ -1,6 +1,6 @@
-models = angular.module('models', [])
+models = angular.module('models', [ ])
 
-command_steps = []
+command_steps = [ ]
 current_state = null
 
 pointer_machine = {
@@ -65,7 +65,13 @@ pointer_machine = {
       step.up(current_state)
       command_steps.push(step)
 
-      opaque_node = {}
+      opaque_node = { }
+      Object.defineProperty(opaque_node, 'toJSON', {
+        value: () -> return node_name
+      })
+      Object.defineProperty(opaque_node, 'name', {
+        value: node_name
+      })
       for field in current_state.fields
         do (field) ->
           Object.defineProperty(opaque_node, field, {
@@ -96,16 +102,22 @@ pointer_machine = {
       return opaque_node
     ),
     delete_node: ((node) ->
-      if !current_state.nodes[node]?
+      if !current_state.nodes[node.name]?
         throw Error('Node ' + JSON.stringify(node) + ' does not exist.')
-      old_node = current_state.nodes[node]
+      for n in current_state.nodes
+        for f in current_state.fields
+          if n[f] == node and n != node
+            throw Error('Cannot delete node ' + JSON.stringify(node) + ' because node ' + JSON.stringify(n) + ' points to it.')
+      if current_state.root == node
+        throw Error('Cannot delete node ' + JSON.stringify(node) + ' because global.root points to it.')
+      old_node = current_state.nodes[node.name]
       step = {
         repr: 'delete_node(' + JSON.stringify(node) + ')',
         up: ((state) ->
-          state.nodes[node] = undefined
+          state.nodes[node.name] = undefined
         ),
         down: ((state) ->
-          state.nodes[node] = old_node
+          state.nodes[node.name] = old_node
         ),
       }
       step.up(current_state)
@@ -127,7 +139,7 @@ bst = {
 
 runCommand = (state, command, operations) ->
   current_state = state
-  command_steps = []
+  command_steps = [ ]
   try
     return_value = (() ->
       context = { }
