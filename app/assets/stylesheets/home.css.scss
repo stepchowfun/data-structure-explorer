@@ -18,6 +18,14 @@ body {
     margin-bottom: 0;
   }
 
+  .compile-success {
+    color: #5daa5e;
+  }
+
+  .compile-error {
+    color: #bd5755;
+  }
+
   .operation-code {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     resize: vertical;
