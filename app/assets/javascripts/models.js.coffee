@@ -129,15 +129,6 @@ models.factory('models', ['makeString', (makeString) ->
           undefined
         )
       }
-    },
-    {
-      constructor: (() ->),
-      name: 'Binary search tree',
-      getInitialState: (() ->
-        return { }
-      ),
-      api: {
-      }
     }
   ]
 ])
