@@ -128,8 +128,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
           name: operation.name,
           fn: ((window) ->
             `with (context) {
-              eval(operation.code)
-              return eval(operation.name)
+              eval(operation.code);
+              return eval(operation.name);
             }`
             undefined
           ).call({ }, { })

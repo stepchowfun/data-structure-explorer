@@ -141,13 +141,13 @@ runCommand = (state, command, operations) ->
   current_state = state
   command_steps = [ ]
   try
+    context = { }
+    for key, value of window
+      context[key] = undefined
+    context.command_steps = undefined
+    context.current_state = undefined
+    context.operations = undefined
     return_value = ((window) ->
-      context = { }
-      for key, value of window
-        context[key] = undefined
-      context.command_steps = undefined
-      context.current_state = undefined
-      context.operations = undefined
       for api_fn_name, api_fn of pointer_machine.api
         context[api_fn_name] = api_fn
       for operation in operations
