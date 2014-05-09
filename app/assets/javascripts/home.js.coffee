@@ -56,6 +56,20 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   # a helper that makes a string out of anything
   $scope.makeString = makeString
 
+  # a helper to scroll an item into view
+  scrollIntoView = (container, element) ->
+    original = $(container).scrollTop()
+    element.scrollIntoView(false)
+    bottom = $(container).scrollTop()
+    $(container).scrollTop(original)
+    element.scrollIntoView(true)
+    top = $(container).scrollTop()
+    if original < bottom
+      original = bottom
+    if original > top
+      original = top
+    $(container).scrollTop(original)
+
   # this updates a few DOM-related things
   $scope.$watch(debounce((() ->
     if loaded
@@ -383,7 +397,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
             elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
             if elements.length > 0
-              elements[0].scrollIntoView()
+              scrollIntoView($('#command-history')[0], elements[0])
         ), 1)
 
   $scope.stepForward = (scroll) ->
@@ -407,7 +421,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
             elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
             if elements.length > 0
-              elements[0].scrollIntoView()
+              scrollIntoView($('#command-history')[0], elements[0])
         ), 1)
 
   $scope.fastBackward = (scroll) ->
@@ -415,7 +429,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.stepBackward(false)
     if scroll
       setTimeout((() ->
-        $('#command-history').scrollTop(0)
+        scrollIntoView($('#command-history')[0], $('#empty')[0])
       ), 1)
 
   $scope.fastForward = (scroll) ->
@@ -426,7 +440,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         if $scope.command_history_cursor? and $scope.command_history_step_cursor?
           elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
           if elements.length > 0
-            elements[0].scrollIntoView()
+            scrollIntoView($('#command-history')[0], elements[0])
       ), 1)
 
   $scope.canStepBackward = () ->

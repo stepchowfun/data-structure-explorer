@@ -52,9 +52,9 @@ models.factory('models', ['makeString', (makeString) ->
               if key not in current_model_options.fields
                 throw Error('Unknown field: ' + key + '.')
               node[key] = value
-          node_name = '<n' + current_state.index.toString() + '>'
+          node_name = 'n' + current_state.index.toString()
           step = {
-            repr: 'make_node(' + makeString(data) + ')',
+            repr: node_name + ' = make_node(' + makeString(data) + ')',
             up: ((state) ->
               state.index += 1
               state.nodes[node_name] = node
