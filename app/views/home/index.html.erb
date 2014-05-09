@@ -161,8 +161,8 @@
           <div class="panel-body">
             <p>Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
 
-            <div class="form-group" data-ng-show="active_data_structure.model === models[0]">
-              <label>Node fields<span data-ng-show="active_data_structure.model_options.fields.length === 0">: None</span></label>
+            <div class="form-group no-bottom-margin" data-ng-show="active_data_structure.model === models[0]">
+              <label>Node fields<span data-ng-show="active_data_structure.model_options.fields.length === 0">: <a href="#" data-ng-click="active_page = 0; stopClick($event);">None</a></span></label>
               <ul data-ng-show="active_data_structure.model_options.fields.length > 0">
                 <li data-ng-repeat="field in active_data_structure.model_options.fields">
                   <div class="dropdown">
@@ -177,6 +177,7 @@
         <div class="panel panel-default">
           <div class="panel-heading">Operations</div>
           <div class="panel-body">
+            <p class="no-bottom-margin" data-ng-show="active_data_structure.operations.length === 0">Switch to the <a href="#" data-ng-click="active_page = 0; stopClick($event);">Edit</a> view and define some operations.</p>
             <ul class="no-bottom-margin" data-ng-show="active_data_structure.operations.length > 0">
               <li data-ng-repeat="operation in active_data_structure.operations">
                 <code>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
