@@ -141,9 +141,13 @@ runCommand = (state, command, operations) ->
   current_state = state
   command_steps = [ ]
   try
-    return_value = (() ->
+    return_value = ((window) ->
       context = { }
-      context.command_steps = undefined;
+      for key, value of window
+        context[key] = undefined
+      context.command_steps = undefined
+      context.current_state = undefined
+      context.operations = undefined
       for api_fn_name, api_fn of pointer_machine.api
         context[api_fn_name] = api_fn
       for operation in operations
@@ -152,7 +156,7 @@ runCommand = (state, command, operations) ->
         return eval(command);
       }`
       undefined
-    )()
+    ).call({ }, { })
     return {
       steps: command_steps,
       return_value: return_value,
