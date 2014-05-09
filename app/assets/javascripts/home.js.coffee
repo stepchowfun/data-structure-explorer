@@ -116,18 +116,23 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
   compileOperations = (operations, model) ->
     compiledOperations = [ ]
     context = { }
+    for key, value of window
+      context[key] = undefined
     for api_fn_name, api_fn of model.api
-      eval('var ' + api_fn_name + ' = api_fn;')
+      context[api_fn_name] = api_fn
     for operation in operations
       eval('var ' + operation.name + ' = undefined;')
     for operation in operations
       try
         compiledOperation = {
           name: operation.name,
-          fn: (() ->
-            eval(operation.code)
-            return eval(operation.name)
-          )()
+          fn: ((window) ->
+            `with (context) {
+              eval(operation.code)
+              return eval(operation.name)
+            }`
+            undefined
+          ).call({ }, { })
           error: null
         }
         if !compiledOperation.fn?
