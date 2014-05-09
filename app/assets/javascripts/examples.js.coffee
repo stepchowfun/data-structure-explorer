@@ -41,6 +41,12 @@ examples.factory('examples', ['models', ((models) ->
       ],
       model: models[1],
       model_options: { }
+    },
+    {
+      name: 'MonoCell',
+      operations: [ ],
+      model: models[0],
+      model_options: { fields: ['value'] }
     }
   ]
 )])
