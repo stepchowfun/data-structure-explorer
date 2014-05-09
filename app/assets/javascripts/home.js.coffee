@@ -456,6 +456,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         if history_cursor > 0
           history_cursor -= 1
           $scope.new_command_str = $scope.command_history[history_cursor].str
+          setTimeout((() ->
+              $('#command')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
+            ), 1)
+          event.preventDefault()
       else
         history_cursor = null
 
@@ -468,6 +472,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           history_cursor += 1
           if history_cursor < $scope.command_history.length
             $scope.new_command_str = $scope.command_history[history_cursor].str
+            setTimeout((() ->
+                $('#command')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
+              ), 1)
+            event.preventDefault()
           else
             $scope.new_command_str = ''
       else
