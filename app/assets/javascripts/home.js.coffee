@@ -300,13 +300,15 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   $scope.resetState = () ->
     if $scope.active_data_structure?
-      $scope.computationState = $scope.active_data_structure.model.getInitialState($scope.active_data_structure.model_options)
-      $scope.computationModel = $scope.active_data_structure.model
+      $scope.computation_state = $scope.active_data_structure.model.getInitialState($scope.active_data_structure.model_options)
+      $scope.computation_model = $scope.active_data_structure.model
+      $scope.computation_model_options = $scope.active_data_structure.model_options
       $scope.command_history = [ ]
     else
-      $scope.computationState = null
+      $scope.computation_state = null
       $scope.command_history = null
-      $scope.computationModel = null
+      $scope.computation_model = null
+      $scope.computation_model_options = null
     $scope.command_history_cursor = null
     $scope.command_history_step_cursor = null
     history_cursor = null
@@ -330,14 +332,19 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         $scope.new_command_error = operation.error.name + ' (' + operation.name + '): ' + operation.error.message
         return
 
-    if $scope.haveCommandHistory() and $scope.computationModel != $scope.active_data_structure.model
-      $scope.new_command_error = 'Reset the state or set the model of computation back to: ' + $scope.computationModel.name + '.'
-      return
     if !$scope.haveCommandHistory()
       $scope.resetState()
 
+    if $scope.computation_model != $scope.active_data_structure.model
+      $scope.new_command_error = 'Reset the state or set the model of computation back to: ' + $scope.computation_model.name + '.'
+      return
+
+    if !angular.equals($scope.computation_model_options, $scope.active_data_structure.model_options)
+      $scope.new_command_error = 'The basic properties of the data structure have changed. Reset the computation to continue.'
+      return
+
     $scope.fastForward(true)
-    result = runCommand($scope.computationState, $scope.new_command_str, $scope.active_data_structure.operations, $scope.active_data_structure.model.api)
+    result = runCommand($scope.computation_state, $scope.new_command_str, $scope.active_data_structure.operations, $scope.computation_model, $scope.computation_model_options)
     if result.error?
       $scope.new_command_error = result.error.name + ': ' + result.error.message
       return
@@ -370,7 +377,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           step_cursor = null
           break
         step_cursor = $scope.command_history[cursor].steps.length - 1
-      $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computationState)
+      $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computation_state)
       $scope.command_history_cursor = cursor
       $scope.command_history_step_cursor = step_cursor
       if scroll
@@ -396,7 +403,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           return
       $scope.command_history_cursor = cursor
       $scope.command_history_step_cursor = step_cursor
-      $scope.command_history[cursor].steps[step_cursor].up($scope.computationState)
+      $scope.command_history[cursor].steps[step_cursor].up($scope.computation_state)
       if scroll
         setTimeout((() ->
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
