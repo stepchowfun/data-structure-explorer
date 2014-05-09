@@ -156,9 +156,18 @@ models.factory('runCommand', ['sandbox', (sandbox) ->
     for operation in operations
       definitions[operation.name] = operation.compiled_value
     sandbox([fragment], definitions)
+    if fragment.error?
+      command_steps.reverse()
+      for command in command_steps
+        command.down(current_state)
+      return {
+        steps: null,
+        return_value: null,
+        error: fragment.error
+      }
     return {
       steps: command_steps,
       return_value: fragment.compiled_value,
-      error: fragment.error
+      error: null
     }
 ])
