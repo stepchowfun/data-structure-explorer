@@ -113,57 +113,12 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
         break
     return args
 
-  compileOperations = (operations, model) ->
-    compiledOperations = [ ]
-    context = { }
-    for key, value of window
-      context[key] = undefined
-    for api_fn_name, api_fn of model.api
-      context[api_fn_name] = api_fn
-    for operation in operations
-      eval('var ' + operation.name + ' = undefined;')
-    for operation in operations
-      try
-        compiledOperation = {
-          name: operation.name,
-          fn: ((window) ->
-            `with (context) {
-              eval(operation.code);
-              return eval(operation.name);
-            }`
-            undefined
-          ).call({ }, { })
-          error: null
-        }
-        if !compiledOperation.fn?
-          throw Error(operation.name + ' is not defined.')
-        else
-          eval(operation.name + ' = compiledOperation.fn;')
-      catch error
-        if error == null or typeof error != 'object'
-          error = {
-            name: 'Error',
-            message: 'Unexpected error: ' + JSON.stringify(error) + '.'
-          }
-        if !error.name?
-          error.name = 'Error'
-        if !error.message?
-          error.message = 'Unexpected error.'
-        compiledOperation = {
-          name: operation.name,
-          fn: null,
-          error: error
-        }
-      compiledOperations.push(compiledOperation)
-    return compiledOperations
-
   cleanDataStructure = (data_structure) ->
     for operation in data_structure.operations
       operation.arguments = get_arguments(operation.code, operation.name)
-    data_structure.compiledOperations = compileOperations(data_structure.operations, data_structure.model)
+    window.sandbox(data_structure.operations, data_structure.model.api)
 
   initializeDataStructure = (data_structure) ->
-    cleanDataStructure(data_structure)
     if !data_structure.model_options?
       data_structure.model_options = { }
     switch data_structure.model
@@ -172,6 +127,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
           data_structure.model_options.fields = [ ]
       when bst
         undefined
+    cleanDataStructure(data_structure)
 
   window.data_structures = $scope.data_structures
   for data_structure in data_structures
@@ -349,10 +305,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
       $scope.new_command_error = 'Please enter a command.'
       return
 
-    if !$scope.active_data_structure.compiledOperations?
-      $scope.new_command_error = 'Your code does not compile. Switch to the Edit view and fix it.'
-      return
-    for operation in $scope.active_data_structure.compiledOperations
+    for operation in $scope.active_data_structure.operations
       if operation.error?
         $scope.new_command_error = operation.error.name + ' (' + operation.name + '): ' + operation.error.message
         return
@@ -364,7 +317,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
       $scope.resetState()
 
     $scope.fastForward(true)
-    result = runCommand($scope.computationState, $scope.new_command_str, $scope.active_data_structure.compiledOperations)
+    result = runCommand($scope.computationState, $scope.new_command_str, $scope.active_data_structure.operations, $scope.active_data_structure.model.api)
     if result.error?
       $scope.new_command_error = result.error.name + ': ' + result.error.message
       return
