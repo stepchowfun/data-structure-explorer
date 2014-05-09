@@ -38,8 +38,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.data_structures = examples
 
   # other global application state
-  $scope.active_page = 1
-  $scope.active_data_structure = $scope.data_structures[2]
+  $scope.active_page = 0
+  $scope.active_data_structure = $scope.data_structures[0]
 
   # switch to the editor
   $scope.editDataStructure = (data_structure) ->
