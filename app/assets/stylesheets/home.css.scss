@@ -1,11 +1,12 @@
 body {
+  font-size: 1.6em !important;
+
   ul > li > ul.list-unstyled {
     padding-left: 40px;
   }
 
   .CodeMirror {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-    font-size: 1.1em;
     height: auto;
   }
 
