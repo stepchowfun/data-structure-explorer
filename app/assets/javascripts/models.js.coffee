@@ -52,7 +52,7 @@ models.factory('models', ['makeString', (makeString) ->
               if key not in current_model_options.fields
                 throw Error('Unknown field: ' + key + '.')
               node[key] = value
-          node_name = 'n' + current_state.index.toString()
+          node_name = '<n' + current_state.index.toString() + '>'
           step = {
             repr: 'make_node(' + makeString(data) + ')',
             up: ((state) ->
@@ -68,7 +68,7 @@ models.factory('models', ['makeString', (makeString) ->
           command_steps.push(step)
 
           opaque_node = { }
-          Object.defineProperty(opaque_node, 'toJSON', {
+          Object.defineProperty(opaque_node, 'toString', {
             value: () -> return node_name
           })
           Object.defineProperty(opaque_node, 'name', {
@@ -104,14 +104,16 @@ models.factory('models', ['makeString', (makeString) ->
           return opaque_node
         ),
         delete_node: ((node) ->
+          if !node? or !node.name?
+            throw Error(makeString(node) + ' is not a node.')
           if !current_state.nodes[node.name]?
             throw Error('Node ' + makeString(node) + ' does not exist.')
-          for n in current_state.nodes
+          for k, v of current_state.nodes
             for f in current_model_options.fields
-              if n[f] == node and n != node
-                throw Error('Cannot delete node ' + makeString(node) + ' because node ' + makeString(n) + ' points to it.')
+              if v? and v[f]? and v[f].name? and v[f].name == node.name
+                throw Error('Cannot delete node ' + node.name + ' because node ' + k + ' points to it.')
           if current_state.root == node
-            throw Error('Cannot delete node ' + makeString(node) + ' because global.root points to it.')
+            throw Error('Cannot delete node ' + node.name + ' because global.root points to it.')
           old_node = current_state.nodes[node.name]
           step = {
             repr: 'delete_node(' + makeString(node) + ')',

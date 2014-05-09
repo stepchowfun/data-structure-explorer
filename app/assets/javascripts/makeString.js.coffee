@@ -8,6 +8,10 @@ makeString.value('makeString', (value) ->
     if value in visited
       return '...'
     visited.push(value)
+    if value.hasOwnProperty('toString')
+      try
+        return value.toString()
+      catch
     if value instanceof Array
       return '[' + (makeStringRecursive(e, visited) for e in value).join(', ') + ']'
     return '{' + (makeStringRecursive(k, visited) + ': ' + makeStringRecursive(v, visited) for k, v of value).join(', ') + '}'
