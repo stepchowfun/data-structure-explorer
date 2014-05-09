@@ -45,6 +45,8 @@ sandbox.factory('sandbox', ['makeString', (makeString) ->
             fragment.error.name = 'Error'
           if !fragment.error.message?
             fragment.error.message = 'Unexpected error: ' + makeString(error) + '.'
+          if !fragment.error.stack?
+            fragment.error.stack = 'No stack trace.'
     undefined
   ))()
 ])

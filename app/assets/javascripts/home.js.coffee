@@ -20,7 +20,7 @@ $ ->
       $(textarea).change().trigger("input")
     )
     editor.on('blur', (args) ->
-      editor.setCursor({ line: 0, ch: 0 })
+      editor.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 0 }, { scroll: false })
     )
     codemirrors.push(editor)
   )
@@ -80,7 +80,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           $(textarea).change().trigger("input")
         )
         editor.on('blur', (args) ->
-          editor.setCursor({ line: 0, ch: 0 })
+          editor.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 0 }, { scroll: false })
         )
         codemirrors.push(editor)
       )
@@ -352,7 +352,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     $scope.fastForward(true)
     result = runCommand($scope.computation_state, $scope.new_command_str, $scope.active_data_structure.operations, $scope.computation_model, $scope.computation_model_options)
     if result.error?
-      $scope.new_command_error = result.error.name + ': ' + result.error.message
+      $scope.new_command_error = result.error
       return
     command = {
       str: $scope.new_command_str,
