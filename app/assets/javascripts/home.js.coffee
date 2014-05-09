@@ -1,4 +1,4 @@
-# tooltips and code editors
+# initialize the DOM
 
 loaded = false
 codemirrors = [ ]
@@ -22,39 +22,17 @@ $ ->
     codemirrors.push(editor)
   )
 
-onDomChange = () ->
-  if loaded
-    $('[data-toggle=tooltip]').tooltip('destroy').tooltip()
-    $('.replace-with-codemirror').each((index, element) ->
-      textarea = $(element).parent().find('textarea')
-      editor = CodeMirror(((e) ->
-        $(element).replaceWith(e)
-      ), {
-        tabSize: 2,
-        lineNumbers: true,
-        value: $(textarea).val()
-      })
-      editor.on('change', (args) ->
-        $(textarea).val(editor.getValue())
-        $(textarea).change().trigger("input")
-      )
-      codemirrors.push(editor)
-    )
-    for codemirror in codemirrors
-      codemirror.refresh()
-
 # application module
-cherries = angular.module('cherries', ['models', 'examples'])
+cherries = angular.module('cherries', ['models', 'examples', 'debounce', 'makeString', 'sandbox'])
 
 # application controller
-cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine', 'bst', 'runCommand', 'examples', ($scope, models, pointer_machine, bst, runCommand, examples) ->
+cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'examples', 'debounce', 'makeString', 'sandbox', ($scope, models, runCommand, examples, debounce, makeString, sandbox) ->
   ############################################################################
   # global
   ############################################################################
 
   # models of computation
   $scope.models = models
-  $scope.pointer_machine = pointer_machine
 
   # list of data structures
   $scope.data_structures = examples
@@ -67,13 +45,11 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
   $scope.editDataStructure = (data_structure) ->
     $scope.active_page = 0
     $scope.active_data_structure = data_structure
-    setTimeout(onDomChange, 1)
 
   # switch to the explorer
   $scope.exploreDataStructure = (data_structure) ->
     $scope.active_page = 1
     $scope.active_data_structure = data_structure
-    setTimeout(onDomChange, 1)
 
   # a helper to be called on click
   $scope.stopClick = (event) ->
@@ -83,9 +59,33 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
   # a helper that makes a string out of anything
   $scope.stringify = (value) ->
     try
-      return JSON.stringify(value)
+      return makeString(value)
     catch e
       return ''
+
+  # this updates a few DOM-related things
+  $scope.$watch(debounce((() ->
+    if loaded
+      $('[data-toggle=tooltip]').tooltip('destroy').tooltip()
+      $('.replace-with-codemirror').each((index, element) ->
+        textarea = $(element).parent().find('textarea')
+        editor = CodeMirror(((e) ->
+          $(element).replaceWith(e)
+        ), {
+          tabSize: 2,
+          lineNumbers: true,
+          value: $(textarea).val()
+        })
+        editor.on('change', (args) ->
+          $(textarea).val(editor.getValue())
+          $(textarea).change().trigger("input")
+        )
+        codemirrors.push(editor)
+      )
+      codemirrors = codemirrors.filter((e) -> jQuery.contains(document, e.getWrapperElement()))
+      for codemirror in codemirrors
+        codemirror.refresh()
+  ), 50), null, false)
 
   ############################################################################
   # editor
@@ -113,59 +113,81 @@ cherries.controller('CherriesController', ['$scope', 'models', 'pointer_machine'
         break
     return args
 
-  cleanDataStructure = (data_structure) ->
-    for operation in data_structure.operations
-      operation.arguments = get_arguments(operation.code, operation.name)
-    window.sandbox(data_structure.operations, data_structure.model.api)
-
   initializeDataStructure = (data_structure) ->
     if !data_structure.model_options?
       data_structure.model_options = { }
-    switch data_structure.model
-      when pointer_machine
+    switch data_structure.model.name
+      when models[0]
         if !data_structure.model_options.fields?
           data_structure.model_options.fields = [ ]
-      when bst
+      when models[1]
         undefined
-    cleanDataStructure(data_structure)
+    for operation in data_structure.operations
+      operation.arguments = get_arguments(operation.code, operation.name)
+    data_structure.startUpdate = debounce () ->
+      $scope.$apply ($scope) ->
+        sandbox(data_structure.operations, data_structure.model.api)
+        for operation in data_structure.operations
+          operation.arguments = get_arguments(operation.code, operation.name)
 
-  window.data_structures = $scope.data_structures
-  for data_structure in data_structures
+  for data_structure in $scope.data_structures
     initializeDataStructure(data_structure)
 
-  $scope.$watch('data_structures', (() ->
-    for data_structure in data_structures
-      cleanDataStructure(data_structure)
-    setTimeout(onDomChange, 1)
-  ), true)
+  unregisterList = []
+  watchDataStructures = () ->
+    if unregisterList.length > $scope.data_structures.length
+      i = $scope.data_structures.length
+      while i < unregisterList.length
+        unregisterList[i]()
+        i += 1
+      unregisterList.splice($scope.data_structures.length, unregisterList.length - $scope.data_structures.length)
+    if unregisterList.length < $scope.data_structures.length
+      i = unregisterList.length
+      while i < $scope.data_structures.length
+        do (i) ->
+          unregisterList.push($scope.$watch((($scope) ->
+            return [
+              $scope.data_structures[i].model,
+              [
+                op.name,
+                op.code
+              ] for op in $scope.data_structures[i].operations
+            ]
+          ), (() ->
+            $scope.data_structures[i].startUpdate()
+          ), true))
+        i += 1
+  watchDataStructures()
 
   # data structures
 
   $scope.newDataStructure = () ->
     data_structure = {
       name: '',
-      fields: [ ],
       operations: [ ],
-      model: pointer_machine
+      model: models[0],
+      model_options: { }
     }
     initializeDataStructure(data_structure)
     $scope.data_structures.push(data_structure)
     $scope.editDataStructure(data_structure)
+    watchDataStructures()
 
   $scope.deleteDataStructure = (data_structure) ->
     index = null
-    for ds, i in data_structures
+    for ds, i in $scope.data_structures
       if ds == data_structure
         index = i
         break
     if index?
       if active_data_structure == data_structure
         active_data_structure = null
-      data_structures.splice(index, 1)
-      if data_structures.length == 0
+      $scope.data_structures.splice(index, 1)
+      if $scope.data_structures.length == 0
         $scope.editDataStructure(null)
       else
-        $scope.editDataStructure(data_structures[0])
+        $scope.editDataStructure($scope.data_structures[0])
+      watchDataStructures()
 
   # fields
 
