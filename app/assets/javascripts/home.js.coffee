@@ -264,7 +264,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.new_operation_error = 'Already exists.'
       return
     if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_operation_name))
-      $scope.new_operation_error = 'Invalid name.'
+      if '(' in $scope.new_operation_name
+        $scope.new_operation_error = 'Invalid name. Note: Do not include the argument list. It will be detected automatically.'
+      else
+        $scope.new_operation_error = 'Invalid name.'
       return
     data_structure.operations.push({
       name: $scope.new_operation_name,
