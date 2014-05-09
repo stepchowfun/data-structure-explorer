@@ -20,7 +20,7 @@ pointer_machine = {
       Object.defineProperty(global, 'root', {
         enumerable: true,
         get: (() ->
-          if current_state? and current_state.root?
+          if current_state?
             return current_state.root
         ),
         set: ((root) ->
