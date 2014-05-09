@@ -179,6 +179,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     initializeDataStructure(data_structure)
     $scope.data_structures.push(data_structure)
     $scope.activateDataStructure(data_structure)
+    $scope.active_page = 0
     watchDataStructures()
 
   $scope.deleteDataStructure = (data_structure) ->

@@ -151,7 +151,7 @@
                 </li>
                 <li>
                   <p class="no-bottom-margin"><code>global.root</code></p>
-                  <p>The global entry point into the data structure. This pointer may be written to and read from.</p>
+                  <p class="no-bottom-margin">The global entry point into the data structure. This pointer may be written to and read from.</p>
                 </li>
               </ul>
             </div>
@@ -200,7 +200,8 @@
             <p>Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
 
             <div class="well" data-ng-show="active_data_structure.model === models[0]">
-              <label>Node fields<span data-ng-show="active_data_structure.model_options.fields.length === 0">: <a href="#" data-ng-click="active_page = 0; stopClick($event);">None</a></span></label>
+              <label data-ng-show="active_data_structure.model_options.fields.length === 0" class="no-bottom-margin">Node fields: <a href="#" data-ng-click="active_page = 0; stopClick($event);">None</a></label>
+              <label data-ng-show="active_data_structure.model_options.fields.length > 0">Node fields</label>
               <ul class="no-bottom-margin" data-ng-show="active_data_structure.model_options.fields.length > 0">
                 <li data-ng-repeat="field in active_data_structure.model_options.fields">
                   <div class="dropdown">
