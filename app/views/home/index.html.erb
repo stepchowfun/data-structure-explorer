@@ -190,7 +190,7 @@
         </div>
       </div>
       <div class="col-sm-6">
-
+        <code>{{ makeString(computationState.root) }}</code>
       </div>
       <div class="col-sm-3"> 
         <div class="panel panel-default">
@@ -204,7 +204,7 @@
                   <li data-ng-repeat="step in command.steps" id="step-{{ $parent.$index }}-{{ $index }}" data-ng-class="{ 'command-step-active': $parent.$index === command_history_cursor && $index === command_history_step_cursor }">{{ step.repr }}</li>
                 </ul>
                 <ul class="list-unstyled" data-ng-hide="command.return_value === undefined">
-                  <li class="return-value">{{ stringify(command.return_value) }}</li>
+                  <li class="return-value">{{ makeString(command.return_value) }}</li>
                 </ul>
               </li>
             </ul>
@@ -212,7 +212,7 @@
             <form data-ng-submit="newCommand(); $event.preventDefault();">
               <div class="form-group" data-ng-class="{ 'has-error': new_command_error }">
                 <div class="input-group">
-                  <input id="command" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5)" />
+                  <input id="command" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5)" />
                   <span class="input-group-btn">
                     <button class="btn btn-default" type="submit" data-ng-blur="clearNewCommandError()">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
                   </span>

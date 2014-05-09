@@ -57,11 +57,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     event.stopPropagation()
 
   # a helper that makes a string out of anything
-  $scope.stringify = (value) ->
-    try
-      return makeString(value)
-    catch e
-      return ''
+  $scope.makeString = makeString
 
   # this updates a few DOM-related things
   $scope.$watch(debounce((() ->
@@ -300,6 +296,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   $scope.new_command_str = null
   $scope.new_command_error = null
+  history_cursor = null
 
   $scope.resetState = () ->
     if $scope.active_data_structure?
@@ -312,6 +309,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.computationModel = null
     $scope.command_history_cursor = null
     $scope.command_history_step_cursor = null
+    history_cursor = null
 
   $scope.resetState()
 
@@ -447,5 +445,31 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           return false
       return true
     return false
+
+  $scope.commandKeyDown = (event) ->
+    # up
+    if event.keyCode == 38
+      if $scope.haveCommandHistory()
+        if history_cursor == null
+          history_cursor = $scope.command_history.length
+        if history_cursor > 0
+          history_cursor -= 1
+          $scope.new_command_str = $scope.command_history[history_cursor].str
+      else
+        history_cursor = null
+
+    # down
+    if event.keyCode == 40
+      if $scope.haveCommandHistory()
+        if history_cursor == null
+          history_cursor = $scope.command_history.length
+        if history_cursor < $scope.command_history.length
+          history_cursor += 1
+          if history_cursor < $scope.command_history.length
+            $scope.new_command_str = $scope.command_history[history_cursor].str
+          else
+            $scope.new_command_str = ''
+      else
+        history_cursor = null
 
 ])
