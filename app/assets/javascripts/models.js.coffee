@@ -2,15 +2,15 @@ models = angular.module('models', [ ])
 
 command_steps = [ ]
 current_state = null
+current_model_options = null
 
 models.factory('models', ['makeString', (makeString) ->
   return [
     {
       constructor: (() ->),
       name: 'Pointer machine',
-      getInitialState: ((options) ->
+      getInitialState: (() ->
         return {
-          fields: options.fields,
           root: null,
           nodes: { },
           index: 0
@@ -45,11 +45,11 @@ models.factory('models', ['makeString', (makeString) ->
         )(),
         make_node: ((data) ->
           node = { }
-          for field in current_state.fields
+          for field in current_model_options.fields
             node[field] = null
           if data?
             for key, value of data
-              if key not in current_state.fields
+              if key not in current_model_options.fields
                 throw Error('Unknown field: ' + key + '.')
               node[key] = value
           node_name = 'n' + current_state.index.toString()
@@ -74,7 +74,7 @@ models.factory('models', ['makeString', (makeString) ->
           Object.defineProperty(opaque_node, 'name', {
             value: node_name
           })
-          for field in current_state.fields
+          for field in current_model_options.fields
             do (field) ->
               Object.defineProperty(opaque_node, field, {
                 enumerable: true,
@@ -107,7 +107,7 @@ models.factory('models', ['makeString', (makeString) ->
           if !current_state.nodes[node.name]?
             throw Error('Node ' + makeString(node) + ' does not exist.')
           for n in current_state.nodes
-            for f in current_state.fields
+            for f in current_model_options.fields
               if n[f] == node and n != node
                 throw Error('Cannot delete node ' + makeString(node) + ' because node ' + makeString(n) + ' points to it.')
           if current_state.root == node
@@ -131,7 +131,7 @@ models.factory('models', ['makeString', (makeString) ->
     {
       constructor: (() ->),
       name: 'Binary search tree',
-      getInitialState: ((options) ->
+      getInitialState: (() ->
         return { }
       ),
       api: {
@@ -141,14 +141,15 @@ models.factory('models', ['makeString', (makeString) ->
 ])
 
 models.factory('runCommand', ['sandbox', (sandbox) ->
-  return (state, command, operations, api) ->
+  return (state, command, operations, model, model_options) ->
     command_steps = [ ]
     current_state = state
+    current_model_options = model_options
     fragment = {
       code: command
     }
     definitions = { }
-    for name, fn of api
+    for name, fn of model.api
       definitions[name] = fn
     for operation in operations
       definitions[operation.name] = operation.compiled_value
