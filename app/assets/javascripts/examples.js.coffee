@@ -1,6 +1,6 @@
 examples = angular.module('examples', ['models'])
 
-examples.factory('examples', ['models', 'pointer_machine', 'bst', ((models, pointer_machine, bst) ->
+examples.factory('examples', ['models', ((models) ->
   return [
     {
       name: 'Binary search tree',
@@ -18,7 +18,7 @@ examples.factory('examples', ['models', 'pointer_machine', 'bst', ((models, poin
           code: 'function contains(value, subtree) {\n  if (global.root === null) {\n    return false;\n  }\n  if (subtree === undefined) {\n    subtree = global.root;\n  }\n  if (subtree === null) {\n    return false;\n  }\n  if (value < subtree.value) {\n    return contains(value, subtree.left_child);\n  } else if (value > subtree.value) {\n    return contains(value, subtree.right_child);\n  } else {\n    return true;\n  }\n}'
         }
       ],
-      model: pointer_machine,
+      model: models[0],
       model_options: {
         fields: ['value', 'left_child', 'right_child']
       }
@@ -39,7 +39,7 @@ examples.factory('examples', ['models', 'pointer_machine', 'bst', ((models, poin
           code: 'function contains(value, subtree) {\n\n}'
         }
       ],
-      model: bst,
+      model: models[1],
       model_options: { }
     }
   ]
