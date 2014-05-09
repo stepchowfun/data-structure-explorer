@@ -44,14 +44,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
 
-  # switch to the editor
-  $scope.editDataStructure = (data_structure) ->
-    $scope.active_page = 0
-    $scope.active_data_structure = data_structure
-
-  # switch to the explorer
-  $scope.exploreDataStructure = (data_structure) ->
-    $scope.active_page = 1
+  # switch to a data structure
+  $scope.activateDataStructure = (data_structure) ->
     $scope.active_data_structure = data_structure
 
   # a helper to be called on click

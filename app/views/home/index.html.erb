@@ -10,20 +10,18 @@
     </div>
     <div class="collapse navbar-collapse" id="navbar-contents">
       <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown" data-ng-class="{ active: active_page === 0 }">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-edit"></span> Edit <b class="caret"></b></a>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span data-ng-show="active_data_structure">{{ active_data_structure.name || 'Untitled' }}</span><span data-ng-hide="active_data_structure">Data structures</span> <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page === 0 && active_data_structure === data_structure }"><a href="#" data-ng-click="editDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
-            <li class="divider"></li>
+            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_data_structure === data_structure }">
+              <a href="#" data-ng-click="activateDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a>
+            </li>
+            <li class="divider" data-ng-show="data_structures.length > 0"></li>
             <li><a href="#" data-ng-click="newDataStructure(); $event.preventDefault();"><span class="glyphicon glyphicon-plus"></span> New data structure</a></li>
           </ul>
         </li>
-        <li class="dropdown" data-ng-class="{ active: active_page === 1 }">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-globe"></span> Explore <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page === 1 && active_data_structure === data_structure }"><a href="#" data-ng-click="exploreDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
-          </ul>
-        </li>
+        <li data-ng-class="{ active: active_page === 0 }"><a href="#" data-ng-click="active_page = 0; $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
+        <li data-ng-class="{ active: active_page === 1 }"><a href="#" data-ng-click="active_page = 1; $event.preventDefault();"><span class="glyphicon glyphicon-globe"></span> Explore</a></li>
       </ul>
     </div>
   </div>
