@@ -143,7 +143,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         do (i) ->
           unregisterList.push($scope.$watch((($scope) ->
             return [
-              $scope.data_structures[i].model,
+              $scope.data_structures[i].model.name
               [
                 op.name,
                 op.code
