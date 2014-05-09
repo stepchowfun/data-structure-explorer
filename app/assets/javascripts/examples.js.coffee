@@ -7,7 +7,7 @@ examples.factory('examples', ['models', 'pointer_machine', 'bst', ((models, poin
       operations: [
         {
           name: 'insert',
-          code: 'function insert(value, subtree) {\n  if (global.root == null) {\n    global.root = make_node({ value: value });\n  } else {\n    if (subtree == undefined) {\n      subtree = global.root;\n    }\n    if (value < subtree.value) {\n      if (subtree.left_child == null) {\n        subtree.left_child = make_node({ value: value });\n      } else {\n        insert(value, subtree.left_child);\n      }\n    }\n    else if (value > subtree.value) {\n      if (subtree.right_child == null) {\n        subtree.right_child = make_node({ value: value });\n      } else {\n        insert(value, subtree.right_child);\n      }\n    } else {\n      throw Error("Value already exists: " + JSON.stringify(value) + ".");\n    }\n  }\n}'
+          code: 'function insert(value, subtree) {\n  if (global.root === null) {\n    global.root = make_node({ value: value });\n  } else {\n    if (subtree === undefined) {\n      subtree = global.root;\n    }\n    if (value < subtree.value) {\n      if (subtree.left_child === null) {\n        subtree.left_child = make_node({ value: value });\n      } else {\n        insert(value, subtree.left_child);\n      }\n    }\n    else if (value > subtree.value) {\n      if (subtree.right_child === null) {\n        subtree.right_child = make_node({ value: value });\n      } else {\n        insert(value, subtree.right_child);\n      }\n    } else {\n      throw Error("Value already exists: " + String(value) + ".");\n    }\n  }\n}'
         },
         {
           name: 'remove',

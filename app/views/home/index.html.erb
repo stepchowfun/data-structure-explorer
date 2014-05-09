@@ -10,18 +10,18 @@
     </div>
     <div class="collapse navbar-collapse" id="navbar-contents">
       <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown" data-ng-class="{ active: active_page == 0 }">
+        <li class="dropdown" data-ng-class="{ active: active_page === 0 }">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-edit"></span> Edit <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page == 0 && active_data_structure == data_structure }"><a href="#" data-ng-click="editDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
+            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page === 0 && active_data_structure === data_structure }"><a href="#" data-ng-click="editDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
             <li class="divider"></li>
             <li><a href="#" data-ng-click="newDataStructure(); $event.preventDefault();"><span class="glyphicon glyphicon-plus"></span> New data structure</a></li>
           </ul>
         </li>
-        <li class="dropdown" data-ng-class="{ active: active_page == 1 }">
+        <li class="dropdown" data-ng-class="{ active: active_page === 1 }">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-globe"></span> Explore <b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page == 1 && active_data_structure == data_structure }"><a href="#" data-ng-click="exploreDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
+            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page === 1 && active_data_structure === data_structure }"><a href="#" data-ng-click="exploreDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
           </ul>
         </li>
       </ul>
@@ -29,7 +29,7 @@
   </div>
 </nav>
 
-<div class="container-fluid" data-ng-show="active_page == 0">
+<div class="container-fluid" data-ng-show="active_page === 0">
   <div data-ng-hide="active_data_structure">
     <div class="row">
       <div class="col-sm-12">
@@ -42,7 +42,7 @@
   <div data-ng-show="active_data_structure">
     <div class="row">
       <div class="col-sm-12">
-        <h2>Edit: {{ active_data_structure.name || 'Untitled' }}</h2>
+        <h2>{{ active_data_structure.name || 'Untitled' }}</h2>
         <hr />
       </div>
     </div>
@@ -62,7 +62,7 @@
               </select>
             </div>
 
-            <div class="form-group" data-ng-show="active_data_structure.model == pointer_machine">
+            <div class="form-group" data-ng-show="active_data_structure.model === pointer_machine">
               <label>Node fields</label>
               <ul data-ng-show="active_data_structure.model_options.fields.length > 0">
                 <li data-ng-repeat="field in active_data_structure.model_options.fields">
@@ -101,7 +101,7 @@
             <ul data-ng-show="active_data_structure.operations.length > 0">
               <li data-ng-repeat="operation in active_data_structure.operations">
                 <div class="dropdown">
-                  <a data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments == null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
+                  <a data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
                   <span class="compile-success" data-ng-hide="active_data_structure.compiledOperations[$index].error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
                   <span class="compile-error" data-ng-show="active_data_structure.compiledOperations[$index].error" data-toggle="tooltip" data-placement="right" title="{{ active_data_structure.compiledOperations[$index].error.name + ': ' + active_data_structure.compiledOperations[$index].error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
                   <ul class="dropdown-menu">
@@ -129,7 +129,7 @@
       <div class="col-sm-8">
         <div data-ng-repeat="operation in active_data_structure.operations">
           <div class="form-group">
-            <label for="ds-code-{{ operation.name }}"><code>{{ operation.name }}(<span data-ng-show="operation.arguments == null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></label>
+            <label for="ds-code-{{ operation.name }}"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></label>
             <div class="replace-with-codemirror"></div>
             <textarea id="ds-code-{{ operation.name }}" class="hidden" data-ng-model="operation.code"></textarea>
           </div>
@@ -139,7 +139,7 @@
   </div>
 </div>
 
-<div class="container-fluid" data-ng-show="active_page == 1">
+<div class="container-fluid" data-ng-show="active_page === 1">
   <div data-ng-hide="active_data_structure">
     <div class="row">
       <div class="col-sm-12">
@@ -152,7 +152,7 @@
   <div data-ng-show="active_data_structure">
     <div class="row">
       <div class="col-sm-12">
-        <h2>Explore: {{ active_data_structure.name || 'Untitled' }}</h2>
+        <h2>{{ active_data_structure.name || 'Untitled' }}</h2>
         <hr />
       </div>
     </div>
@@ -163,8 +163,8 @@
           <div class="panel-body">
             <p>Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
 
-            <div class="form-group" data-ng-show="active_data_structure.model == pointer_machine">
-              <label>Node fields<span data-ng-show="active_data_structure.model_options.fields.length == 0">: None</span></label>
+            <div class="form-group" data-ng-show="active_data_structure.model === pointer_machine">
+              <label>Node fields<span data-ng-show="active_data_structure.model_options.fields.length === 0">: None</span></label>
               <ul data-ng-show="active_data_structure.model_options.fields.length > 0">
                 <li data-ng-repeat="field in active_data_structure.model_options.fields">
                   <div class="dropdown">
@@ -195,13 +195,13 @@
           <div class="panel-heading">Command history</div>
           <div class="panel-body">
             <ul id="command-history" class="list-unstyled" data-ng-show="command_history.length > 0">
-              <li class="command" data-ng-show="haveCommandHistory()" data-ng-class="{ 'command-active': command_history_cursor == null }">empty</li>
+              <li class="command" data-ng-show="haveCommandHistory()" data-ng-class="{ 'command-active': command_history_cursor === null }">empty</li>
               <li class="command" data-ng-repeat="command in command_history">
-                <span data-ng-class="{ 'command-active': $index == command_history_cursor }">{{ command.str }}</span>
+                <span data-ng-class="{ 'command-active': $index === command_history_cursor }">{{ command.str }}</span>
                 <ul>
-                  <li data-ng-repeat="step in command.steps" id="step-{{ $parent.$index }}-{{ $index }}" data-ng-class="{ 'command-step-active': $parent.$index == command_history_cursor && $index == command_history_step_cursor }">{{ step.repr }}</li>
+                  <li data-ng-repeat="step in command.steps" id="step-{{ $parent.$index }}-{{ $index }}" data-ng-class="{ 'command-step-active': $parent.$index === command_history_cursor && $index === command_history_step_cursor }">{{ step.repr }}</li>
                 </ul>
-                <ul class="list-unstyled" data-ng-show="command.return_value">
+                <ul class="list-unstyled" data-ng-hide="command.return_value === undefined">
                   <li class="return-value">{{ stringify(command.return_value) }}</li>
                 </ul>
               </li>
