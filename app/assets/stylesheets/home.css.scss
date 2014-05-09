@@ -52,7 +52,8 @@ body {
 
   #command-history {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-    max-height: 300px;
+    font-size: 0.93em;
+    max-height: 400px;
     overflow: auto;
 
     .command-active {
