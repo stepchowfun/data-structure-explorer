@@ -102,8 +102,8 @@
               <li data-ng-repeat="operation in active_data_structure.operations">
                 <div class="dropdown">
                   <a data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
-                  <span class="compile-success" data-ng-hide="active_data_structure.compiledOperations[$index].error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
-                  <span class="compile-error" data-ng-show="active_data_structure.compiledOperations[$index].error" data-toggle="tooltip" data-placement="right" title="{{ active_data_structure.compiledOperations[$index].error.name + ': ' + active_data_structure.compiledOperations[$index].error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
+                  <span class="compile-success" data-ng-hide="active_data_structure.operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
+                  <span class="compile-error" data-ng-show="active_data_structure.operation.error" data-toggle="tooltip" data-placement="right" title="{{ active_data_structure.operation.error.name + ': ' + active_data_structure.operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
                   <ul class="dropdown-menu">
                     <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                     <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>

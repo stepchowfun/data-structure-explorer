@@ -137,50 +137,23 @@ bst = {
   }
 }
 
-runCommand = (state, command, operations) ->
-  current_state = state
+runCommand = (state, command, operations, api) ->
   command_steps = [ ]
-  try
-    context = { }
-    for key, value of window
-      context[key] = undefined
-    context.command_steps = undefined
-    context.current_state = undefined
-    context.operations = undefined
-    return_value = ((window) ->
-      for api_fn_name, api_fn of pointer_machine.api
-        context[api_fn_name] = api_fn
-      for operation in operations
-        context[operation.name] = operation.fn
-      `with (context) {
-        return eval(command);
-      }`
-      undefined
-    ).call({ }, { })
-    return {
-      steps: command_steps,
-      return_value: return_value,
-      error: null
-    }
-  catch error
-    if error == null or typeof error != 'object'
-      error = {
-        name: 'Error',
-        message: 'Unexpected error: ' + JSON.stringify(error) + '.'
-      }
-    if !error.name?
-      error.name = 'Error'
-    if !error.message?
-      error.message = 'Unexpected error.'
-    command_steps.reverse()
-    for command in command_steps
-      command.down(current_state)
-    return {
-      steps: null,
-      return_value: null,
-      error: error
-    }
-  undefined
+  current_state = state
+  fragment = {
+    code: command
+  }
+  definitions = { }
+  for name, fn of api
+    definitions[name] = fn
+  for operation in operations
+    definitions[operation.name] = operation.compiled_value
+  window.sandbox([fragment], definitions)
+  return {
+    steps: command_steps,
+    return_value: fragment.compiled_value,
+    error: fragment.error
+  }
 
 models.value('pointer_machine', pointer_machine)
 models.value('bst', bst)
