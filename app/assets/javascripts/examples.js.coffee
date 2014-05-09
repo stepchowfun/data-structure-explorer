@@ -22,31 +22,6 @@ examples.factory('examples', ['models', ((models) ->
       model_options: {
         fields: ['value', 'parent', 'left_child', 'right_child']
       }
-    },
-    {
-      name: 'Splay tree',
-      operations: [
-        {
-          name: 'insert',
-          code: 'function insert(value, subtree) {\n\n}'
-        },
-        {
-          name: 'remove',
-          code: 'function remove(value, subtree) {\n\n}'
-        },
-        {
-          name: 'contains',
-          code: 'function contains(value, subtree) {\n\n}'
-        }
-      ],
-      model: models[1],
-      model_options: { }
-    },
-    {
-      name: 'MonoCell',
-      operations: [ ],
-      model: models[0],
-      model_options: { fields: ['value'] }
     }
   ]
 )])

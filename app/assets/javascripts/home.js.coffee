@@ -116,8 +116,6 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       when models[0]
         if !data_structure.model_options.fields?
           data_structure.model_options.fields = [ ]
-      when models[1]
-        undefined
     for operation in data_structure.operations
       operation.arguments = get_arguments(operation.code, operation.name)
     data_structure.startUpdate = debounce () ->
@@ -166,7 +164,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     }
     initializeDataStructure(data_structure)
     $scope.data_structures.push(data_structure)
-    $scope.editDataStructure(data_structure)
+    $scope.activateDataStructure(data_structure)
     watchDataStructures()
 
   $scope.deleteDataStructure = (data_structure) ->
@@ -180,9 +178,9 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         active_data_structure = null
       $scope.data_structures.splice(index, 1)
       if $scope.data_structures.length == 0
-        $scope.editDataStructure(null)
+        $scope.activateDataStructure(null)
       else
-        $scope.editDataStructure($scope.data_structures[0])
+        $scope.activateDataStructure($scope.data_structures[0])
       watchDataStructures()
 
   # fields
