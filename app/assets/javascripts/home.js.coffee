@@ -19,6 +19,9 @@ $ ->
       $(textarea).val(editor.getValue())
       $(textarea).change().trigger("input")
     )
+    editor.on('blur', (args) ->
+      editor.setCursor({ line: 0, ch: 0 })
+    )
     codemirrors.push(editor)
   )
 
@@ -75,6 +78,9 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         editor.on('change', (args) ->
           $(textarea).val(editor.getValue())
           $(textarea).change().trigger("input")
+        )
+        editor.on('blur', (args) ->
+          editor.setCursor({ line: 0, ch: 0 })
         )
         codemirrors.push(editor)
       )
