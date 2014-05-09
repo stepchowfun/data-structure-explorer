@@ -112,7 +112,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   initializeDataStructure = (data_structure) ->
     if !data_structure.model_options?
       data_structure.model_options = { }
-    switch data_structure.model.name
+    switch data_structure.model
       when models[0]
         if !data_structure.model_options.fields?
           data_structure.model_options.fields = [ ]
