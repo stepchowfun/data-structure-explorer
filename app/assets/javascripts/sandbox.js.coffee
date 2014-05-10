@@ -30,9 +30,17 @@ sandbox.factory('sandbox', ['makeString', (makeString) ->
             }`
             undefined
         ).call({ }, { })
+<<<<<<< HEAD
         fragment.error = null
         if fragment.name?
           eval(fragment.name + ' = fragment.compiled_value;')
+=======
+        if fragment.name?
+          if fragment.compiled_value == undefined
+            throw Error('Undefined value: ' + fragment.name + '.')
+          eval(fragment.name + ' = fragment.compiled_value;')
+        fragment.error = null
+>>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
       catch error
         if error == null or typeof error != 'object'
           fragment.error = {

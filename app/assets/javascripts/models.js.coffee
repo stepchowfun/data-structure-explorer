@@ -52,9 +52,15 @@ models.factory('models', ['makeString', (makeString) ->
               if key not in current_model_options.fields
                 throw Error('Unknown field: ' + key + '.')
               node[key] = value
+<<<<<<< HEAD
           node_name = '<n' + current_state.index.toString() + '>'
           step = {
             repr: 'make_node(' + makeString(data) + ')',
+=======
+          node_name = 'n' + current_state.index.toString()
+          step = {
+            repr: node_name + ' = make_node(' + makeString(data) + ')',
+>>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
             up: ((state) ->
               state.index += 1
               state.nodes[node_name] = node
@@ -129,6 +135,7 @@ models.factory('models', ['makeString', (makeString) ->
           undefined
         )
       }
+<<<<<<< HEAD
     },
     {
       constructor: (() ->),
@@ -138,6 +145,8 @@ models.factory('models', ['makeString', (makeString) ->
       ),
       api: {
       }
+=======
+>>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
     }
   ]
 ])
