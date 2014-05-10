@@ -1,0 +1,66 @@
+body {
+  ul > li > ul.list-unstyled {
+    padding-left: 40px;
+  }
+
+  .CodeMirror {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-size: 1.1em;
+    height: auto;
+  }
+
+  .CodeMirror-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .return-value {
+    color: #31708f;
+  }
+
+  .form-control:focus {
+    -webkit-box-shadow: rgba(0, 0, 0, 0.0745098) 0px 2px 0px 0px inset !important;
+    box-shadow: rgba(0, 0, 0, 0.0745098) 0px 2px 0px 0px inset !important;
+    border-color: #ccc;
+  }
+
+  .no-top-margin {
+    margin-top: 0;
+  }
+
+  .no-bottom-margin {
+    margin-bottom: 0;
+  }
+
+  .no-vertical-margin {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .compile-success {
+    color: #5daa5e;
+  }
+
+  .compile-error {
+    color: #bd5755;
+  }
+
+  #command {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  }
+
+  #command-history {
+    font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+    max-height: 250px;
+    overflow: auto;
+
+    .command-active {
+      font-weight: bold;
+    }
+
+    .command-step-active {
+      font-weight: bold;
+      color: #090;
+    }
+  }
+}
