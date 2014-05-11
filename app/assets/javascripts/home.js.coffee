@@ -246,6 +246,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
             for data_structure in $scope.data_structures
               initializeDataStructure(data_structure)
             watchDataStructures()
+            $scope.resetState()
             $scope.message('Load successful', 'The data structures were loaded successfully.')
           )
         ), 1)
