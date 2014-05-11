@@ -73,7 +73,7 @@
                     <ul class="dropdown-menu">
                       <li><a href="#" data-ng-click="moveFieldUp(active_data_structure, field); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                       <li><a href="#" data-ng-click="moveFieldDown(active_data_structure, field); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                      <li><a href="#" data-ng-click="deleteField(active_data_structure, field); $event.preventDefault();"><i class="fi-minus-circle"></i> Delete</a></li>
+                      <li><a href="#" data-toggle="modal" data-target="#confirm-field-delete-modal" data-ng-click="prepareDeleteField(active_data_structure, field)"><i class="fi-minus-circle"></i> Delete</a></li>
                     </ul>
                   </div>
                 </li>
@@ -105,7 +105,7 @@
                     <ul class="dropdown-menu">
                       <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
                       <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                      <li><a href="#" data-ng-click="deleteOperation(active_data_structure, operation); $event.preventDefault();"><i class="fi-minus-circle"></i> Delete</a></li>
+                      <li><a href="#" data-toggle="modal" data-target="#confirm-operation-delete-modal" data-ng-click="prepareDeleteOperation(active_data_structure, operation)"><i class="fi-minus-circle"></i> Delete</a></li>
                     </ul>
                   </div>
                 </li>
@@ -124,7 +124,7 @@
             </div>
 
             <p class="no-bottom-margin">
-              <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#confirm-ds-delete-modal"><span class="glyphicon glyphicon-trash"></span> Delete data structure</a>
+              <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#confirm-ds-delete-modal" data-ng-click="data_structure_to_delete = active_data_structure"><span class="glyphicon glyphicon-trash"></span> Delete data structure</a>
             </p>
           </div>
         </div>
@@ -283,6 +283,42 @@
   </div>
 </div>
 
+<div id="confirm-field-delete-modal" class="modal fade">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Confirm delete</h4>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete <strong>{{ field_to_delete }}</strong>?
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-default" data-dismiss="modal">Close</a>
+        <a href="#" class="btn btn-danger" data-ng-click="deleteField(data_structure_to_delete, field_to_delete); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="confirm-operation-delete-modal" class="modal fade">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title">Confirm delete</h4>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete <strong>{{ operation_to_delete.name }}</strong>?
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-default" data-dismiss="modal">Close</a>
+        <a href="#" class="btn btn-danger" data-ng-click="deleteOperation(data_structure_to_delete, operation_to_delete); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="confirm-ds-delete-modal" class="modal fade">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
@@ -291,11 +327,11 @@
         <h4 class="modal-title">Confirm delete</h4>
       </div>
       <div class="modal-body">
-        Are you sure you want to delete <strong>{{ active_data_structure.name }}</strong>?
+        Are you sure you want to delete <strong>{{ data_structure_to_delete.name }}</strong>?
       </div>
       <div class="modal-footer">
         <a class="btn btn-default" data-dismiss="modal">Close</a>
-        <a href="#" class="btn btn-danger" data-ng-click="deleteDataStructure(active_data_structure); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+        <a href="#" class="btn btn-danger" data-ng-click="deleteDataStructure(data_structure_to_delete); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
       </div>
     </div>
   </div>

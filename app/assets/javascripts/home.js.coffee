@@ -43,6 +43,9 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   # other global application state
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
+  $scope.data_structure_to_delete = null
+  $scope.field_to_delete = null
+  $scope.operation = null
 
   # switch to a data structure
   $scope.activateDataStructure = (data_structure) ->
@@ -240,6 +243,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       data_structure.model_options.fields.splice(index, 1)
       data_structure.model_options.fields.splice(index + 1, 0, field)
 
+  $scope.prepareDeleteField = (data_structure, field) ->
+    $scope.data_structure_to_delete = data_structure
+    $scope.field_to_delete = field
+
   $scope.deleteField = (data_structure, field) ->
     index = null
     for name, i in data_structure.model_options.fields
@@ -296,6 +303,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     if index? and index < data_structure.operations.length - 1
       data_structure.operations.splice(index, 1)
       data_structure.operations.splice(index + 1, 0, operation)
+
+  $scope.prepareDeleteOperation = (data_structure, operation) ->
+    $scope.data_structure_to_delete = data_structure
+    $scope.operation_to_delete = operation
 
   $scope.deleteOperation = (data_structure, operation) ->
     index = null
