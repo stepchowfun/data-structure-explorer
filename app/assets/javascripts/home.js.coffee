@@ -43,7 +43,6 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   # other global application state
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
-  $scope.data_structure_to_delete = null
   $scope.field_to_delete = null
   $scope.operation = null
 
@@ -185,15 +184,14 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     $scope.active_page = 0
     watchDataStructures()
 
-  $scope.deleteDataStructure = (data_structure) ->
+  $scope.deleteDataStructure = () ->
     index = null
     for ds, i in $scope.data_structures
-      if ds == data_structure
+      if ds == $scope.active_data_structure
         index = i
         break
     if index?
-      if active_data_structure == data_structure
-        active_data_structure = null
+      $scope.active_data_structure = null
       $scope.data_structures.splice(index, 1)
       if $scope.data_structures.length == 0
         $scope.activateDataStructure(null)
@@ -209,52 +207,66 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.clearAddFieldError = () ->
     $scope.new_field_error = null
 
-  $scope.addField = (data_structure) ->
+  $scope.addField = () ->
     if !$scope.new_field_name? or $scope.new_field_name == ''
       $scope.new_field_error = Error('Please enter a name.')
       return
-    if $scope.new_field_name in data_structure.model_options.fields
+    if $scope.new_field_name in $scope.active_data_structure.model_options.fields
       $scope.new_field_error = Error('Already exists.')
       return
     if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_field_name))
       $scope.new_field_error = Error('Invalid name.')
       return
-    data_structure.model_options.fields.push($scope.new_field_name)
+    $scope.active_data_structure.model_options.fields.push($scope.new_field_name)
     $scope.new_field_name = ''
     $scope.clearAddFieldError()
 
-  $scope.moveFieldUp = (data_structure, field) ->
+  $scope.moveFieldUp = (field) ->
     index = null
-    for name, i in data_structure.model_options.fields
+    for name, i in $scope.active_data_structure.model_options.fields
       if name == field
         index = i
         break
     if index? and index > 0
-      data_structure.model_options.fields.splice(index, 1)
-      data_structure.model_options.fields.splice(index - 1, 0, field)
+      $scope.active_data_structure.model_options.fields.splice(index, 1)
+      $scope.active_data_structure.model_options.fields.splice(index - 1, 0, field)
 
-  $scope.moveFieldDown = (data_structure, field) ->
+  $scope.moveFieldDown = (field) ->
     index = null
-    for name, i in data_structure.model_options.fields
+    for name, i in $scope.active_data_structure.model_options.fields
       if name == field
         index = i
         break
-    if index? and index < data_structure.model_options.fields.length - 1
-      data_structure.model_options.fields.splice(index, 1)
-      data_structure.model_options.fields.splice(index + 1, 0, field)
+    if index? and index < $scope.active_data_structure.model_options.fields.length - 1
+      $scope.active_data_structure.model_options.fields.splice(index, 1)
+      $scope.active_data_structure.model_options.fields.splice(index + 1, 0, field)
 
-  $scope.prepareDeleteField = (data_structure, field) ->
-    $scope.data_structure_to_delete = data_structure
+  $scope.prepareRenameField = (field) ->
+    setTimeout((() ->
+      element = $('#new-field-name-' + field)
+      element.focus()
+      element[0].setSelectionRange(0, element.val().length)
+    ), 1)
+
+  $scope.renameField = (field, new_field_name) ->
+    if new_field_name == ''
+      return
+    for name, i in $scope.active_data_structure.model_options.fields
+      if name == field
+        $scope.active_data_structure.model_options.fields[i] = new_field_name
+        break
+
+  $scope.prepareDeleteField = (field) ->
     $scope.field_to_delete = field
 
-  $scope.deleteField = (data_structure, field) ->
+  $scope.deleteField = (field) ->
     index = null
-    for name, i in data_structure.model_options.fields
+    for name, i in $scope.active_data_structure.model_options.fields
       if name == field
         index = i
         break
     if index?
-      data_structure.model_options.fields.splice(index, 1)
+      $scope.active_data_structure.model_options.fields.splice(index, 1)
 
   # operations
 
@@ -304,18 +316,29 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       data_structure.operations.splice(index, 1)
       data_structure.operations.splice(index + 1, 0, operation)
 
-  $scope.prepareDeleteOperation = (data_structure, operation) ->
-    $scope.data_structure_to_delete = data_structure
+  $scope.prepareRenameOperation = (operation) ->
+    setTimeout((() ->
+      element = $('#new-operation-name-' + operation.name)
+      element.focus()
+      element[0].setSelectionRange(0, element.val().length)
+    ), 1)
+
+  $scope.renameOperation = (operation, new_operation_name) ->
+    if new_operation_name == ''
+      return
+    operation.name = new_operation_name
+
+  $scope.prepareDeleteOperation = (operation) ->
     $scope.operation_to_delete = operation
 
-  $scope.deleteOperation = (data_structure, operation) ->
+  $scope.deleteOperation = (operation) ->
     index = null
-    for op, i in data_structure.operations
+    for op, i in $scope.active_data_structure.operations
       if op.name == operation.name
         index = i
         break
     if index?
-      data_structure.operations.splice(index, 1)
+      $scope.active_data_structure.operations.splice(index, 1)
 
   ############################################################################
   # explorer
@@ -491,7 +514,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           history_cursor -= 1
           $scope.new_command_str = $scope.command_history[history_cursor].str
           setTimeout((() ->
-              $('#command')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
+              $('#new_command_str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
             ), 1)
           event.preventDefault()
       else
@@ -507,7 +530,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           if history_cursor < $scope.command_history.length
             $scope.new_command_str = $scope.command_history[history_cursor].str
             setTimeout((() ->
-                $('#command')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
+                $('#new_command_str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
               ), 1)
             event.preventDefault()
           else

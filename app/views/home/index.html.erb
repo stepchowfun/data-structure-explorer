@@ -67,18 +67,23 @@
             <div class="well" data-ng-show="active_data_structure.model === models[0]">
               <label>Node fields</label>
               <ul data-ng-show="active_data_structure.model_options.fields.length > 0">
-                <li data-ng-repeat="field in active_data_structure.model_options.fields">
+                <li data-ng-repeat="field in active_data_structure.model_options.fields" data-ng-init="rename = false">
                   <div class="dropdown">
-                    <a data-toggle="dropdown" href="#"><code>{{ field }}</code></a>
+                    <form data-ng-show="rename" data-ng-submit="renameField(field, new_field_name); rename = false; $event.preventDefault();">
+                      <input type="text" id="new-field-name-{{ field }}" class="form-control" style="display: inline-block; width: 40%;" data-ng-model="new_field_name" data-ng-blur="renameField(field, new_field_name); rename = false;" placeholder="e.g., left_child" />
+                      <input type="submit" class="hidden" />
+                    </form>
+                    <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ field }}</code></a>
                     <ul class="dropdown-menu">
-                      <li><a href="#" data-ng-click="moveFieldUp(active_data_structure, field); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
-                      <li><a href="#" data-ng-click="moveFieldDown(active_data_structure, field); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                      <li><a href="#" data-toggle="modal" data-target="#confirm-field-delete-modal" data-ng-click="prepareDeleteField(active_data_structure, field)"><i class="fi-minus-circle"></i> Delete</a></li>
+                      <li><a href="#" data-ng-click="moveFieldUp(field); $event.preventDefault();" data-ng-hide="$first"><span class="glyphicon glyphicon-arrow-up"></span> Move up</a></li>
+                      <li><a href="#" data-ng-click="moveFieldDown(field); $event.preventDefault();" data-ng-hide="$last"><span class="glyphicon glyphicon-arrow-down"></span> Move down</a></li>
+                      <li><a href="#" data-ng-click="rename = true; new_field_name = field; prepareRenameField(field); $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Rename</a></li>
+                      <li><a href="#" data-toggle="modal" data-target="#confirm-field-delete-modal" data-ng-click="prepareDeleteField(field)"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
                     </ul>
                   </div>
                 </li>
               </ul>
-              <form data-ng-submit="addField(active_data_structure); $event.preventDefault();">
+              <form data-ng-submit="addField(); $event.preventDefault();">
                 <div class="form-group no-bottom-margin" data-ng-class="{ 'has-error': new_field_error }">
                   <div class="input-group">
                     <input type="text" class="form-control" data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" placeholder="e.g., left_child" />
@@ -94,18 +99,23 @@
             <div class="well">
               <label>Operations</label>
               <ul data-ng-show="active_data_structure.operations.length > 0">
-                <li data-ng-repeat="operation in active_data_structure.operations">
+                <li data-ng-repeat="operation in active_data_structure.operations" data-ng-init="rename = false">
                   <div class="dropdown">
-                    <a data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
-                    <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
-                    <span data-ng-show="operation.error">
+                    <form data-ng-show="rename" data-ng-submit="renameOperation(operation, new_operation_name); rename = false; $event.preventDefault();">
+                      <input type="text" id="new-operation-name-{{ operation.name }}" class="form-control" style="display: inline-block; width: 40%;" data-ng-model="new_operation_name" data-ng-blur="renameOperation(operation, new_operation_name); rename = false;" placeholder="e.g., insert" />
+                      <input type="submit" class="hidden" />
+                    </form>
+                    <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
+                    <span class="compile-success" data-ng-hide="operation.error || rename" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
+                    <span data-ng-show="operation.error && !rename">
                       <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
                       <span class="compile-error" data-ng-hide="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
                     </span>
                     <ul class="dropdown-menu">
-                      <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
-                      <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                      <li><a href="#" data-toggle="modal" data-target="#confirm-operation-delete-modal" data-ng-click="prepareDeleteOperation(active_data_structure, operation)"><i class="fi-minus-circle"></i> Delete</a></li>
+                      <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><span class="glyphicon glyphicon-arrow-up"></span> Move up</a></li>
+                      <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><span class="glyphicon glyphicon-arrow-down"></span> Move down</a></li>
+                      <li><a href="#" data-ng-click="rename = true; new_operation_name = operation.name; prepareRenameOperation(operation); $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Rename</a></li>
+                      <li><a href="#" data-toggle="modal" data-target="#confirm-operation-delete-modal" data-ng-click="prepareDeleteOperation(operation)"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
                     </ul>
                   </div>
                 </li>
@@ -124,7 +134,7 @@
             </div>
 
             <p class="no-bottom-margin">
-              <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#confirm-ds-delete-modal" data-ng-click="data_structure_to_delete = active_data_structure"><span class="glyphicon glyphicon-trash"></span> Delete data structure</a>
+              <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#confirm-ds-delete-modal"><span class="glyphicon glyphicon-trash"></span> Delete data structure</a>
             </p>
           </div>
         </div>
@@ -257,7 +267,7 @@
             <form data-ng-submit="newCommand(); $event.preventDefault();">
               <div class="form-group" data-ng-class="{ 'has-error': new_command_error }">
                 <div class="input-group">
-                  <input id="command" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5)" />
+                  <input id="new_command_str" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5)" />
                   <span class="input-group-btn">
                     <button class="btn btn-default" type="submit" data-ng-blur="clearNewCommandError()">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
                   </span>
@@ -295,7 +305,7 @@
       </div>
       <div class="modal-footer">
         <a class="btn btn-default" data-dismiss="modal">Close</a>
-        <a href="#" class="btn btn-danger" data-ng-click="deleteField(data_structure_to_delete, field_to_delete); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+        <a href="#" class="btn btn-danger" data-ng-click="deleteField(field_to_delete); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
       </div>
     </div>
   </div>
@@ -313,7 +323,7 @@
       </div>
       <div class="modal-footer">
         <a class="btn btn-default" data-dismiss="modal">Close</a>
-        <a href="#" class="btn btn-danger" data-ng-click="deleteOperation(data_structure_to_delete, operation_to_delete); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+        <a href="#" class="btn btn-danger" data-ng-click="deleteOperation(operation_to_delete); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
       </div>
     </div>
   </div>
@@ -327,11 +337,11 @@
         <h4 class="modal-title">Confirm delete</h4>
       </div>
       <div class="modal-body">
-        Are you sure you want to delete <strong>{{ data_structure_to_delete.name }}</strong>?
+        Are you sure you want to delete <strong>{{ active_data_structure.name || 'Untitled' }}</strong>?
       </div>
       <div class="modal-footer">
         <a class="btn btn-default" data-dismiss="modal">Close</a>
-        <a href="#" class="btn btn-danger" data-ng-click="deleteDataStructure(data_structure_to_delete); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
+        <a href="#" class="btn btn-danger" data-ng-click="deleteDataStructure(); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
       </div>
     </div>
   </div>
