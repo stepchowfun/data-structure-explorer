@@ -200,7 +200,7 @@
             <p>Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
 
             <div class="well" data-ng-show="active_data_structure.model === models[0]">
-              <p class="no-bottom-margin" data-ng-show="active_data_structure.operations.length === 0">Switch to the <a href="#" data-ng-click="active_page = 0; stopClick($event);">Edit</a> view and define some node fields.</p>
+              <p class="no-bottom-margin" data-ng-show="active_data_structure.model_options.fields.length === 0">Switch to the <a href="#" data-ng-click="active_page = 0; stopClick($event);">Edit</a> view and define some node fields.</p>
               <label data-ng-show="active_data_structure.model_options.fields.length > 0">Node fields</label>
               <ul class="no-bottom-margin" data-ng-show="active_data_structure.model_options.fields.length > 0">
                 <li data-ng-repeat="field in active_data_structure.model_options.fields">
