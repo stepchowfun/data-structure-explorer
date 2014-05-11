@@ -142,7 +142,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     if !data_structure.model_options?
       data_structure.model_options = { }
     switch data_structure.model
-      when 0
+      when 'pointer_machine'
         if !data_structure.model_options.fields?
           data_structure.model_options.fields = [ ]
     for operation in data_structure.operations
@@ -188,7 +188,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     data_structure = {
       name: '',
       operations: [ ],
-      model: 0,
+      model: 'pointer_machine',
       model_options: { }
     }
     initializeDataStructure(data_structure)

@@ -5,10 +5,11 @@ current_state = null
 current_model_options = null
 
 models.factory('models', ['makeString', (makeString) ->
-  return [
+  machines_array = [
     {
       constructor: (() ->),
       name: 'Pointer machine',
+      machine_name: 'pointer_machine',
       getInitialState: (() ->
         return {
           root: null,
@@ -129,8 +130,12 @@ models.factory('models', ['makeString', (makeString) ->
           undefined
         )
       }
-    }
+    },
   ]
+  machines_object = { }
+  for machine in machines_array
+    machines_object[machine.machine_name] = machine
+  return machines_object
 ])
 
 models.factory('runCommand', ['sandbox', (sandbox) ->

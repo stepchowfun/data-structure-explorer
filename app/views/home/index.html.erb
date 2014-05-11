@@ -61,12 +61,12 @@
               <div class="form-group">
                 <label for="ds-model" class="col-sm-3 control-label">Model</label>
                 <div class="col-sm-9">
-                  <select class="form-control" id="ds-model" data-ng-model="models[active_data_structure.model]" data-ng-options="model as model.name for model in models"></select>
+                  <select class="form-control" id="ds-model" data-ng-model="active_data_structure.model" data-ng-options="key as value.name for (key, value) in models"></select>
                 </div>
               </div>
             </form>
 
-            <div class="well" data-ng-show="active_data_structure.model === 0">
+            <div class="well" data-ng-show="active_data_structure.model === 'pointer_machine'">
               <label>Node fields</label>
               <ul data-ng-show="active_data_structure.model_options.fields.length > 0">
                 <li data-ng-repeat="field in active_data_structure.model_options.fields" data-ng-init="rename = false">
@@ -144,7 +144,7 @@
         <div class="panel panel-default">
           <div class="panel-heading">Model of computation</div>
           <div class="panel-body">
-            <div data-ng-show="active_data_structure.model === 0">
+            <div data-ng-show="active_data_structure.model === 'pointer_machine'">
               <h3 class="no-top-margin">Pointer machine</h3>
               <p>A model of computation in which nodes of fixed or bounded size are linked. The following primitive operations are supported:</p>
               <ul class="no-bottom-margin">
@@ -217,7 +217,7 @@
           <div class="panel-body">
             <p>Model of computation: <em>{{ models[active_data_structure.model].name }}</em></p>
 
-            <div class="well" data-ng-show="active_data_structure.model === 0">
+            <div class="well" data-ng-show="active_data_structure.model === 'pointer_machine'">
               <p class="no-bottom-margin" data-ng-show="active_data_structure.model_options.fields.length === 0">Switch to the <a href="#" data-ng-click="active_page = 0; stopClick($event);">Edit</a> view and define some node fields.</p>
               <label data-ng-show="active_data_structure.model_options.fields.length > 0">Node fields</label>
               <ul class="no-bottom-margin" data-ng-show="active_data_structure.model_options.fields.length > 0">
