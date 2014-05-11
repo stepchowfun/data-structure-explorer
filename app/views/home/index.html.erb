@@ -20,7 +20,7 @@
         </li>
 
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span data-ng-show="active_data_structure">{{ active_data_structure.name || 'Untitled' }}</span><span data-ng-hide="active_data_structure">Data structures</span> <b class="caret"></b></a>
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data structures <b class="caret"></b></a>
           <ul class="dropdown-menu">
             <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_data_structure === data_structure }">
               <a href="#" data-ng-click="activateDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a>
