@@ -70,7 +70,7 @@
                 <li data-ng-repeat="field in active_data_structure.model_options.fields" data-ng-init="rename = false">
                   <div class="dropdown">
                     <form data-ng-show="rename" data-ng-submit="renameField(field, new_field_name); rename = false; $event.preventDefault();">
-                      <input type="text" id="new-field-name-{{ field }}" class="form-control" style="display: inline-block; width: 40%;" data-ng-model="new_field_name" data-ng-blur="renameField(field, new_field_name); rename = false;" placeholder="e.g., left_child" />
+                      <input type="text" id="new-field-name-{{ field }}" class="form-control inline-block" data-ng-model="new_field_name" data-ng-blur="renameField(field, new_field_name); rename = false;" placeholder="e.g., left_child" />
                       <input type="submit" class="hidden" />
                     </form>
                     <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ field }}</code></a>
@@ -102,7 +102,7 @@
                 <li data-ng-repeat="operation in active_data_structure.operations" data-ng-init="rename = false">
                   <div class="dropdown">
                     <form data-ng-show="rename" data-ng-submit="renameOperation(operation, new_operation_name); rename = false; $event.preventDefault();">
-                      <input type="text" id="new-operation-name-{{ operation.name }}" class="form-control" style="display: inline-block; width: 40%;" data-ng-model="new_operation_name" data-ng-blur="renameOperation(operation, new_operation_name); rename = false;" placeholder="e.g., insert" />
+                      <input type="text" id="new-operation-name-{{ operation.name }}" class="form-control inline-block" data-ng-model="new_operation_name" data-ng-blur="renameOperation(operation, new_operation_name); rename = false;" placeholder="e.g., insert" />
                       <input type="submit" class="hidden" />
                     </form>
                     <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
