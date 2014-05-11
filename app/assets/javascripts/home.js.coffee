@@ -26,7 +26,7 @@ $ ->
   )
 
 # application module
-cherries = angular.module('cherries', ['models', 'examples', 'debounce', 'makeString', 'sandbox'])
+cherries = angular.module('cherries', ['ngSanitize', 'models', 'examples', 'debounce', 'makeString', 'sandbox'])
 
 # application controller
 cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'examples', 'debounce', 'makeString', 'sandbox', ($scope, models, runCommand, examples, debounce, makeString, sandbox) ->
