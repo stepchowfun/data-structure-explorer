@@ -291,7 +291,7 @@
         <h4 class="modal-title">Confirm delete</h4>
       </div>
       <div class="modal-body">
-        Are you sure you want to delete <strong>{{ field_to_delete }}</strong>?
+        Are you sure you want to delete <code>{{ field_to_delete }}</code>?
       </div>
       <div class="modal-footer">
         <a class="btn btn-default" data-dismiss="modal">Close</a>
@@ -309,7 +309,7 @@
         <h4 class="modal-title">Confirm delete</h4>
       </div>
       <div class="modal-body">
-        Are you sure you want to delete <strong>{{ operation_to_delete.name }}</strong>?
+        Are you sure you want to delete <code>{{ operation_to_delete.name }}(<span data-ng-repeat="arg in operation_to_delete.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>?
       </div>
       <div class="modal-footer">
         <a class="btn btn-default" data-dismiss="modal">Close</a>
