@@ -52,7 +52,6 @@ sandbox.factory('sandbox', ['makeString', (makeString) ->
         fragment.error.stack_list = null
         try
           stack_list = printStackTrace({e: error})
-          console.log stack_list
           i = stack_list.length - 1
           found = false
           while i >= 0

@@ -110,7 +110,7 @@ models.factory('models', ['makeString', (makeString) ->
             throw Error('Node ' + makeString(node) + ' does not exist.')
           for k, v of current_state.nodes
             for f in current_model_options.fields
-              if v? and v[f]? and v[f].name? and v[f].name == node.name
+              if v? and v[f]? and v[f].name? and v[f].name == node.name and k != node.name
                 throw Error('Cannot delete node ' + node.name + ' because node ' + k + ' points to it.')
           if current_state.root == node
             throw Error('Cannot delete node ' + node.name + ' because global.root points to it.')
