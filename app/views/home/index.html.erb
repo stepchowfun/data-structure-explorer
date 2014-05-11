@@ -86,7 +86,7 @@
                       <button type="submit" class="btn btn-default" data-ng-blur="clearAddFieldError()"><span class="glyphicon glyphicon-plus"></span> Add field</button>
                     </span>
                   </div>
-                  <p class="no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error }}</p>
+                  <p class="no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error.message }}</p>
                 </div>
               </form>
             </div>
@@ -115,7 +115,7 @@
                       <button type="submit" class="btn btn-default" data-ng-blur="clearAddOperationError()"><span class="glyphicon glyphicon-plus"></span> Add operation</button>
                     </span>
                   </div>
-                  <p class="no-bottom-margin" data-ng-show="new_operation_error">{{ new_operation_error }}</p>
+                  <p class="no-bottom-margin" data-ng-show="new_operation_error">{{ new_operation_error.message }}</p>
                 </div>
               </form>
             </div>

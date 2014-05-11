@@ -208,13 +208,13 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   $scope.addField = (data_structure) ->
     if !$scope.new_field_name? or $scope.new_field_name == ''
-      $scope.new_field_error = 'Please enter a name.'
+      $scope.new_field_error = Error('Please enter a name.')
       return
     if $scope.new_field_name in data_structure.model_options.fields
-      $scope.new_field_error = 'Already exists.'
+      $scope.new_field_error = Error('Already exists.')
       return
     if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_field_name))
-      $scope.new_field_error = 'Invalid name.'
+      $scope.new_field_error = Error('Invalid name.')
       return
     data_structure.model_options.fields.push($scope.new_field_name)
     $scope.new_field_name = ''
@@ -259,16 +259,16 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   $scope.addOperation = (data_structure) ->
     if !$scope.new_operation_name? or $scope.new_operation_name == ''
-      $scope.new_operation_error = 'Please enter a name.'
+      $scope.new_operation_error = Error('Please enter a name.')
       return
     if $scope.new_operation_name in (operation.name for operation in data_structure.operations)
-      $scope.new_operation_error = 'Already exists.'
+      $scope.new_operation_error = Error('Already exists.')
       return
     if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_operation_name))
       if '(' in $scope.new_operation_name
-        $scope.new_operation_error = 'Invalid name. Note: Do not include the argument list. It will be detected automatically.'
+        $scope.new_operation_error = Error('Invalid name. Note: Do not include the argument list. It will be detected automatically.')
       else
-        $scope.new_operation_error = 'Invalid name.'
+        $scope.new_operation_error = Error('Invalid name.')
       return
     data_structure.operations.push({
       name: $scope.new_operation_name,
