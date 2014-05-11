@@ -44,7 +44,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.active_page = 0
   $scope.active_data_structure = $scope.data_structures[0]
   $scope.field_to_delete = null
-  $scope.operation = null
+  $scope.operation_to_delete = null
 
   # switch to a data structure
   $scope.activateDataStructure = (data_structure) ->
