@@ -336,27 +336,27 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   $scope.newCommand = () ->
     if !$scope.active_data_structure?
-      $scope.new_command_error = 'Select a data structure first.'
+      $scope.new_command_error = Error('Select a data structure first.')
       return
 
     if !$scope.new_command_str? or $scope.new_command_str == ''
-      $scope.new_command_error = 'Please enter a command.'
+      $scope.new_command_error = Error('Please enter a command.')
       return
 
     for operation in $scope.active_data_structure.operations
       if operation.error?
-        $scope.new_command_error = operation.error.name + ' (' + operation.name + '): ' + operation.error.message
+        $scope.new_command_error = operation.error
         return
 
     if !$scope.haveCommandHistory()
       $scope.resetState()
 
     if $scope.computation_model != $scope.active_data_structure.model
-      $scope.new_command_error = 'Reset the state or set the model of computation back to: ' + $scope.computation_model.name + '.'
+      $scope.new_command_error = Error('Reset the state or set the model of computation back to: ' + $scope.computation_model.name + '.')
       return
 
     if !angular.equals($scope.computation_model_options, $scope.active_data_structure.model_options)
-      $scope.new_command_error = 'The basic properties of the data structure have changed. Reset the computation to continue.'
+      $scope.new_command_error = Error('The basic properties of the data structure have changed. Reset the computation to continue.')
       return
 
     $scope.fastForward(true)
