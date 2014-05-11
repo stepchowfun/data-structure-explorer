@@ -5,6 +5,16 @@ body {
     padding-left: 40px;
   }
 
+  a, input, button {
+    &:focus {
+      outline: none;
+    }
+
+    &::-moz-focus-inner {
+      border: 0;
+    }
+  }
+
   .CodeMirror {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     height: auto;
