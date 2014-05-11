@@ -397,6 +397,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     result = runCommand($scope.computation_state, $scope.new_command_str, $scope.active_data_structure.operations, $scope.computation_model, $scope.computation_model_options)
     if result.error?
       $scope.new_command_error = result.error
+      if $scope.new_command_error.stack_list?
+        $scope.new_command_error.stack_list.pop()
       return
     command = {
       str: $scope.new_command_str,

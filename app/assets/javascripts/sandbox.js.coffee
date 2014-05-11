@@ -61,14 +61,18 @@ sandbox.factory('sandbox', ['makeString', (makeString) ->
               break
             i -= 1
           if found
+            found = false
             i = 0
             while i < stack_list.length
+              if stack_list[i].indexOf('<anonymous>') >= 0
+                found = true
               stack_list[i] = stack_list[i].replace(/\ \(.*\), \<anonymous\>/g, '')
               stack_list[i] = stack_list[i].replace('Object.', '')
               stack_list[i] = stack_list[i].replace('eval', 'code')
               stack_list[i] = stack_list[i].replace(/:([0-9]*)\:[0-9]*$/g, ':$1')
               i += 1
-            fragment.error.stack_list = stack_list
+            if found
+              fragment.error.stack_list = stack_list
         catch
           undefined
     undefined
