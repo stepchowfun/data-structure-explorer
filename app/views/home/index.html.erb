@@ -10,6 +10,15 @@
     </div>
     <div class="collapse navbar-collapse" id="navbar-contents">
       <ul class="nav navbar-nav navbar-right">
+
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown">File <b class="caret"></b></a>
+          <ul class="dropdown-menu">
+            <li><a href="#" data-ng-click="save(); $event.preventDefault();"><span class="glyphicon glyphicon-save"></span> Save all to local storage</a></li>
+            <li><a href="#" data-ng-click="load(); $event.preventDefault();"><span class="glyphicon glyphicon-open"></span> Load all from local storage</a></li>
+          </ul>
+        </li>
+
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span data-ng-show="active_data_structure">{{ active_data_structure.name || 'Untitled' }}</span><span data-ng-hide="active_data_structure">Data structures</span> <b class="caret"></b></a>
           <ul class="dropdown-menu">
@@ -59,12 +68,12 @@
               <div class="form-group">
                 <label for="ds-model" class="col-sm-3 control-label">Model</label>
                 <div class="col-sm-9">
-                  <select class="form-control" id="ds-model" data-ng-model="active_data_structure.model" data-ng-options="model as model.name for model in models"></select>
+                  <select class="form-control" id="ds-model" data-ng-model="models[active_data_structure.model]" data-ng-options="model as model.name for model in models"></select>
                 </div>
               </div>
             </form>
 
-            <div class="well" data-ng-show="active_data_structure.model === models[0]">
+            <div class="well" data-ng-show="active_data_structure.model === 0">
               <label>Node fields</label>
               <ul data-ng-show="active_data_structure.model_options.fields.length > 0">
                 <li data-ng-repeat="field in active_data_structure.model_options.fields" data-ng-init="rename = false">
@@ -142,7 +151,7 @@
         <div class="panel panel-default">
           <div class="panel-heading">Model of computation</div>
           <div class="panel-body">
-            <div data-ng-show="active_data_structure.model === models[0]">
+            <div data-ng-show="active_data_structure.model === 0">
               <h3 class="no-top-margin">Pointer machine</h3>
               <p>A model of computation in which nodes of fixed or bounded size are linked. The following primitive operations are supported:</p>
               <ul class="no-bottom-margin">
@@ -213,9 +222,9 @@
         <div class="panel panel-default">
           <div class="panel-heading">Basic properties</div>
           <div class="panel-body">
-            <p>Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
+            <p>Model of computation: <em>{{ models[active_data_structure.model].name }}</em></p>
 
-            <div class="well" data-ng-show="active_data_structure.model === models[0]">
+            <div class="well" data-ng-show="active_data_structure.model === 0">
               <p class="no-bottom-margin" data-ng-show="active_data_structure.model_options.fields.length === 0">Switch to the <a href="#" data-ng-click="active_page = 0; stopClick($event);">Edit</a> view and define some node fields.</p>
               <label data-ng-show="active_data_structure.model_options.fields.length > 0">Node fields</label>
               <ul class="no-bottom-margin" data-ng-show="active_data_structure.model_options.fields.length > 0">
@@ -293,7 +302,7 @@
   </div>
 </div>
 
-<div id="confirm-field-delete-modal" class="modal fade">
+<div class="modal fade" id="confirm-field-delete-modal">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -311,7 +320,7 @@
   </div>
 </div>
 
-<div id="confirm-operation-delete-modal" class="modal fade">
+<div class="modal fade" id="confirm-operation-delete-modal">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -329,7 +338,7 @@
   </div>
 </div>
 
-<div id="confirm-ds-delete-modal" class="modal fade">
+<div class="modal fade" id="confirm-ds-delete-modal">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -343,6 +352,18 @@
         <a class="btn btn-default" data-dismiss="modal">Close</a>
         <a href="#" class="btn btn-danger" data-ng-click="deleteDataStructure(); $event.preventDefault();" data-dismiss="modal"><span class="glyphicon glyphicon-trash"></span> Delete</a>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="message-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" data-ng-bind-html="modal_title"></h4>
+      </div>
+      <div class="modal-body" data-ng-bind-html="modal_message"></div>
     </div>
   </div>
 </div>

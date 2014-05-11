@@ -42,9 +42,14 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   # other global application state
   $scope.active_page = 0
-  $scope.active_data_structure = $scope.data_structures[0]
+  if $scope.data_structures.length > 0
+    $scope.active_data_structure = $scope.data_structures[0]
+  else
+    $scope.active_data_structure = null
   $scope.field_to_delete = null
   $scope.operation_to_delete = null
+  $scope.modal_title = null
+  $scope.modal_message = null
 
   # switch to a data structure
   $scope.activateDataStructure = (data_structure) ->
@@ -57,6 +62,14 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   # a helper that makes a string out of anything
   $scope.makeString = makeString
+
+  # a helper for showing a message in a modal
+  $scope.message = (title, message) ->
+    $scope.modal_title = title
+    $scope.modal_message = message
+    setTimeout((() ->
+      $('#message-modal').modal({ })
+    ), 1)
 
   # a helper to scroll an item into view
   scrollIntoView = (container, element) ->
@@ -129,14 +142,14 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     if !data_structure.model_options?
       data_structure.model_options = { }
     switch data_structure.model
-      when models[0]
+      when 0
         if !data_structure.model_options.fields?
           data_structure.model_options.fields = [ ]
     for operation in data_structure.operations
       operation.arguments = get_arguments(operation.code, operation.name)
     data_structure.startUpdate = debounce () ->
       $scope.$apply ($scope) ->
-        sandbox(data_structure.operations, data_structure.model.api)
+        sandbox(data_structure.operations, models[data_structure.model].api)
         for operation in data_structure.operations
           operation.arguments = get_arguments(operation.code, operation.name)
 
@@ -157,7 +170,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         do (i) ->
           unregisterList.push($scope.$watch((($scope) ->
             return [
-              $scope.data_structures[i].model.name
+              models[$scope.data_structures[i].model].name
               [
                 op.name,
                 op.code
@@ -175,7 +188,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     data_structure = {
       name: '',
       operations: [ ],
-      model: models[0],
+      model: 0,
       model_options: { }
     }
     initializeDataStructure(data_structure)
@@ -198,6 +211,48 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       else
         $scope.activateDataStructure($scope.data_structures[0])
       watchDataStructures()
+
+  # save to local storage
+  $scope.save = () ->
+    localStorage = window['localStorage']
+    if localStorage?
+      try
+        localStorage.setItem('data_structures', JSON.stringify($scope.data_structures))
+        $scope.message('Save successful', 'The data structures were saved successfully.')
+      catch
+        $scope.message('Uh oh', 'There was a problem saving to local storage.')
+    else
+      $scope.message('Uh oh', 'Your browser doesn&rsquo;t support local storage.')
+
+  # load from local storage
+  $scope.load = () ->
+    localStorage = window['localStorage']
+    if localStorage?
+      try
+        ds = JSON.parse(localStorage.getItem('data_structures'))
+        if !ds?
+          $scope.message('Uh oh', 'There was a problem loading from local storage.')
+          return
+        $scope.data_structures = []
+        $scope.activateDataStructure(null)
+        watchDataStructures()
+        setTimeout((() ->
+          $scope.$apply(($scope) ->
+            $scope.data_structures = ds
+            if $scope.data_structures.length > 0
+              $scope.activateDataStructure($scope.data_structures[0])
+            else
+              $scope.activateDataStructure(null)
+            for data_structure in $scope.data_structures
+              initializeDataStructure(data_structure)
+            watchDataStructures()
+            $scope.message('Load successful', 'The data structures were loaded successfully.')
+          )
+        ), 1)
+      catch
+        $scope.message('Uh oh', 'There was a problem loading from local storage.')
+    else
+      $scope.message('Uh oh', 'Your browser doesn&rsquo;t support local storage.')
 
   # fields
 
@@ -350,8 +405,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   $scope.resetState = () ->
     if $scope.active_data_structure?
-      $scope.computation_state = $scope.active_data_structure.model.getInitialState($scope.active_data_structure.model_options)
-      $scope.computation_model = $scope.active_data_structure.model
+      $scope.computation_state = models[$scope.active_data_structure.model].getInitialState($scope.active_data_structure.model_options)
+      $scope.computation_model = models[$scope.active_data_structure.model]
       $scope.computation_model_options = $scope.active_data_structure.model_options
       $scope.command_history = [ ]
     else
@@ -385,7 +440,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     if !$scope.haveCommandHistory()
       $scope.resetState()
 
-    if $scope.computation_model != $scope.active_data_structure.model
+    if $scope.computation_model != models[$scope.active_data_structure.model]
       $scope.new_command_error = Error('Reset the state or set the model of computation back to: ' + $scope.computation_model.name + '.')
       return
 
