@@ -32,10 +32,6 @@ $ ->
     },
     ready: (()->
       cy = this
-      $(window).resize(() ->
-        console.log 'yay'
-        console.log cy.resize()
-      )
     )
   })
 
