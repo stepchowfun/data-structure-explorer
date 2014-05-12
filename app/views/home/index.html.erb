@@ -247,7 +247,9 @@
         </div>
       </div>
       <div class="col-sm-6">
-        <div data-ng-show="active_data_structure.model === 'pointer_machine'" id="graph"></div>
+        <svg xmlns="http://www.w3.org/2000/svg" version="1.1" data-ng-show="active_data_structure.model === 'pointer_machine'" id="graph">
+          <rect x="10" y="10" height="100" width="100" style="stroke:#ff0000; fill: #0000ff"/>
+        </svg>
       </div>
       <div class="col-sm-3"> 
         <div class="panel panel-default">
@@ -269,7 +271,7 @@
             <form data-ng-submit="newCommand(); $event.preventDefault();">
               <div class="form-group" data-ng-class="{ 'has-error': new_command_error }">
                 <div class="input-group">
-                  <input id="new_command_str" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5)" />
+                  <input id="new_command_str" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5)" data-ng-disabled="animating" />
                   <span class="input-group-btn">
                     <button class="btn btn-default" type="submit" data-ng-blur="clearNewCommandError()">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
                   </span>
@@ -282,11 +284,11 @@
             </form>
 
             <p class="btn-group no-bottom-margin">
-              <a href="#" class="btn btn-default" data-ng-click="fastBackward(true); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() }"><span class="glyphicon glyphicon-fast-backward"></span></a>
-              <a href="#" class="btn btn-default" data-ng-click="stepBackward(true); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() }"><span class="glyphicon glyphicon-step-backward"></span></a>
-              <a href="#" class="btn btn-danger" data-ng-click="resetState(); $event.preventDefault();" data-ng-class="{ 'disabled': !haveCommandHistory() }"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
-              <a href="#" class="btn btn-default" data-ng-click="stepForward(true); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() }"><span class="glyphicon glyphicon-step-forward"></span></a>
-              <a href="#" class="btn btn-default" data-ng-click="fastForward(true); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() }"><span class="glyphicon glyphicon-fast-forward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="fastBackward(true); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || animating }"><span class="glyphicon glyphicon-fast-backward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="stepBackward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || animating }"><span class="glyphicon glyphicon-step-backward"></span></a>
+              <a href="#" class="btn btn-danger" data-ng-click="resetState(); $event.preventDefault();" data-ng-class="{ 'disabled': !haveCommandHistory() || animating }"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
+              <a href="#" class="btn btn-default" data-ng-click="stepForward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || animating }"><span class="glyphicon glyphicon-step-forward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="fastForward(true); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || animating }"><span class="glyphicon glyphicon-fast-forward"></span></a>
             </p>
           </div>
         </div>

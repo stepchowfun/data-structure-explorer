@@ -50,6 +50,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.operation_to_delete = null
   $scope.modal_title = null
   $scope.modal_message = null
+  $scope.animating = false
 
   # switch to a data structure
   $scope.activateDataStructure = (data_structure) ->
@@ -411,6 +412,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   history_cursor = null
 
   $scope.resetState = () ->
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot reset the state while animating.')
+
     if $scope.command_history?
       $scope.fastBackward(false)
     if $scope.active_data_structure?
@@ -420,6 +425,26 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.command_history = [ ]
 
   $scope.resetState()
+
+  $scope.animateTo = (cursor, step_cursor) ->
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot start new animation while already animating.')
+
+    if $scope.command_history_cursor?
+      if $scope.command_history_cursor < cursor or ($scope.command_history_cursor == cursor and $scope.command_history_step_cursor < step_cursor)
+        $scope.stepForward(true, true, () ->
+          $scope.animateTo(cursor, step_cursor)
+        )
+      if $scope.command_history_cursor > cursor or ($scope.command_history_cursor == cursor and $scope.command_history_step_cursor > step_cursor)
+        $scope.stepBackward(true, true, () ->
+          $scope.animateTo(cursor, step_cursor)
+        )
+    else
+      if cursor?
+        $scope.stepForward(true, true, () ->
+          $scope.animateTo(cursor, step_cursor)
+        )
 
   $scope.clearNewCommandError = () ->
     $scope.new_command_error = null
@@ -449,6 +474,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.new_command_error = Error('The basic properties of the data structure have changed. Reset the computation to continue.')
       return
 
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot enter new command while animating.')
+
     $scope.fastForward(true)
     result = runCommand($scope.computation_state, $scope.new_command_str, $scope.active_data_structure.operations, $scope.computation_model, $scope.computation_model_options)
     if result.error?
@@ -462,17 +491,23 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       return_value: result.return_value
     }
     $scope.command_history.push(command)
-    if command.steps.length > 0
-      $scope.command_history_cursor = $scope.command_history.length - 1
-      $scope.command_history_step_cursor = command.steps.length - 1
     $scope.new_command_str = ''
     history_cursor = null
     $scope.clearNewCommandError()
+    if command.steps.length > 0
+      if $scope.command_history_cursor?
+        $scope.animateTo($scope.command_history_cursor + 1, command.steps.length - 1)
+      else
+        $scope.animateTo(0, command.steps.length - 1)
 
   $scope.haveCommandHistory = () ->
     return $scope.command_history? and $scope.command_history.length > 0
 
-  $scope.stepBackward = (scroll) ->
+  $scope.stepBackward = (scroll, animate, done) ->
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot step backward while animating.')
+
     if $scope.command_history? and $scope.command_history.length > 0
       if $scope.command_history_cursor == null
         return
@@ -485,7 +520,13 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           step_cursor = null
           break
         step_cursor = $scope.command_history[cursor].steps.length - 1
-      $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computation_state)
+      $scope.animating = true
+      $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computation_state, animate, () ->
+        $scope.$apply ($scope) ->
+          $scope.animating = false
+          if done?          
+            done($scope)
+      )
       $scope.command_history_cursor = cursor
       $scope.command_history_step_cursor = step_cursor
       if scroll
@@ -496,7 +537,11 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
               scrollIntoView($('#command-history')[0], elements[0])
         ), 1)
 
-  $scope.stepForward = (scroll) ->
+  $scope.stepForward = (scroll, animate, done) ->
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot step forward while animating.')
+
     if $scope.command_history? and $scope.command_history.length > 0
       if $scope.command_history_cursor == null
         cursor = 0
@@ -511,7 +556,13 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           return
       $scope.command_history_cursor = cursor
       $scope.command_history_step_cursor = step_cursor
-      $scope.command_history[cursor].steps[step_cursor].up($scope.computation_state)
+      $scope.animating = true
+      $scope.command_history[cursor].steps[step_cursor].up($scope.computation_state, animate, () ->
+        $scope.$apply ($scope) ->
+          $scope.animating = false
+          if done?          
+            done($scope)
+      )
       if scroll
         setTimeout((() ->
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
@@ -521,25 +572,37 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         ), 1)
 
   $scope.fastBackward = (scroll) ->
-    while $scope.canStepBackward()
-      $scope.stepBackward(false)
-    if scroll
-      setTimeout((() ->
-        scrollIntoView($('#command-history')[0], $('#empty')[0])
-      ), 1)
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot fast backward while animating.')
+
+    if $scope.canStepBackward()
+      $scope.stepBackward(false, false, ($scope) -> $scope.fastBackward(scroll))
+    else
+      if scroll
+        setTimeout((() ->
+          scrollIntoView($('#command-history')[0], $('#empty')[0])
+        ), 1)
 
   $scope.fastForward = (scroll) ->
-    while $scope.canStepForward()
-      $scope.stepForward(false)
-    if scroll
-      setTimeout((() ->
-        if $scope.command_history_cursor? and $scope.command_history_step_cursor?
-          elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
-          if elements.length > 0
-            scrollIntoView($('#command-history')[0], elements[0])
-      ), 1)
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot fast forward while animating.')
+
+    if $scope.canStepForward()
+      $scope.stepForward(false, false, ($scope) -> $scope.fastForward(scroll))
+    else
+      if scroll
+        setTimeout((() ->
+          if $scope.command_history_cursor? and $scope.command_history_step_cursor?
+            elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
+            if elements.length > 0
+              scrollIntoView($('#command-history')[0], elements[0])
+        ), 1)
 
   $scope.canStepBackward = () ->
+    if $scope.animating
+      return false
     if $scope.command_history? and $scope.command_history.length > 0
       if $scope.command_history_cursor == null
         return false
@@ -547,6 +610,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     return false
 
   $scope.canStepForward = () ->
+    if $scope.animating
+      return false
     if $scope.command_history? and $scope.command_history.length > 0
       if $scope.command_history_cursor == null
         cursor = 0

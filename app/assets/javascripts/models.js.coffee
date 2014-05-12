@@ -4,75 +4,22 @@ command_steps = [ ]
 current_state = null
 current_model_options = null
 
-cy = null
-
-$ ->
-  $('#graph').cytoscape({
-    layout: {
-      name: 'breadthfirst',
-      roots: '#root'
-    },
-    userZoomingEnabled: false,
-    userPanningEnabled: false,
-    autoungrabifyNodes: true,
-    style: cytoscape.stylesheet()
-      .selector('node')
-        .css({
-          'content': 'data(id)',
-          'text-valign': 'center'
-        })
-      .selector('edge')
-        .css({
-          'target-arrow-shape': 'triangle'
-        }),
-    elements: {
-      nodes: [
-        { data: { id: 'root' } }
-      ],
-      edges: [ ],
-    },
-    ready: (()->
-      cy = this
-      $(window).resize(() ->
-        cy.resize()
-        cy.layout({ name: 'breadthfirst', roots: '#root' })
-      )
-    )
-  })
-
-get_transparent_node = (state, opaque_node) ->
-  if !opaque_node? or !opaque_node.name?
-    return null
-  if !state.nodes[opaque_node.name]?
-    return null
-  return state.nodes[opaque_node.name]
-
-layout = () ->
-  cy.layout({ name: 'breadthfirst', roots: '#root' })
-
-add_node = (id) ->
-  cy.add({
-    group: 'nodes',
-    data: { id: id },
-  })
-  layout()
-
-remove_node = (id) ->
-  cy.$('#' + id).remove()
-  layout()
-
-add_edge = (source, target) ->
-  cy.add({
-    group: 'edges',
-    data: { source: source, target: target },
-  })
-  layout()
-
-remove_edge = (source, target) ->
-  cy.$('edge[source="' + source + '"][target="' + target + '"]').remove()
-  layout()
-
 models.factory('models', ['makeString', (makeString) ->
+  get_transparent_node = (state, opaque_node) ->
+    if !opaque_node? or !opaque_node.name?
+      return null
+    if !state.nodes[opaque_node.name]?
+      return null
+    return state.nodes[opaque_node.name]
+
+  add_node = (id) ->
+
+  remove_node = (id) ->
+
+  add_edge = (source, target) ->
+
+  remove_edge = (source, target) ->
+
   machines_array = [
     {
       constructor: (() ->),
@@ -98,7 +45,7 @@ models.factory('models', ['makeString', (makeString) ->
               old_root = current_state.root
               step = {
                 repr: 'global.root = ' + makeString(root) + '',
-                up: ((state) ->
+                up: ((state, animate, done) ->
                   target = get_transparent_node(state, old_root)
                   if target?
                     remove_edge('root', old_root.name)
@@ -108,8 +55,11 @@ models.factory('models', ['makeString', (makeString) ->
                   target = get_transparent_node(state, root)
                   if target?
                     add_edge('root', root.name)
+
+                  if done?
+                    setTimeout(done, 1)
                 ),
-                down: ((state) ->
+                down: ((state, animate, done) ->
                   target = get_transparent_node(state, root)
                   if target?
                     remove_edge('root', root.name)
@@ -119,9 +69,12 @@ models.factory('models', ['makeString', (makeString) ->
                   target = get_transparent_node(state, old_root)
                   if target?
                     add_edge('root', old_root.name)
+
+                  if done?
+                    setTimeout(done, 1)
                 ),
               }
-              step.up(current_state)
+              step.up(current_state, false, null)
               command_steps.push(step)
               undefined
             )
@@ -140,7 +93,7 @@ models.factory('models', ['makeString', (makeString) ->
           node_name = 'n' + current_state.index.toString()
           step = {
             repr: node_name + ' = make_node(' + makeString(data) + ')',
-            up: ((state) ->
+            up: ((state, animate, done) ->
               state.index += 1
               state.nodes[node_name] = node
 
@@ -151,8 +104,11 @@ models.factory('models', ['makeString', (makeString) ->
                   target = get_transparent_node(state, data[field])
                   if target?
                     add_edge(node_name, value.name)
+
+              if done?
+                setTimeout(done, 1)
             ),
-            down: ((state) ->
+            down: ((state, animate, done) ->
               if data?
                 for field in current_model_options.fields
                   target = get_transparent_node(state, data[field])
@@ -163,9 +119,12 @@ models.factory('models', ['makeString', (makeString) ->
 
               state.nodes[node_name] = undefined
               state.index -= 1
+
+              if done?
+                setTimeout(done, 1)
             ),
           }
-          step.up(current_state)
+          step.up(current_state, false, null)
           command_steps.push(step)
 
           opaque_node = { }
@@ -190,7 +149,7 @@ models.factory('models', ['makeString', (makeString) ->
                   old_value = current_state.nodes[node_name][field]
                   step = {
                     repr: node_name + '.' + field + ' = ' + makeString(value),
-                    up: ((state) ->
+                    up: ((state, animate, done) ->
                       target = get_transparent_node(state, old_value)
                       if target?
                         remove_edge(node_name, old_value.name)
@@ -200,8 +159,11 @@ models.factory('models', ['makeString', (makeString) ->
                       target = get_transparent_node(state, value)
                       if target?
                         add_edge(node_name, value.name)
+
+                      if done?
+                        setTimeout(done, 1)
                     ),
-                    down: ((state) ->
+                    down: ((state, animate, done) ->
                       target = get_transparent_node(state, value)
                       if target?
                         remove_edge(node_name, value.name)
@@ -211,9 +173,12 @@ models.factory('models', ['makeString', (makeString) ->
                       target = get_transparent_node(state, old_value)
                       if target?
                         add_edge(node_name, old_value.name)
+
+                      if done?
+                        setTimeout(done, 1)
                     ),
                   }
-                  step.up(current_state)
+                  step.up(current_state, false, null)
                   command_steps.push(step)
                   undefined
                 )
@@ -232,18 +197,24 @@ models.factory('models', ['makeString', (makeString) ->
           old_node = current_state.nodes[node.name]
           step = {
             repr: 'delete_node(' + makeString(node) + ')',
-            up: ((state) ->
+            up: ((state, animate, done) ->
               remove_node(node.name)
 
               state.nodes[node.name] = undefined
+
+              if done?
+                setTimeout(done, 1)
             ),
-            down: ((state) ->
+            down: ((state, animate, done) ->
               state.nodes[node.name] = old_node
 
               add_node(node.name)
+
+              if done?
+                setTimeout(done, 1)
             ),
           }
-          step.up(current_state)
+          step.up(current_state, false, null)
           command_steps.push(step)
           undefined
         )
@@ -270,10 +241,11 @@ models.factory('runCommand', ['sandbox', (sandbox) ->
     for operation in operations
       definitions[operation.name] = operation.compiled_value
     sandbox([fragment], definitions)
+    command_steps.reverse()
+    for command in command_steps
+      command.down(current_state, false, null)
+    command_steps.reverse()
     if fragment.error?
-      command_steps.reverse()
-      for command in command_steps
-        command.down(current_state)
       return {
         steps: null,
         return_value: null,
