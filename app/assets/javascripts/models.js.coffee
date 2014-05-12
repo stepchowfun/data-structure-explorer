@@ -4,7 +4,7 @@ command_steps = [ ]
 current_state = null
 current_model_options = null
 
-models.factory('models', ['makeString', (makeString) ->
+models.factory('models', ['makeString', 'animation', (makeString, animation) ->
   return [
     {
       constructor: (() ->),

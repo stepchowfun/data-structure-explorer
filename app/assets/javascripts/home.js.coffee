@@ -26,13 +26,15 @@ $ ->
   )
 
 # application module
-cherries = angular.module('cherries', ['models', 'examples', 'debounce', 'makeString', 'sandbox'])
+cherries = angular.module('cherries', ['animation', 'models', 'examples', 'debounce', 'makeString', 'sandbox'])
 
 # application controller
-cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'examples', 'debounce', 'makeString', 'sandbox', ($scope, models, runCommand, examples, debounce, makeString, sandbox) ->
+cherries.controller('CherriesController', ['$scope', 'animation', 'models', 'runCommand', 'examples', 'debounce', 'makeString', 'sandbox', ($scope, animation, models, runCommand, examples, debounce, makeString, sandbox) ->
   ############################################################################
   # global
   ############################################################################
+
+  $scope.animation = animation
 
   # models of computation
   $scope.models = models
