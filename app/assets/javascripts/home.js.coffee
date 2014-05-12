@@ -450,6 +450,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     $scope.new_command_error = null
 
   $scope.newCommand = () ->
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot enter new command while animating.')
+
     if !$scope.active_data_structure?
       $scope.new_command_error = Error('Select a data structure first.')
       return
@@ -473,10 +477,6 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     if !angular.equals($scope.computation_model_options, $scope.active_data_structure.model_options)
       $scope.new_command_error = Error('The basic properties of the data structure have changed. Reset the computation to continue.')
       return
-
-    # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot enter new command while animating.')
 
     $scope.fastForward(true)
     result = runCommand($scope.computation_state, $scope.new_command_str, $scope.active_data_structure.operations, $scope.computation_model, $scope.computation_model_options)
