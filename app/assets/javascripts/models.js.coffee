@@ -4,6 +4,48 @@ command_steps = [ ]
 current_state = null
 current_model_options = null
 
+cy = null
+
+$ ->
+  $('#graph').cytoscape({
+    layout: {
+      name: 'breadthfirst'
+    },
+    userZoomingEnabled: false,
+    userPanningEnabled: false,
+    autoungrabifyNodes: true,
+    style: cytoscape.stylesheet()
+      .selector('node')
+        .css({
+          'content': 'data(id)',
+          'text-valign': 'center'
+        })
+      .selector('edge')
+        .css({
+          'target-arrow-shape': 'triangle'
+        }),
+    elements: {
+      nodes: [
+        { data: { id: 'root' } }
+      ],
+      edges: [ ],
+    },
+    ready: (()->
+      cy = this
+      $(window).resize(() ->
+        console.log 'yay'
+        console.log cy.resize()
+      )
+    )
+  })
+
+get_transparent_node = (state, opaque_node) ->
+  if !opaque_node? or !opaque_node.name?
+    return null
+  if !state.nodes[opaque_node.name]?
+    return null
+  return state.nodes[opaque_node.name]
+
 models.factory('models', ['makeString', (makeString) ->
   machines_array = [
     {
@@ -31,10 +73,40 @@ models.factory('models', ['makeString', (makeString) ->
               step = {
                 repr: 'global.root = ' + makeString(root) + '',
                 up: ((state) ->
+                  target = get_transparent_node(state, old_root)
+                  if target?
+                    cy.$('edge[source="root"][target="' + old_root.name + '"]').remove()
+                    cy.layout({ name: 'breadthfirst' })
+                    cy.fit()
+
                   state.root = root
+
+                  target = get_transparent_node(state, root)
+                  if target?
+                    cy.add({
+                      group: 'edges',
+                      data: { source: 'root', target: root.name },
+                    });
+                    cy.layout({ name: 'breadthfirst' })
+                    cy.fit()
                 ),
                 down: ((state) ->
+                  target = get_transparent_node(state, root)
+                  if target?
+                    cy.$('edge[source="root"][target="' + root.name + '"]').remove()
+                    cy.layout({ name: 'breadthfirst' })
+                    cy.fit()
+
                   state.root = old_root
+
+                  target = get_transparent_node(state, old_root)
+                  if target?
+                    cy.add({
+                      group: 'edges',
+                      data: { source: 'root', target: old_root.name },
+                    });
+                    cy.layout({ name: 'breadthfirst' })
+                    cy.fit()
                 ),
               }
               step.up(current_state)
@@ -59,8 +131,39 @@ models.factory('models', ['makeString', (makeString) ->
             up: ((state) ->
               state.index += 1
               state.nodes[node_name] = node
+
+              cy.add({
+                group: 'nodes',
+                data: { id: node_name },
+              });
+
+              if data?
+                for field in current_model_options.fields
+                  target = get_transparent_node(state, data[field])
+                  if target?
+                    cy.add({
+                      group: 'edges',
+                      data: { source: node_name, target: value.name },
+                    });
+                    cy.layout({ name: 'breadthfirst' })
+                    cy.fit()
+
+              cy.layout({ name: 'breadthfirst' })
+              cy.fit()
             ),
             down: ((state) ->
+              if data?
+                for field in current_model_options.fields
+                  target = get_transparent_node(state, data[field])
+                  if target?
+                    cy.$('edge[source="' + node_name + '"][target="' + data[field].name + '"]').remove()
+                    cy.layout({ name: 'breadthfirst' })
+                    cy.fit()
+
+              cy.$('#' + node_name).remove()
+              cy.layout({ name: 'breadthfirst' })
+              cy.fit()
+
               state.nodes[node_name] = undefined
               state.index -= 1
             ),
@@ -91,10 +194,40 @@ models.factory('models', ['makeString', (makeString) ->
                   step = {
                     repr: node_name + '.' + field + ' = ' + makeString(value),
                     up: ((state) ->
+                      target = get_transparent_node(state, old_value)
+                      if target?
+                        cy.$('edge[source="' + node_name + '"][target="' + old_value.name + '"]').remove()
+                        cy.layout({ name: 'breadthfirst' })
+                        cy.fit()
+
                       state.nodes[node_name][field] = value
+
+                      target = get_transparent_node(state, value)
+                      if target?
+                        cy.add({
+                          group: 'edges',
+                          data: { source: node_name, target: value.name },
+                        });
+                        cy.layout({ name: 'breadthfirst' })
+                        cy.fit()
                     ),
                     down: ((state) ->
+                      target = get_transparent_node(state, value)
+                      if target?
+                        cy.$('edge[source="' + node_name + '"][target="' + value.name + '"]').remove()
+                        cy.layout({ name: 'breadthfirst' })
+                        cy.fit()
+
                       state.nodes[node_name][field] = old_value
+
+                      target = get_transparent_node(state, old_value)
+                      if target?
+                        cy.add({
+                          group: 'edges',
+                          data: { source: node_name, target: old_value.name },
+                        });
+                        cy.layout({ name: 'breadthfirst' })
+                        cy.fit()
                     ),
                   }
                   step.up(current_state)
@@ -105,10 +238,8 @@ models.factory('models', ['makeString', (makeString) ->
           return opaque_node
         ),
         delete_node: ((node) ->
-          if !node? or !node.name?
+          if !get_transparent_node(current_state, node)?
             throw Error(makeString(node) + ' is not a node.')
-          if !current_state.nodes[node.name]?
-            throw Error('Node ' + makeString(node) + ' does not exist.')
           for k, v of current_state.nodes
             for f in current_model_options.fields
               if v? and v[f]? and v[f].name? and v[f].name == node.name and k != node.name
@@ -119,10 +250,21 @@ models.factory('models', ['makeString', (makeString) ->
           step = {
             repr: 'delete_node(' + makeString(node) + ')',
             up: ((state) ->
+              cy.$('#' + node.name).remove()
+              cy.layout({ name: 'breadthfirst' })
+              cy.fit()
+
               state.nodes[node.name] = undefined
             ),
             down: ((state) ->
               state.nodes[node.name] = old_node
+
+              cy.add({
+                group: 'nodes',
+                data: { id: node.name },
+              });
+              cy.layout({ name: 'breadthfirst' })
+              cy.fit()
             ),
           }
           step.up(current_state)
@@ -130,7 +272,7 @@ models.factory('models', ['makeString', (makeString) ->
           undefined
         )
       }
-    },
+    }
   ]
   machines_object = { }
   for machine in machines_array

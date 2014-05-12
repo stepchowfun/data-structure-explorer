@@ -247,7 +247,7 @@
         </div>
       </div>
       <div class="col-sm-6">
-        {{ makeString(computation_state.root) }}
+        <div data-ng-show="active_data_structure.model === 'pointer_machine'" id="graph"></div>
       </div>
       <div class="col-sm-3"> 
         <div class="panel panel-default">

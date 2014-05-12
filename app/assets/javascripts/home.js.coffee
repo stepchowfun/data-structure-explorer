@@ -41,7 +41,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.data_structures = examples
 
   # other global application state
-  $scope.active_page = 0
+  $scope.active_page = 1
   if $scope.data_structures.length > 0
     $scope.active_data_structure = $scope.data_structures[0]
   else
@@ -402,22 +402,22 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   $scope.new_command_str = null
   $scope.new_command_error = null
+  $scope.computation_state = null
+  $scope.computation_model = null
+  $scope.computation_model_options = null
+  $scope.command_history = null
+  $scope.command_history_cursor = null
+  $scope.command_history_step_cursor = null
   history_cursor = null
 
   $scope.resetState = () ->
+    if $scope.command_history?
+      $scope.fastBackward(false)
     if $scope.active_data_structure?
       $scope.computation_state = models[$scope.active_data_structure.model].getInitialState($scope.active_data_structure.model_options)
       $scope.computation_model = models[$scope.active_data_structure.model]
       $scope.computation_model_options = $scope.active_data_structure.model_options
       $scope.command_history = [ ]
-    else
-      $scope.computation_state = null
-      $scope.command_history = null
-      $scope.computation_model = null
-      $scope.computation_model_options = null
-    $scope.command_history_cursor = null
-    $scope.command_history_step_cursor = null
-    history_cursor = null
 
   $scope.resetState()
 
