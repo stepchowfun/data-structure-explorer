@@ -32,6 +32,11 @@ $ ->
     },
     ready: (()->
       cy = this
+      $(window).resize(() ->
+        cy.resize()
+        cy.layout({ name: 'breadthfirst' })
+        cy.fit()
+      )
     )
   })
 
