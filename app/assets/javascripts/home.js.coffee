@@ -41,25 +41,11 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.data_structures = examples
 
   # other global application state
-<<<<<<< HEAD
-  $scope.active_page =1 
-  $scope.active_data_structure = $scope.data_structures[0]
-
-  # switch to the editor
-  $scope.editDataStructure = (data_structure) ->
-    $scope.active_page = 0
-    $scope.active_data_structure = data_structure
-
-  # switch to the explorer
-  $scope.exploreDataStructure = (data_structure) ->
-    $scope.active_page = 1
-=======
-  $scope.active_page = 0
+  $scope.active_page = 1 
   $scope.active_data_structure = $scope.data_structures[0]
 
   # switch to a data structure
   $scope.activateDataStructure = (data_structure) ->
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
     $scope.active_data_structure = data_structure
 
   # a helper to be called on click
@@ -70,8 +56,6 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   # a helper that makes a string out of anything
   $scope.makeString = makeString
 
-<<<<<<< HEAD
-=======
   # a helper to scroll an item into view
   scrollIntoView = (container, element) ->
     original = $(container).scrollTop()
@@ -86,7 +70,6 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       original = top
     $(container).scrollTop(original)
 
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
   # this updates a few DOM-related things
   $scope.$watch(debounce((() ->
     if loaded
@@ -143,19 +126,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   initializeDataStructure = (data_structure) ->
     if !data_structure.model_options?
       data_structure.model_options = { }
-<<<<<<< HEAD
-    switch data_structure.model.name
-      when models[0]
-        if !data_structure.model_options.fields?
-          data_structure.model_options.fields = [ ]
-      when models[1]
-        undefined
-=======
     switch data_structure.model
       when models[0]
         if !data_structure.model_options.fields?
           data_structure.model_options.fields = [ ]
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
     for operation in data_structure.operations
       operation.arguments = get_arguments(operation.code, operation.name)
     data_structure.startUpdate = debounce () ->
@@ -204,12 +178,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     }
     initializeDataStructure(data_structure)
     $scope.data_structures.push(data_structure)
-<<<<<<< HEAD
-    $scope.editDataStructure(data_structure)
-=======
     $scope.activateDataStructure(data_structure)
-    $scope.active_page = 0
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
+    $scope.active_page =1 
     watchDataStructures()
 
   $scope.deleteDataStructure = (data_structure) ->
@@ -223,15 +193,9 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         active_data_structure = null
       $scope.data_structures.splice(index, 1)
       if $scope.data_structures.length == 0
-<<<<<<< HEAD
-        $scope.editDataStructure(null)
-      else
-        $scope.editDataStructure($scope.data_structures[0])
-=======
         $scope.activateDataStructure(null)
       else
         $scope.activateDataStructure($scope.data_structures[0])
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
       watchDataStructures()
 
   # fields
@@ -301,14 +265,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.new_operation_error = 'Already exists.'
       return
     if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_operation_name))
-<<<<<<< HEAD
-      $scope.new_operation_error = 'Invalid name.'
-=======
       if '(' in $scope.new_operation_name
         $scope.new_operation_error = 'Invalid name. Note: Do not include the argument list. It will be detected automatically.'
       else
         $scope.new_operation_error = 'Invalid name.'
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
       return
     data_structure.operations.push({
       name: $scope.new_operation_name,
@@ -441,11 +401,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
             elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
             if elements.length > 0
-<<<<<<< HEAD
-              elements[0].scrollIntoView()
-=======
               scrollIntoView($('#command-history')[0], elements[0])
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
         ), 1)
 
   $scope.stepForward = (scroll) ->
@@ -469,11 +425,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
             elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
             if elements.length > 0
-<<<<<<< HEAD
-              elements[0].scrollIntoView()
-=======
               scrollIntoView($('#command-history')[0], elements[0])
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
         ), 1)
 
   $scope.fastBackward = (scroll) ->
@@ -481,11 +433,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.stepBackward(false)
     if scroll
       setTimeout((() ->
-<<<<<<< HEAD
-        $('#command-history').scrollTop(0)
-=======
         scrollIntoView($('#command-history')[0], $('#empty')[0])
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
       ), 1)
 
   $scope.fastForward = (scroll) ->
@@ -496,11 +444,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         if $scope.command_history_cursor? and $scope.command_history_step_cursor?
           elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
           if elements.length > 0
-<<<<<<< HEAD
-            elements[0].scrollIntoView()
-=======
             scrollIntoView($('#command-history')[0], elements[0])
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
       ), 1)
 
   $scope.canStepBackward = () ->

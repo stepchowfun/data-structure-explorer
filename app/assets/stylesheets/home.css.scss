@@ -1,19 +1,12 @@
 body {
-<<<<<<< HEAD
-=======
   font-size: 1.6em !important;
 
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
   ul > li > ul.list-unstyled {
     padding-left: 40px;
   }
 
   .CodeMirror {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-<<<<<<< HEAD
-    font-size: 1.1em;
-=======
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
     height: auto;
   }
 
@@ -59,12 +52,8 @@ body {
 
   #command-history {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-<<<<<<< HEAD
-    max-height: 250px;
-=======
     font-size: 0.93em;
     max-height: 400px;
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
     overflow: auto;
 
     .command-active {

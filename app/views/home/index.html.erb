@@ -6,24 +6,6 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-<<<<<<< HEAD
-    <div class="collapse navbar-collapse" id="navbar-contents">
-      <ul class="nav navbar-nav navbar-right">
-        <li class="dropdown" data-ng-class="{ active: active_page === 0 }">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-edit"></span> Edit <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page === 0 && active_data_structure === data_structure }"><a href="#" data-ng-click="editDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
-            <li class="divider"></li>
-            <li><a href="#" data-ng-click="newDataStructure(); $event.preventDefault();"><span class="glyphicon glyphicon-plus"></span> New data structure</a></li>
-          </ul>
-        </li>
-        <li class="dropdown" data-ng-class="{ active: active_page === 1 }">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-globe"></span> Explore <b class="caret"></b></a>
-          <ul class="dropdown-menu">
-            <li data-ng-repeat="data_structure in data_structures" data-ng-class="{ active: active_page === 1 && active_data_structure === data_structure }"><a href="#" data-ng-click="exploreDataStructure(data_structure); $event.preventDefault();">{{ data_structure.name || 'Untitled' }}</a></li>
-          </ul>
-        </li>
-=======
       <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-send"></span> Data Structure Explorer</a>
     </div>
     <div class="collapse navbar-collapse" id="navbar-contents">
@@ -40,7 +22,6 @@
         </li>
         <li data-ng-class="{ active: active_page === 0 }"><a href="#" data-ng-click="active_page = 0; $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
         <li data-ng-class="{ active: active_page === 1 }"><a href="#" data-ng-click="active_page = 1; $event.preventDefault();"><span class="glyphicon glyphicon-globe"></span> Explore</a></li>
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
       </ul>
     </div>
   </div>
@@ -68,20 +49,6 @@
         <div class="panel panel-default">
           <div class="panel-heading">Basic properties</div>
           <div class="panel-body">
-<<<<<<< HEAD
-            <div class="form-group">
-              <label for="ds-name">Name</label>
-              <input id="ds-name" type="text" class="form-control" placeholder="e.g., Binary search tree" data-ng-model="active_data_structure.name" />
-            </div>
-
-            <div class="form-group">
-              <label for="ds-model">Model of computation</label>
-              <select id="ds-model" class="form-control" data-ng-model="active_data_structure.model" data-ng-options="model as model.name for model in models">
-              </select>
-            </div>
-
-            <div class="form-group" data-ng-show="active_data_structure.model === models[0]">
-=======
             <form class="form-horizontal">
               <div class="form-group">
                 <label for="ds-name" class="col-sm-3 control-label">Name</label>
@@ -98,7 +65,6 @@
             </form>
 
             <div class="well" data-ng-show="active_data_structure.model === models[0]">
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
               <label>Node fields</label>
               <ul data-ng-show="active_data_structure.model_options.fields.length > 0">
                 <li data-ng-repeat="field in active_data_structure.model_options.fields">
@@ -125,8 +91,6 @@
               </form>
             </div>
 
-<<<<<<< HEAD
-=======
             <div class="well">
               <label>Operations</label>
               <ul data-ng-show="active_data_structure.operations.length > 0">
@@ -156,7 +120,6 @@
               </form>
             </div>
 
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
             <p class="no-bottom-margin">
               <a href="#" class="btn btn-danger" data-toggle="modal" data-target="#confirm-ds-delete-modal"><span class="glyphicon glyphicon-trash"></span> Delete data structure</a>
             </p>
@@ -164,35 +127,6 @@
         </div>
 
         <div class="panel panel-default">
-<<<<<<< HEAD
-          <div class="panel-heading">Operations</div>
-          <div class="panel-body">
-            <ul data-ng-show="active_data_structure.operations.length > 0">
-              <li data-ng-repeat="operation in active_data_structure.operations">
-                <div class="dropdown">
-                  <a data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
-                  <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
-                  <span class="compile-error" data-ng-show="operation.error" data-toggle="tooltip" data-placement="right" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
-                  <ul class="dropdown-menu">
-                    <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><i class="fi-arrow-up"></i> Move up</a></li>
-                    <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><i class="fi-arrow-down"></i> Move down</a></li>
-                    <li><a href="#" data-ng-click="deleteOperation(active_data_structure, operation); $event.preventDefault();"><i class="fi-minus-circle"></i> Delete</a></li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-            <form data-ng-submit="addOperation(active_data_structure); $event.preventDefault();">
-              <div class="form-group no-bottom-margin" data-ng-class="{ 'has-error': new_operation_error }">
-                <div class="input-group">
-                  <input type="text" class="form-control" data-ng-model="new_operation_name" data-ng-focus="clearAddOperationError()" data-ng-blur="clearAddOperationError()" placeholder="e.g., insert" />
-                  <span class="input-group-btn">
-                    <button type="submit" class="btn btn-default" data-ng-blur="clearAddOperationError()"><span class="glyphicon glyphicon-plus"></span> Add operation</button>
-                  </span>
-                </div>
-                <p class="no-bottom-margin" data-ng-show="new_operation_error">{{ new_operation_error }}</p>
-              </div>
-            </form>
-=======
           <div class="panel-heading">Model of computation</div>
           <div class="panel-body">
             <div data-ng-show="active_data_structure.model === models[0]">
@@ -221,22 +155,17 @@
                 </li>
               </ul>
             </div>
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
           </div>
         </div>
       </div>
       <div class="col-sm-8">
         <div data-ng-repeat="operation in active_data_structure.operations">
           <div class="form-group">
-<<<<<<< HEAD
-            <label for="ds-code-{{ operation.name }}"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></label>
-=======
-            <label for="ds-code-{{ operation.name }}">
+           <label for="ds-code-{{ operation.name }}">
               <code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
               <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
               <span class="compile-error" data-ng-show="operation.error" data-toggle="tooltip" data-placement="right" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
             </label>
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
             <div class="replace-with-codemirror"></div>
             <textarea id="ds-code-{{ operation.name }}" class="hidden" data-ng-model="operation.code"></textarea>
           </div>
@@ -270,16 +199,10 @@
           <div class="panel-body">
             <p>Model of computation: <em>{{ active_data_structure.model.name }}</em></p>
 
-<<<<<<< HEAD
-            <div class="form-group" data-ng-show="active_data_structure.model === models[0]">
-              <label>Node fields<span data-ng-show="active_data_structure.model_options.fields.length === 0">: None</span></label>
-              <ul data-ng-show="active_data_structure.model_options.fields.length > 0">
-=======
             <div class="well" data-ng-show="active_data_structure.model === models[0]">
               <label data-ng-show="active_data_structure.model_options.fields.length === 0" class="no-bottom-margin">Node fields: <a href="#" data-ng-click="active_page = 0; stopClick($event);">None</a></label>
               <label data-ng-show="active_data_structure.model_options.fields.length > 0">Node fields</label>
               <ul class="no-bottom-margin" data-ng-show="active_data_structure.model_options.fields.length > 0">
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
                 <li data-ng-repeat="field in active_data_structure.model_options.fields">
                   <div class="dropdown">
                     <code>{{ field }}</code>
@@ -287,25 +210,6 @@
                 </li>
               </ul>
             </div>
-<<<<<<< HEAD
-          </div>
-        </div>
-
-        <div class="panel panel-default">
-          <div class="panel-heading">Operations</div>
-          <div class="panel-body">
-            <ul class="no-bottom-margin" data-ng-show="active_data_structure.operations.length > 0">
-              <li data-ng-repeat="operation in active_data_structure.operations">
-                <code>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
-                <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
-                <span class="compile-error" data-ng-show="operation.error" data-toggle="tooltip" data-placement="right" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="col-sm-6" id="tree-container">
-=======
 
             <div class="well no-bottom-margin">
               <p class="no-bottom-margin" data-ng-show="active_data_structure.operations.length === 0">Switch to the <a href="#" data-ng-click="active_page = 0; stopClick($event);">Edit</a> view and define some operations.</p>
@@ -321,20 +225,14 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-6">
-        {{ makeString(computation_state.root) }}
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
+      <div class="col-sm-6" id="tree-container">
       </div>
       <div class="col-sm-3"> 
         <div class="panel panel-default">
           <div class="panel-heading">Command history</div>
           <div class="panel-body">
             <ul id="command-history" class="list-unstyled" data-ng-show="command_history.length > 0">
-<<<<<<< HEAD
-              <li class="command" data-ng-show="haveCommandHistory()" data-ng-class="{ 'command-active': command_history_cursor === null }">empty</li>
-=======
-              <li id="empty" class="command" data-ng-show="haveCommandHistory()" data-ng-class="{ 'command-active': command_history_cursor === null }">empty</li>
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
+             <li id="empty" class="command" data-ng-show="haveCommandHistory()" data-ng-class="{ 'command-active': command_history_cursor === null }">empty</li>
               <li class="command" data-ng-repeat="command in command_history">
                 <span data-ng-class="{ 'command-active': $index === command_history_cursor }">{{ command.str }}</span>
                 <ul>
@@ -372,13 +270,6 @@
   </div>
 </div>
 
-<<<<<<< HEAD
-<div data-ng-show="active_page == 1">
-  <div class="row">
-    <div class="small-12 column">
-	      <hr />
-=======
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
 <div id="confirm-ds-delete-modal" class="modal fade">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
@@ -395,12 +286,4 @@
       </div>
     </div>
   </div>
-<<<<<<< HEAD
-  <div class="row">
-	<div class="small-12 column">
-		<div id="tree-container" />
-	</div>
-  </div>
-=======
->>>>>>> cdc287049f9a465a9051612aa9fe4df66aaaed6c
 </div>
