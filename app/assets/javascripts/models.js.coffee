@@ -199,7 +199,7 @@ models.factory('models', ['makeString', 'getField', 'graph', (makeString, getFie
                         new_target = get_transparent_node(state, value)
 
                         add_old_edge = () ->
-                          if new_target?
+                          if old_target?
                             graph.add_edge(node_name, old_value.name, field, animate, done)
                           else
                             if done?
@@ -238,7 +238,7 @@ models.factory('models', ['makeString', 'getField', 'graph', (makeString, getFie
               if getField(current_state.opaque_root, 'name') == opaque_node.name
                 throw Error('Cannot delete node ' + opaque_node.name + ' because global.root points to it.')
               step = {
-                repr: 'delete_node(' + makeString(opaque_node) + ')',
+                repr: makeString(opaque_node) + '.remove()',
                 up: ((state, animate, done) ->
                   state.transparent_nodes[opaque_node.name] = undefined
                   if disable_rendering
