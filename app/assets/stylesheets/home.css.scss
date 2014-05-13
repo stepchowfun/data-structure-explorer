@@ -12,6 +12,10 @@ body {
     }
   }
 
+  ul.list-unstyled, ol.list-unstyled {
+    padding-left: 0;
+  }
+
   /* used for return values in REPL */
   ul > li > ul.list-unstyled {
     padding-left: 40px;

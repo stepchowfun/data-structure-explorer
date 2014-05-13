@@ -229,33 +229,33 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.load = () ->
     $scope.resetState () ->
       $scope.$apply ($scope) ->
-        localStorage = window['localStorage']
-        if localStorage?
-          try
-            ds = JSON.parse(localStorage.getItem('data_structures'))
-            if !ds?
-              $scope.message('Uh oh', 'There was a problem loading from local storage.')
-              return
-            $scope.data_structures = []
-            $scope.activateDataStructure(null)
-            watchDataStructures()
-            setTimeout((() ->
-              $scope.$apply(($scope) ->
-                $scope.data_structures = ds
-                if $scope.data_structures.length > 0
-                  $scope.activateDataStructure($scope.data_structures[0])
-                else
-                  $scope.activateDataStructure(null)
-                for data_structure in $scope.data_structures
-                  initializeDataStructure(data_structure)
-                watchDataStructures()
-                $scope.message('Load successful', 'The data structures were loaded successfully.')
-              )
-            ), 1)
-          catch
+      localStorage = window['localStorage']
+      if localStorage?
+        try
+          ds = JSON.parse(localStorage.getItem('data_structures'))
+          if !ds?
             $scope.message('Uh oh', 'There was a problem loading from local storage.')
-        else
-          $scope.message('Uh oh', 'Your browser doesn&rsquo;t support local storage.')
+            return
+          $scope.data_structures = []
+          $scope.activateDataStructure(null)
+          watchDataStructures()
+          setTimeout((() ->
+            $scope.$apply(($scope) ->
+              $scope.data_structures = ds
+              if $scope.data_structures.length > 0
+                $scope.activateDataStructure($scope.data_structures[0])
+              else
+                $scope.activateDataStructure(null)
+              for data_structure in $scope.data_structures
+                initializeDataStructure(data_structure)
+              watchDataStructures()
+              $scope.message('Load successful', 'The data structures were loaded successfully.')
+            )
+          ), 1)
+        catch
+          $scope.message('Uh oh', 'There was a problem loading from local storage.')
+      else
+        $scope.message('Uh oh', 'Your browser doesn&rsquo;t support local storage.')
 
   # fields
 
@@ -481,7 +481,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.new_command_error = Error('The basic properties of the data structure have changed. Reset the computation to continue.')
       return
 
-    $scope.fastForward(true, true, () ->
+    $scope.fastForward(true, false, () ->
       $scope.$apply ($scope) ->
         result = runCommand($scope.computation_state, $scope.new_command_str, $scope.active_data_structure.operations, $scope.computation_model, $scope.computation_model_options)
         if result.error?
@@ -498,13 +498,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         input_history_cursor = null
         $scope.new_command_str = ''
         $scope.clearNewCommandError()
-        if command.steps.length > 0
-          if $scope.command_history_cursor?
-            $scope.jumpTo($scope.command_history_cursor + 1, command.steps.length - 1, true, true, (() -> $('#new-command-str').focus()))
-          else
-            $scope.jumpTo(0, command.steps.length - 1, true, true, (() -> $('#new-command-str').focus()))
-        else
-          setTimeout((() -> $('#new-command-str').focus()), 1)
+        $scope.fastForward(true, true, () -> $('#new-command-str').focus())
     )
 
   $scope.haveCommandHistory = () ->
@@ -546,17 +540,15 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     if !$scope.canStepForward()
       throw Error('Cannot step forward.')
 
-    if $scope.command_history_cursor == null
-      cursor = 0
-      step_cursor = 0
-    else
+    if $scope.command_history_cursor?
       cursor = $scope.command_history_cursor
       step_cursor = $scope.command_history_step_cursor + 1
+    else
+      cursor = 0
+      step_cursor = 0
     while step_cursor == $scope.command_history[cursor].steps.length
       cursor += 1
       step_cursor = 0
-      if cursor == $scope.command_history.length
-        return
     $scope.command_history_cursor = cursor
     $scope.command_history_step_cursor = step_cursor
     $scope.animating = true
@@ -565,10 +557,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         $scope.$apply ($scope) ->
           $scope.animating = false
         if scroll
-          if $scope.command_history_cursor? and $scope.command_history_step_cursor?
-            elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
-            if elements.length > 0
-              scrollIntoView($('#command-history')[0], elements[0])
+          elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
+          scrollIntoView($('#command-history')[0], elements[0])
         if done?
           setTimeout(done, 1)
       ), 1)
@@ -652,8 +642,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       setTimeout((() ->
         if $scope.command_history_cursor? and $scope.command_history_step_cursor?
           elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
-          if elements.length > 0
-            scrollIntoView($('#command-history')[0], elements[0])
+          scrollIntoView($('#command-history')[0], elements[0])
         else
           scrollIntoView($('#command-history')[0], $('#empty')[0])
       ), 1)

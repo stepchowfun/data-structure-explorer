@@ -304,7 +304,7 @@ models.factory('runCommand', ['sandbox', (sandbox) ->
         error: fragment.error
       }
     return {
-      steps: command_steps,
+      steps: angular.copy(command_steps),
       return_value: fragment.compiled_value,
       error: null
     }
