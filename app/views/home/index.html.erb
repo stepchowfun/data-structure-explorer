@@ -88,9 +88,9 @@
               <form data-ng-submit="addField(); $event.preventDefault();">
                 <div class="form-group no-bottom-margin" data-ng-class="{ 'has-error': new_field_error }">
                   <div class="input-group">
-                    <input type="text" class="form-control" data-ng-model="new_field_name" data-ng-focus="clearAddFieldError()" data-ng-blur="clearAddFieldError()" placeholder="e.g., left_child" />
+                    <input type="text" class="form-control" data-ng-model="new_field_name" data-ng-change="clearAddFieldError()" placeholder="e.g., left_child" />
                     <span class="input-group-btn">
-                      <button type="submit" class="btn btn-default" data-ng-blur="clearAddFieldError()"><span class="glyphicon glyphicon-plus"></span> Add field</button>
+                      <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add field</button>
                     </span>
                   </div>
                   <p class="no-bottom-margin" data-ng-show="new_field_error">{{ new_field_error.message }}</p>
@@ -107,27 +107,29 @@
                       <input type="text" id="new-operation-name-{{ operation.name }}" class="form-control inline-block" data-ng-model="new_operation_name" data-ng-blur="renameOperation(operation, new_operation_name); rename = false;" placeholder="e.g., insert" />
                       <input type="submit" class="hidden" />
                     </form>
-                    <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
-                    <span class="compile-success" data-ng-hide="operation.error || rename" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
-                    <span data-ng-show="operation.error && !rename">
-                      <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
-                      <span class="compile-error" data-ng-hide="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
+                    <span class="no-wrap">
+                      <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
+                      <span class="compile-success" data-ng-hide="operation.error || rename" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
+                      <span data-ng-show="operation.error && !rename">
+                        <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
+                        <span class="compile-error" data-ng-hide="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
+                      </span>
+                      <ul class="dropdown-menu">
+                        <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><span class="glyphicon glyphicon-arrow-up"></span> Move up</a></li>
+                        <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><span class="glyphicon glyphicon-arrow-down"></span> Move down</a></li>
+                        <li><a href="#" data-ng-click="rename = true; new_operation_name = operation.name; prepareRenameOperation(operation); $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Rename</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#confirm-operation-delete-modal" data-ng-click="prepareDeleteOperation(operation)"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
+                      </ul>
                     </span>
-                    <ul class="dropdown-menu">
-                      <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><span class="glyphicon glyphicon-arrow-up"></span> Move up</a></li>
-                      <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><span class="glyphicon glyphicon-arrow-down"></span> Move down</a></li>
-                      <li><a href="#" data-ng-click="rename = true; new_operation_name = operation.name; prepareRenameOperation(operation); $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Rename</a></li>
-                      <li><a href="#" data-toggle="modal" data-target="#confirm-operation-delete-modal" data-ng-click="prepareDeleteOperation(operation)"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
-                    </ul>
                   </div>
                 </li>
               </ul>
               <form data-ng-submit="addOperation(active_data_structure); $event.preventDefault();">
                 <div class="form-group no-bottom-margin" data-ng-class="{ 'has-error': new_operation_error }">
                   <div class="input-group">
-                    <input type="text" class="form-control" data-ng-model="new_operation_name" data-ng-focus="clearAddOperationError()" data-ng-blur="clearAddOperationError()" placeholder="e.g., insert" />
+                    <input type="text" class="form-control" data-ng-model="new_operation_name" data-ng-change="clearAddOperationError()" placeholder="e.g., insert" />
                     <span class="input-group-btn">
-                      <button type="submit" class="btn btn-default" data-ng-blur="clearAddOperationError()"><span class="glyphicon glyphicon-plus"></span> Add operation</button>
+                      <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add operation</button>
                     </span>
                   </div>
                   <p class="no-bottom-margin" data-ng-show="new_operation_error">{{ new_operation_error.message }}</p>
@@ -149,24 +151,20 @@
               <p>A model of computation in which nodes of fixed or bounded size are linked. The following primitive operations are supported:</p>
               <ul class="no-bottom-margin">
                 <li>
-                  <p class="no-bottom-margin"><code>make_node(data)</code></p>
-                  <p>Create a new node. Optionally, a <code>data</code> object may be provided which is used to initialize the fields of the node. At attempt to initialize fields that are not listed above will raise an error.</p>
+                  <p class="no-bottom-margin"><code>node = make_node(data)</code></p>
+                  <p>Create a new node. Optionally, a <code>data</code> object may be provided which is used to initialize the fields of the node. At attempt to initialize fields that are not listed above is an error.</p>
                 </li>
                 <li>
-                  <p class="no-bottom-margin"><code>delete_node(node)</code></p>
-                  <p>Delete a node. An error will be raised if any other nodes point to it.</p>
+                  <p class="no-bottom-margin"><code>node.remove()</code></p>
+                  <p>Delete a node. An error will be raised if any other nodes (or the root) point(s) to it.</p>
                 </li>
                 <li>
-                  <p class="no-bottom-margin"><code>x.field</code></p>
-                  <p>Read a field of a node.</p>
-                </li>
-                <li>
-                  <p class="no-bottom-margin"><code>x.field = y</code></p>
-                  <p>Assign to a field of a node.</p>
+                  <p class="no-bottom-margin"><code>node.field</code></p>
+                  <p>Read from or write to a field of a node. At attempt to read from or write to a field not listed above is an error.</p>
                 </li>
                 <li>
                   <p class="no-bottom-margin"><code>global.root</code></p>
-                  <p class="no-bottom-margin">The global entry point into the data structure. This pointer may be written to and read from.</p>
+                  <p class="no-bottom-margin">The global entry point into the data structure. This pointer may be written to and read from. At attempt to assign this pointer to anything other than a node or <code>null</code> is an error.</p>
                 </li>
               </ul>
             </div>
@@ -234,11 +232,13 @@
               <label data-ng-show="active_data_structure.operations.length > 0">Operations</label>
               <ul class="no-bottom-margin" data-ng-show="active_data_structure.operations.length > 0">
                 <li data-ng-repeat="operation in active_data_structure.operations">
-                  <code>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
-                  <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
-                  <span data-ng-show="operation.error">
-                    <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
-                    <span class="compile-error" data-ng-hide="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
+                  <span class="no-wrap">
+                    <code>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
+                    <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
+                    <span data-ng-show="operation.error">
+                      <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
+                      <span class="compile-error" data-ng-hide="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
+                    </span>
                   </span>
                 </li>
               </ul>
@@ -271,24 +271,26 @@
             <form data-ng-submit="newCommand(); $event.preventDefault();">
               <div class="form-group" data-ng-class="{ 'has-error': new_command_error }">
                 <div class="input-group">
-                  <input id="new_command_str" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-focus="clearNewCommandError()" data-ng-blur="clearNewCommandError()" placeholder="e.g., insert(5)" data-ng-disabled="animating" />
+                  <input id="new-command-str" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-change="clearNewCommandError()" placeholder="e.g., insert(5)" data-ng-disabled="animating" />
                   <span class="input-group-btn">
-                    <button class="btn btn-default" type="submit" data-ng-blur="clearNewCommandError()">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
+                    <button class="btn btn-default" type="submit" data-ng-disabled="animating">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
                   </span>
                 </div>
                 <p data-ng-show="new_command_error">
                   {{ new_command_error.name }}: {{ new_command_error.message }}
                 </p>
-                <pre data-ng-show="new_command_error && new_command_error.stack_list" data-ng-bind-html="new_command_error.stack_list.join('\n')"></pre>
+                <ul data-ng-show="new_command_error && new_command_error.stack_list">
+                  <li data-ng-repeat="line in new_command_error.stack_list"><code>{{ line }}</code></li>
+                </ul>
               </div>
             </form>
 
             <p class="btn-group no-bottom-margin">
-              <a href="#" class="btn btn-default" data-ng-click="fastBackward(true); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || animating }"><span class="glyphicon glyphicon-fast-backward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="fastBackward(true, false, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || animating }"><span class="glyphicon glyphicon-fast-backward"></span></a>
               <a href="#" class="btn btn-default" data-ng-click="stepBackward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || animating }"><span class="glyphicon glyphicon-step-backward"></span></a>
-              <a href="#" class="btn btn-danger" data-ng-click="resetState(); $event.preventDefault();" data-ng-class="{ 'disabled': !haveCommandHistory() || animating }"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
+              <a href="#" class="btn btn-danger" data-ng-click="resetState(null); $event.preventDefault();" data-ng-class="{ 'disabled': !haveCommandHistory() || animating }"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
               <a href="#" class="btn btn-default" data-ng-click="stepForward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || animating }"><span class="glyphicon glyphicon-step-forward"></span></a>
-              <a href="#" class="btn btn-default" data-ng-click="fastForward(true); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || animating }"><span class="glyphicon glyphicon-fast-forward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="fastForward(true, false, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || animating }"><span class="glyphicon glyphicon-fast-forward"></span></a>
             </p>
           </div>
         </div>

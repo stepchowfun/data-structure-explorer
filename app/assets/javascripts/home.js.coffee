@@ -247,8 +247,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
             for data_structure in $scope.data_structures
               initializeDataStructure(data_structure)
             watchDataStructures()
-            $scope.resetState()
-            $scope.message('Load successful', 'The data structures were loaded successfully.')
+            $scope.resetState(() ->
+              $scope.$apply ($scope) ->
+                $scope.message('Load successful', 'The data structures were loaded successfully.')
+            )
           )
         ), 1)
       catch
@@ -406,45 +408,38 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.computation_state = null
   $scope.computation_model = null
   $scope.computation_model_options = null
-  $scope.command_history = null
+  $scope.command_history = [ ]
   $scope.command_history_cursor = null
   $scope.command_history_step_cursor = null
-  history_cursor = null
+  input_history_cursor = null
 
-  $scope.resetState = () ->
+  $scope.resetState = (done) ->
     # the gui should prevent this, but just in case
     if $scope.animating
       throw Error('Cannot reset the state while animating.')
 
+    new_done = () ->
+      $scope.$apply ($scope) ->
+        $scope.new_command_error = null
+        if $scope.active_data_structure?
+          $scope.computation_state = models[$scope.active_data_structure.model].getInitialState($scope.active_data_structure.model_options)
+          $scope.computation_model = models[$scope.active_data_structure.model]
+          $scope.computation_model_options = $scope.active_data_structure.model_options
+          $scope.command_history = [ ]
+        else
+          $scope.computation_state = null
+          $scope.computation_model = null
+          $scope.computation_model_options = null
+          $scope.command_history = [ ]
+      if done?
+        done()
+
     if $scope.command_history?
-      $scope.fastBackward(false)
-    if $scope.active_data_structure?
-      $scope.computation_state = models[$scope.active_data_structure.model].getInitialState($scope.active_data_structure.model_options)
-      $scope.computation_model = models[$scope.active_data_structure.model]
-      $scope.computation_model_options = $scope.active_data_structure.model_options
-      $scope.command_history = [ ]
-
-  $scope.resetState()
-
-  $scope.animateTo = (cursor, step_cursor) ->
-    # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot start new animation while already animating.')
-
-    if $scope.command_history_cursor?
-      if $scope.command_history_cursor < cursor or ($scope.command_history_cursor == cursor and $scope.command_history_step_cursor < step_cursor)
-        $scope.stepForward(true, true, () ->
-          $scope.animateTo(cursor, step_cursor)
-        )
-      if $scope.command_history_cursor > cursor or ($scope.command_history_cursor == cursor and $scope.command_history_step_cursor > step_cursor)
-        $scope.stepBackward(true, true, () ->
-          $scope.animateTo(cursor, step_cursor)
-        )
+      $scope.fastBackward(false, false, new_done)
     else
-      if cursor?
-        $scope.stepForward(true, true, () ->
-          $scope.animateTo(cursor, step_cursor)
-        )
+      setTimeout(new_done, 1)
+
+  setTimeout((() -> $scope.resetState(null)), 1)
 
   $scope.clearNewCommandError = () ->
     $scope.new_command_error = null
@@ -467,198 +462,241 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         $scope.new_command_error = operation.error
         return
 
-    if !$scope.haveCommandHistory()
-      $scope.resetState()
-
     if $scope.computation_model != models[$scope.active_data_structure.model]
+      if !$scope.haveCommandHistory()
+        $scope.resetState(() ->
+          $scope.$apply ($scope) ->
+            $scope.newCommand()
+        )
+        return
       $scope.new_command_error = Error('Reset the state or set the model of computation back to: ' + $scope.computation_model.name + '.')
       return
 
     if !angular.equals($scope.computation_model_options, $scope.active_data_structure.model_options)
+      if !$scope.haveCommandHistory()
+        $scope.resetState(() ->
+          $scope.$apply ($scope) ->
+            $scope.newCommand()
+        )
+        return
       $scope.new_command_error = Error('The basic properties of the data structure have changed. Reset the computation to continue.')
       return
 
-    $scope.fastForward(true)
-    result = runCommand($scope.computation_state, $scope.new_command_str, $scope.active_data_structure.operations, $scope.computation_model, $scope.computation_model_options)
-    if result.error?
-      $scope.new_command_error = result.error
-      if $scope.new_command_error.stack_list?
-        $scope.new_command_error.stack_list.pop()
-      return
-    command = {
-      str: $scope.new_command_str,
-      steps: result.steps,
-      return_value: result.return_value
-    }
-    $scope.command_history.push(command)
-    $scope.new_command_str = ''
-    history_cursor = null
-    $scope.clearNewCommandError()
-    if command.steps.length > 0
-      if $scope.command_history_cursor?
-        $scope.animateTo($scope.command_history_cursor + 1, command.steps.length - 1)
-      else
-        $scope.animateTo(0, command.steps.length - 1)
+    $scope.fastForward(true, true, () ->
+      $scope.$apply ($scope) ->
+        result = runCommand($scope.computation_state, $scope.new_command_str, $scope.active_data_structure.operations, $scope.computation_model, $scope.computation_model_options)
+        if result.error?
+          $scope.new_command_error = result.error
+          if $scope.new_command_error.stack_list?
+            $scope.new_command_error.stack_list.pop()
+          return
+        command = {
+          str: $scope.new_command_str,
+          steps: result.steps,
+          return_value: result.return_value
+        }
+        $scope.command_history.push(command)
+        input_history_cursor = null
+        $scope.new_command_str = ''
+        $scope.clearNewCommandError()
+        if command.steps.length > 0
+          if $scope.command_history_cursor?
+            $scope.jumpTo($scope.command_history_cursor + 1, command.steps.length - 1, true, true, (() -> $('#new-command-str').focus()))
+          else
+            $scope.jumpTo(0, command.steps.length - 1, true, true, (() -> $('#new-command-str').focus()))
+        else
+          setTimeout((() -> $('#new-command-str').focus()), 1)
+    )
 
   $scope.haveCommandHistory = () ->
     return $scope.command_history? and $scope.command_history.length > 0
 
   $scope.stepBackward = (scroll, animate, done) ->
-    # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot step backward while animating.')
+    if !$scope.canStepBackward()
+      throw Error('Cannot step backward.')
 
-    if $scope.command_history? and $scope.command_history.length > 0
-      if $scope.command_history_cursor == null
-        return
-      cursor = $scope.command_history_cursor
-      step_cursor = $scope.command_history_step_cursor - 1
-      while step_cursor == -1
-        cursor -= 1
-        if cursor == -1
-          cursor = null
-          step_cursor = null
-          break
-        step_cursor = $scope.command_history[cursor].steps.length - 1
-      $scope.animating = true
-      $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computation_state, animate, () ->
+    cursor = $scope.command_history_cursor
+    step_cursor = $scope.command_history_step_cursor - 1
+    while step_cursor == -1
+      cursor -= 1
+      if cursor == -1
+        cursor = null
+        step_cursor = null
+        break
+      step_cursor = $scope.command_history[cursor].steps.length - 1
+    $scope.animating = true
+    $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computation_state, animate, () ->
+      setTimeout((() ->
         $scope.$apply ($scope) ->
           $scope.animating = false
-          if done?          
-            done($scope)
-      )
-      $scope.command_history_cursor = cursor
-      $scope.command_history_step_cursor = step_cursor
-      if scroll
-        setTimeout((() ->
+        if scroll
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
             elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
             if elements.length > 0
               scrollIntoView($('#command-history')[0], elements[0])
-        ), 1)
+          else
+            scrollIntoView($('#command-history')[0], $('#empty')[0])
+        if done?
+          setTimeout(done, 1)
+      ), 1)
+    )
+    $scope.command_history_cursor = cursor
+    $scope.command_history_step_cursor = step_cursor
 
   $scope.stepForward = (scroll, animate, done) ->
-    # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot step forward while animating.')
+    if !$scope.canStepForward()
+      throw Error('Cannot step forward.')
 
-    if $scope.command_history? and $scope.command_history.length > 0
-      if $scope.command_history_cursor == null
-        cursor = 0
-        step_cursor = 0
-      else
-        cursor = $scope.command_history_cursor
-        step_cursor = $scope.command_history_step_cursor + 1
-      while step_cursor == $scope.command_history[cursor].steps.length
-        cursor += 1
-        step_cursor = 0
-        if cursor == $scope.command_history.length
-          return
-      $scope.command_history_cursor = cursor
-      $scope.command_history_step_cursor = step_cursor
-      $scope.animating = true
-      $scope.command_history[cursor].steps[step_cursor].up($scope.computation_state, animate, () ->
+    if $scope.command_history_cursor == null
+      cursor = 0
+      step_cursor = 0
+    else
+      cursor = $scope.command_history_cursor
+      step_cursor = $scope.command_history_step_cursor + 1
+    while step_cursor == $scope.command_history[cursor].steps.length
+      cursor += 1
+      step_cursor = 0
+      if cursor == $scope.command_history.length
+        return
+    $scope.command_history_cursor = cursor
+    $scope.command_history_step_cursor = step_cursor
+    $scope.animating = true
+    $scope.command_history[cursor].steps[step_cursor].up($scope.computation_state, animate, () ->
+      setTimeout((() ->
         $scope.$apply ($scope) ->
           $scope.animating = false
-          if done?          
-            done($scope)
-      )
-      if scroll
-        setTimeout((() ->
+        if scroll
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
             elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
             if elements.length > 0
               scrollIntoView($('#command-history')[0], elements[0])
-        ), 1)
+        if done?
+          setTimeout(done, 1)
+      ), 1)
+    )
 
-  $scope.fastBackward = (scroll) ->
-    # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot fast backward while animating.')
+  $scope.fastBackward = (scroll, animate, done) ->
+    $scope.jumpTo(null, null, scroll, animate, done)
 
-    if $scope.canStepBackward()
-      $scope.stepBackward(false, false, ($scope) -> $scope.fastBackward(scroll))
-    else
-      if scroll
-        setTimeout((() ->
-          scrollIntoView($('#command-history')[0], $('#empty')[0])
-        ), 1)
-
-  $scope.fastForward = (scroll) ->
-    # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot fast forward while animating.')
-
-    if $scope.canStepForward()
-      $scope.stepForward(false, false, ($scope) -> $scope.fastForward(scroll))
-    else
-      if scroll
-        setTimeout((() ->
-          if $scope.command_history_cursor? and $scope.command_history_step_cursor?
-            elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
-            if elements.length > 0
-              scrollIntoView($('#command-history')[0], elements[0])
-        ), 1)
+  $scope.fastForward = (scroll, animate, done) ->
+    last_cursor = null
+    last_step_cursor = null
+    for command, i in $scope.command_history
+      for step, j in command.steps
+        last_cursor = i
+        last_step_cursor = j
+    $scope.jumpTo(last_cursor, last_step_cursor, scroll, false, done)
+    setTimeout((() ->
+      $("#command-history").scrollTop($("#command-history")[0].scrollHeight)
+    ), 1)
 
   $scope.canStepBackward = () ->
     if $scope.animating
       return false
     if $scope.command_history? and $scope.command_history.length > 0
-      if $scope.command_history_cursor == null
-        return false
-      return true
+      return $scope.command_history_cursor != null
     return false
 
   $scope.canStepForward = () ->
     if $scope.animating
       return false
     if $scope.command_history? and $scope.command_history.length > 0
-      if $scope.command_history_cursor == null
-        cursor = 0
-        step_cursor = 0
-      else
-        cursor = $scope.command_history_cursor
-        step_cursor = $scope.command_history_step_cursor + 1
-      while step_cursor == $scope.command_history[cursor].steps.length
-        cursor += 1
-        step_cursor = 0
-        if cursor == $scope.command_history.length
-          return false
-      return true
+      last_cursor = null
+      last_step_cursor = null
+      for command, i in $scope.command_history
+        for step, j in command.steps
+          last_cursor = i
+          last_step_cursor = j
+      if !last_cursor?
+        return false
+      if !$scope.command_history_cursor?
+        return true
+      if $scope.command_history_cursor < last_cursor
+        return true
+      if $scope.command_history_cursor == last_cursor and $scope.command_history_step_cursor < last_step_cursor
+        return true
     return false
 
+  $scope.jumpTo = (cursor, step_cursor, scroll, animate, done) ->
+    # the gui should prevent this, but just in case
+    if $scope.animating
+      throw Error('Cannot start new animation while already animating.')
+    if $scope.command_history_cursor?
+      if cursor?
+        if $scope.command_history_cursor < cursor or ($scope.command_history_cursor == cursor and $scope.command_history_step_cursor < step_cursor)
+          $scope.stepForward(scroll and animate, animate, () ->
+            $scope.$apply ($scope) ->
+              $scope.jumpTo(cursor, step_cursor, scroll, animate, done)
+          )
+          return
+        if $scope.command_history_cursor > cursor or ($scope.command_history_cursor == cursor and $scope.command_history_step_cursor > step_cursor)
+          $scope.stepBackward(scroll and animate, animate, () ->
+            $scope.$apply ($scope) ->
+              $scope.jumpTo(cursor, step_cursor, scroll, animate, done)
+          )
+          return
+      else
+        $scope.stepBackward(scroll and animate, animate, () ->
+          $scope.$apply ($scope) ->
+            $scope.jumpTo(cursor, step_cursor, scroll, animate, done)
+        )
+        return
+    else
+      if cursor?
+        $scope.stepForward(scroll and animate, animate, () ->
+          $scope.$apply ($scope) ->
+            $scope.jumpTo(cursor, step_cursor, scroll, animate, done)
+        )
+        return
+
+    if scroll and !animate
+      setTimeout((() ->
+        if $scope.command_history_cursor? and $scope.command_history_step_cursor?
+          elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
+          if elements.length > 0
+            scrollIntoView($('#command-history')[0], elements[0])
+        else
+          scrollIntoView($('#command-history')[0], $('#empty')[0])
+      ), 1)
+
+    if done?
+      setTimeout(done, 1)
+
   $scope.commandKeyDown = (event) ->
+    if $('#new-command-str').attr('disabled')?
+      return
+
     # up
     if event.keyCode == 38
       if $scope.haveCommandHistory()
-        if history_cursor == null
-          history_cursor = $scope.command_history.length
-        if history_cursor > 0
-          history_cursor -= 1
-          $scope.new_command_str = $scope.command_history[history_cursor].str
+        if input_history_cursor == null
+          input_history_cursor = $scope.command_history.length
+        if input_history_cursor > 0
+          input_history_cursor -= 1
+          $scope.new_command_str = $scope.command_history[input_history_cursor].str
           setTimeout((() ->
-              $('#new_command_str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
+              $('#new-command-str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
             ), 1)
           event.preventDefault()
       else
-        history_cursor = null
+        input_history_cursor = null
 
     # down
     if event.keyCode == 40
       if $scope.haveCommandHistory()
-        if history_cursor == null
-          history_cursor = $scope.command_history.length
-        if history_cursor < $scope.command_history.length
-          history_cursor += 1
-          if history_cursor < $scope.command_history.length
-            $scope.new_command_str = $scope.command_history[history_cursor].str
+        if input_history_cursor == null
+          input_history_cursor = $scope.command_history.length
+        if input_history_cursor < $scope.command_history.length
+          input_history_cursor += 1
+          if input_history_cursor < $scope.command_history.length
+            $scope.new_command_str = $scope.command_history[input_history_cursor].str
             setTimeout((() ->
-                $('#new_command_str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
+                $('#new-command-str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
               ), 1)
             event.preventDefault()
           else
             $scope.new_command_str = ''
       else
-        history_cursor = null
+        input_history_cursor = null
 
 ])

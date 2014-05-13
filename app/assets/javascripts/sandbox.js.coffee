@@ -1,4 +1,4 @@
-sandbox = angular.module('sandbox', [])
+sandbox = angular.module('sandbox', ['makeString'])
 
 sandbox.factory('sandbox', ['makeString', (makeString) ->
   (() -> return ((fragments, definitions) ->

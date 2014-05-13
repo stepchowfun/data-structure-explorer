@@ -1,35 +1,27 @@
-models = angular.module('models', [ ])
+models = angular.module('models', ['sandbox', 'makeString', 'getField', 'graph'])
 
 command_steps = [ ]
 current_state = null
 current_model_options = null
+disable_rendering = false
 
-models.factory('models', ['makeString', (makeString) ->
+models.factory('models', ['makeString', 'getField', 'graph', (makeString, getField, graph) ->
   get_transparent_node = (state, opaque_node) ->
-    if !opaque_node? or !opaque_node.name?
+    if !opaque_node? or !getField(opaque_node, 'name')?
       return null
-    if !state.nodes[opaque_node.name]?
+    if !state.transparent_nodes[opaque_node.name]?
       return null
-    return state.nodes[opaque_node.name]
-
-  add_node = (id) ->
-
-  remove_node = (id) ->
-
-  add_edge = (source, target) ->
-
-  remove_edge = (source, target) ->
+    return state.transparent_nodes[opaque_node.name]
 
   machines_array = [
     {
-      constructor: (() ->),
       name: 'Pointer machine',
       machine_name: 'pointer_machine',
       getInitialState: (() ->
         return {
-          root: null,
-          nodes: { },
-          index: 0
+          opaque_root: null,
+          transparent_nodes: { },
+          name_accumulator: 0
         }
       ),
       api: {
@@ -38,94 +30,104 @@ models.factory('models', ['makeString', (makeString) ->
           Object.defineProperty(global, 'root', {
             enumerable: true,
             get: (() ->
-              if current_state?
-                return current_state.root
+              return getField(current_state, 'opaque_root')
             ),
-            set: ((root) ->
-              old_root = current_state.root
+            set: ((opaque_root) ->
+              old_opaque_root = current_state.opaque_root
+              if opaque_root != null and !get_transparent_node(current_state, opaque_root)
+                throw Error(makeString(opaque_root) + ' is not a node.')
               step = {
-                repr: 'global.root = ' + makeString(root) + '',
+                repr: 'global.root = ' + makeString(opaque_root) + '',
                 up: ((state, animate, done) ->
-                  target = get_transparent_node(state, old_root)
-                  if target?
-                    remove_edge('root', old_root.name)
-
-                  state.root = root
-
-                  target = get_transparent_node(state, root)
-                  if target?
-                    add_edge('root', root.name)
-
-                  if done?
-                    setTimeout(done, 1)
+                  current_state.opaque_root = opaque_root
+                  if disable_rendering
+                    if done?
+                      done()
+                  else
+                    if opaque_root?
+                      graph.set_root(opaque_root.name, animate, done)
+                    else
+                      graph.set_root(null, animate, done)
                 ),
                 down: ((state, animate, done) ->
-                  target = get_transparent_node(state, root)
-                  if target?
-                    remove_edge('root', root.name)
-
-                  state.root = old_root
-
-                  target = get_transparent_node(state, old_root)
-                  if target?
-                    add_edge('root', old_root.name)
-
-                  if done?
-                    setTimeout(done, 1)
+                  current_state.opaque_root = old_opaque_root
+                  if disable_rendering
+                    if done?
+                      done()
+                  else
+                    if old_opaque_root?
+                      graph.set_root(old_opaque_root.name, animate, done)
+                    else
+                      graph.set_root(null, animate, done)
                 ),
               }
-              step.up(current_state, false, null)
               command_steps.push(step)
+              step.up(current_state, false, null)
               undefined
             )
           })
           return global
         )(),
         make_node: ((data) ->
-          node = { }
+          transparent_node = { }
           for field in current_model_options.fields
-            node[field] = null
+            transparent_node[field] = null
           if data?
             for key, value of data
               if key not in current_model_options.fields
                 throw Error('Unknown field: ' + key + '.')
-              node[key] = value
-          node_name = 'n' + current_state.index.toString()
+              transparent_node[key] = value
+          node_name = 'n' + current_state.name_accumulator.toString()
+          original_graph_node_data = { }
+          original_graph_link_data = [ ]
+          for key, value of transparent_node
+            if get_transparent_node(current_state, value)?
+              original_graph_link_data.push([node_name, value.name, key])
+            else
+              original_graph_node_data[key] = value
           step = {
             repr: node_name + ' = make_node(' + makeString(data) + ')',
             up: ((state, animate, done) ->
-              state.index += 1
-              state.nodes[node_name] = node
-
-              add_node(node_name)
-
-              if data?
-                for field in current_model_options.fields
-                  target = get_transparent_node(state, data[field])
-                  if target?
-                    add_edge(node_name, value.name)
-
-              if done?
-                setTimeout(done, 1)
+              state.name_accumulator += 1
+              state.transparent_nodes[node_name] = transparent_node
+              if disable_rendering
+                if done?
+                  done()
+              else
+                process_graph_link_data = (remaining_graph_link_data) ->
+                  if remaining_graph_link_data.length > 0
+                    graph.add_edge(remaining_graph_link_data[0][0], remaining_graph_link_data[0][1], remaining_graph_link_data[0][2], animate, () ->
+                      process_graph_link_data(remaining_graph_link_data.slice(1))
+                    )
+                  else
+                    if done?
+                      done()
+                graph.add_node(node_name, original_graph_node_data, animate, () ->
+                  process_graph_link_data(original_graph_link_data)
+                )
             ),
             down: ((state, animate, done) ->
-              if data?
-                for field in current_model_options.fields
-                  target = get_transparent_node(state, data[field])
-                  if target?
-                    remove_edge(node_name, data[field].name)
-
-              remove_node(node_name)
-
-              state.nodes[node_name] = undefined
-              state.index -= 1
-
-              if done?
-                setTimeout(done, 1)
-            ),
+              state.transparent_nodes[node_name] = undefined
+              state.name_accumulator -= 1
+              if disable_rendering
+                if done?
+                  done()
+              else
+                process_graph_link_data = (remaining_graph_link_data) ->
+                  if remaining_graph_link_data.length > 0
+                    graph.remove_edge(remaining_graph_link_data[0][0], remaining_graph_link_data[0][1], animate, () ->
+                      process_graph_link_data(remaining_graph_link_data.slice(1))
+                    )
+                  else
+                    graph.remove_node(node_name, animate, () ->
+                      if done?
+                        done()
+                    )
+                process_graph_link_data(original_graph_link_data)
+            )
           }
-          step.up(current_state, false, null)
           command_steps.push(step)
+          step.up(current_state, false, null)
 
           opaque_node = { }
           Object.defineProperty(opaque_node, 'toString', {
@@ -139,43 +141,83 @@ models.factory('models', ['makeString', (makeString) ->
               Object.defineProperty(opaque_node, field, {
                 enumerable: true,
                 get: (() ->
-                  if !current_state.nodes[node_name]?
+                  if !get_transparent_node(current_state, opaque_node)?
                     throw Error('Node ' + node_name + ' does not exist.')
-                  return current_state.nodes[node_name][field]
+                  return current_state.transparent_nodes[node_name][field]
                 ),
                 set: ((value) ->
-                  if !current_state.nodes[node_name]?
+                  if !get_transparent_node(current_state, opaque_node)?
                     throw Error('Node ' + node_name + ' does not exist.')
-                  old_value = current_state.nodes[node_name][field]
+                  old_value = transparent_node[field]
+                  old_graph_node_data = { }
+                  for k, v of transparent_node
+                    if !get_transparent_node(current_state, v)?
+                      old_graph_node_data[k] = v
                   step = {
                     repr: node_name + '.' + field + ' = ' + makeString(value),
                     up: ((state, animate, done) ->
-                      target = get_transparent_node(state, old_value)
-                      if target?
-                        remove_edge(node_name, old_value.name)
+                      transparent_node[field] = value
+                      if disable_rendering
+                        if done?
+                          done()
+                      else
+                        old_target = get_transparent_node(state, old_value)
+                        new_target = get_transparent_node(state, value)
 
-                      state.nodes[node_name][field] = value
+                        add_new_edge = () ->
+                          if new_target?
+                            graph.add_edge(node_name, value.name, field, animate, done)
+                          else
+                            if done?
+                              done()
 
-                      target = get_transparent_node(state, value)
-                      if target?
-                        add_edge(node_name, value.name)
+                        update_node_data = () ->
+                          if !old_target? or !new_target?
+                            new_graph_node_data = { }
+                            for k, v of transparent_node
+                              if !get_transparent_node(state, v)?
+                                new_graph_node_data[k] = v
+                            graph.set_node_data(node_name, new_graph_node_data, animate, add_new_edge)
+                          else
+                            add_new_edge()
 
-                      if done?
-                        setTimeout(done, 1)
+                        remove_old_edge = () ->
+                          if old_target?
+                            graph.remove_edge(node_name, old_value.name, animate, update_node_data)
+                          else
+                            update_node_data()
+
+                        remove_old_edge()
                     ),
                     down: ((state, animate, done) ->
-                      target = get_transparent_node(state, value)
-                      if target?
-                        remove_edge(node_name, value.name)
+                      transparent_node[field] = old_value
+                      if disable_rendering
+                        if done?
+                          done()
+                      else
+                        old_target = get_transparent_node(state, old_value)
+                        new_target = get_transparent_node(state, value)
 
-                      state.nodes[node_name][field] = old_value
+                        add_old_edge = () ->
+                          if new_target?
+                            graph.add_edge(node_name, old_value.name, field, animate, done)
+                          else
+                            if done?
+                              done()
 
-                      target = get_transparent_node(state, old_value)
-                      if target?
-                        add_edge(node_name, old_value.name)
+                        update_node_data = () ->
+                          if !old_target? or !new_target?
+                            graph.set_node_data(node_name, old_graph_node_data, animate, add_old_edge)
+                          else
+                            add_old_edge()
 
-                      if done?
-                        setTimeout(done, 1)
+                        remove_new_edge = () ->
+                          if new_target?
+                            graph.remove_edge(node_name, value.name, animate, update_node_data)
+                          else
+                            update_node_data()
+
+                        remove_new_edge()
                     ),
                   }
                   step.up(current_state, false, null)
@@ -183,40 +225,48 @@ models.factory('models', ['makeString', (makeString) ->
                   undefined
                 )
               })
+          Object.defineProperty(opaque_node, 'remove', {
+            enumerable: true,
+            value: (() ->
+              if !get_transparent_node(current_state, opaque_node)?
+                throw Error('Node ' + node_name + ' does not exist.')
+              for k, v of current_state.transparent_nodes
+                if v != transparent_node
+                  for f in current_model_options.fields
+                    if getField(getField(v, f), 'name') == opaque_node.name
+                      throw Error('Cannot delete node ' + opaque_node.name + ' because node ' + k + ' points to it.')
+              if getField(current_state.opaque_root, 'name') == opaque_node.name
+                throw Error('Cannot delete node ' + opaque_node.name + ' because global.root points to it.')
+              step = {
+                repr: 'delete_node(' + makeString(opaque_node) + ')',
+                up: ((state, animate, done) ->
+                  state.transparent_nodes[opaque_node.name] = undefined
+                  if disable_rendering
+                    if done?
+                      done()
+                  else
+                    graph.remove_node(opaque_node.name, animate, done)
+                ),
+                down: ((state, animate, done) ->
+                  state.transparent_nodes[opaque_node.name] = transparent_node
+                  if disable_rendering
+                    if done?
+                      done()
+                  else
+                    graph_node_data = { }
+                    for k, v of transparent_node
+                      if !get_transparent_node(state, v)?
+                        graph_node_data[k] = v
+                    graph.add_node(opaque_node.name, graph_node_data, animate, done)
+                )
+              }
+              command_steps.push(step)
+              step.up(current_state, false, null)
+              undefined
+            )
+          })
+          Object.freeze(opaque_node)
           return opaque_node
-        ),
-        delete_node: ((node) ->
-          if !get_transparent_node(current_state, node)?
-            throw Error(makeString(node) + ' is not a node.')
-          for k, v of current_state.nodes
-            for f in current_model_options.fields
-              if v? and v[f]? and v[f].name? and v[f].name == node.name and k != node.name
-                throw Error('Cannot delete node ' + node.name + ' because node ' + k + ' points to it.')
-          if current_state.root == node
-            throw Error('Cannot delete node ' + node.name + ' because global.root points to it.')
-          old_node = current_state.nodes[node.name]
-          step = {
-            repr: 'delete_node(' + makeString(node) + ')',
-            up: ((state, animate, done) ->
-              remove_node(node.name)
-
-              state.nodes[node.name] = undefined
-
-              if done?
-                setTimeout(done, 1)
-            ),
-            down: ((state, animate, done) ->
-              state.nodes[node.name] = old_node
-
-              add_node(node.name)
-
-              if done?
-                setTimeout(done, 1)
-            ),
-          }
-          step.up(current_state, false, null)
-          command_steps.push(step)
-          undefined
         )
       }
     }
@@ -240,11 +290,13 @@ models.factory('runCommand', ['sandbox', (sandbox) ->
       definitions[name] = fn
     for operation in operations
       definitions[operation.name] = operation.compiled_value
+    disable_rendering = true
     sandbox([fragment], definitions)
     command_steps.reverse()
     for command in command_steps
       command.down(current_state, false, null)
     command_steps.reverse()
+    disable_rendering = false
     if fragment.error?
       return {
         steps: null,

@@ -1,4 +1,4 @@
-debounce = angular.module('debounce', [])
+debounce = angular.module('debounce', [ ])
 
 # takes a callback and returns a debounced version
 debounce.value('debounce', (callback, delay = 300) ->

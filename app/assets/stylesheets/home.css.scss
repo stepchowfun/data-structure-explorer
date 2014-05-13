@@ -1,6 +1,7 @@
 body {
   font-size: 1.6em !important;
 
+  /* fix some ugly outlines added by some browsers to focused elements */
   a, input, button {
     &:focus {
       outline: none;
@@ -11,6 +12,16 @@ body {
     }
   }
 
+  /* used for return values in REPL */
+  ul > li > ul.list-unstyled {
+    padding-left: 40px;
+  }
+
+  .no-wrap {
+    white-space: nowrap;
+  }
+
+  /* the next two rules enable auto-height on CodeMirror editors */
   .CodeMirror {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
     height: auto;
@@ -56,7 +67,7 @@ body {
     color: #bd5755;
   }
 
-  #new_command_str {
+  #new-command-str {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
   }
 
