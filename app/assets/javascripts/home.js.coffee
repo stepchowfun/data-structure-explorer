@@ -227,36 +227,35 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   # load from local storage
   $scope.load = () ->
-    localStorage = window['localStorage']
-    if localStorage?
-      try
-        ds = JSON.parse(localStorage.getItem('data_structures'))
-        if !ds?
-          $scope.message('Uh oh', 'There was a problem loading from local storage.')
-          return
-        $scope.data_structures = []
-        $scope.activateDataStructure(null)
-        watchDataStructures()
-        setTimeout((() ->
-          $scope.$apply(($scope) ->
-            $scope.data_structures = ds
-            if $scope.data_structures.length > 0
-              $scope.activateDataStructure($scope.data_structures[0])
-            else
-              $scope.activateDataStructure(null)
-            for data_structure in $scope.data_structures
-              initializeDataStructure(data_structure)
+    $scope.resetState () ->
+      $scope.$apply ($scope) ->
+        localStorage = window['localStorage']
+        if localStorage?
+          try
+            ds = JSON.parse(localStorage.getItem('data_structures'))
+            if !ds?
+              $scope.message('Uh oh', 'There was a problem loading from local storage.')
+              return
+            $scope.data_structures = []
+            $scope.activateDataStructure(null)
             watchDataStructures()
-            $scope.resetState(() ->
-              $scope.$apply ($scope) ->
+            setTimeout((() ->
+              $scope.$apply(($scope) ->
+                $scope.data_structures = ds
+                if $scope.data_structures.length > 0
+                  $scope.activateDataStructure($scope.data_structures[0])
+                else
+                  $scope.activateDataStructure(null)
+                for data_structure in $scope.data_structures
+                  initializeDataStructure(data_structure)
+                watchDataStructures()
                 $scope.message('Load successful', 'The data structures were loaded successfully.')
-            )
-          )
-        ), 1)
-      catch
-        $scope.message('Uh oh', 'There was a problem loading from local storage.')
-    else
-      $scope.message('Uh oh', 'Your browser doesn&rsquo;t support local storage.')
+              )
+            ), 1)
+          catch
+            $scope.message('Uh oh', 'There was a problem loading from local storage.')
+        else
+          $scope.message('Uh oh', 'Your browser doesn&rsquo;t support local storage.')
 
   # fields
 
