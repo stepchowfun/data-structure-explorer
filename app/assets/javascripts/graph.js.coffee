@@ -2,9 +2,9 @@ graph = angular.module('graph', ['makeString', 'debounce'])
 
 graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
   ANIMATION_DURATION = 300
-  X_SPACING = 200
-  Y_SPACING = 200
-  RADIUS = 60
+  X_SPACING = 225
+  Y_SPACING = 225
+  RADIUS = 55
   LINE_HEIGHT = 20
   EPSILON = 0.00001
 
@@ -190,9 +190,12 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       source_node = getNode(edge.source)
       target_node = getNode(edge.target)
       norm = Math.sqrt(EPSILON + Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))  
+      edge.chirality = false
       if source_node.x > target_node.x
+        edge.chirality = true
         offset = -offset
       if source_node.x == target_node.x and source_node.y > target_node.y
+        edge.chirality = true
         offset = -offset
       old_x = RADIUS * (target_node.x - source_node.x) / norm
       old_y = RADIUS * (target_node.y - source_node.y) / norm
@@ -252,6 +255,15 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       .attr('x2', (d) -> d.x2)
       .attr('y2', (d) -> d.y2)
 
+    selection = selectEdges().select('text.edge-text')
+    if animate
+      selection = selection.transition().duration(ANIMATION_DURATION)
+    selection.attr('transform', (d) ->
+      if d.chirality
+        'translate(' + String((d.x1 + d.x2) / 2) + ' ' + String((d.y1 + d.y2) / 2) + ') rotate(' + String(Math.atan2(d.y2 - d.y1, d.x2 - d.x1) * 360 / (Math.PI * 2)) + ') translate(0 -7)'
+      else
+        'translate(' + String((d.x1 + d.x2) / 2) + ' ' + String((d.y1 + d.y2) / 2) + ') rotate(' + String(180 + Math.atan2(d.y2 - d.y1, d.x2 - d.x1) * 360 / (Math.PI * 2)) + ') translate(0 -7)'
+    )
     updateViewBox(animate)
 
   $(window).resize(debounce () ->
@@ -317,8 +329,8 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       selection.append('text')
         .attr('class', 'node-name')
         .text(id)
-        .attr('x', -RADIUS)
-        .attr('y', -RADIUS)
+        .attr('x', -RADIUS * 1.5)
+        .attr('y', -RADIUS * 0.5)
       data_group_outline = selection.append('g').attr('class', 'data_outline')
       data_group = selection.append('g').attr('class', 'data')
       data_entries = [ ]
@@ -418,8 +430,19 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         x2: target_node.x - RADIUS * (target_node.x - source_node.x) / norm,
         y2: target_node.y - RADIUS * (target_node.y - source_node.y) / norm
       }
+      edge.chirality = false
+      if source_node.x > target_node.x
+        edge.chirality = true
+        offset = -offset
+      if source_node.x == target_node.x and source_node.y > target_node.y
+        edge.chirality = true
+        offset = -offset
       edge_data.push(edge)
       selection = selectEdges().enter().append('g').attr('class', 'edge')
+      if animate
+        selection
+          .attr('opacity', 0)
+          .transition().duration(ANIMATION_DURATION).attr('opacity', 1)
       edge_line = selection.append('line').attr('class', 'edge-line')
       edge_line
         .attr('marker-end', 'url(#arrow)')
@@ -436,6 +459,16 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         edge_line
           .attr('x2', edge.x2)
           .attr('y2', edge.y2)
+      edge_text = selection.append('text').attr('class', 'edge-text')
+      edge_text
+        .text(label)
+        .attr('text-anchor', 'middle')
+        .attr('x', 0)
+        .attr('y', 0)
+      if edge.chirality
+        edge_text.attr('transform', 'translate(' + String((edge.x1 + edge.x2) / 2) + ' ' + String((edge.y1 + edge.y2) / 2) + ') rotate(' + String(Math.atan2(edge.y2 - edge.y1, edge.x2 - edge.x1) * 360 / (Math.PI * 2)) + ') translate(0 -7)')
+      else
+        edge_text.attr('transform', 'translate(' + String((edge.x1 + edge.x2) / 2) + ' ' + String((edge.y1 + edge.y2) / 2) + ') rotate(' + String(180 + Math.atan2(edge.y2 - edge.y1, edge.x2 - edge.x1) * 360 / (Math.PI * 2)) + ') translate(0 -7)')
       if animate
         setTimeout((() ->
           layoutBFS()
@@ -460,6 +493,8 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
           break
       selection = selectEdges().exit()
       if animate
+        selection
+          .transition().duration(ANIMATION_DURATION).attr('opacity', 0)
         selection.select('line').transition().duration(ANIMATION_DURATION)
           .attr('x2', (d) -> d.x1)
           .attr('y2', (d) -> d.y1)
