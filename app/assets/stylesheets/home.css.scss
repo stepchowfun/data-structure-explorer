@@ -100,7 +100,6 @@ body {
     circle {
       stroke: #bbb;
       stroke-width: 4px;
-      fill: #fff;
     }
 
     line {
@@ -116,7 +115,7 @@ body {
 
     g.data_outline text {
       stroke: #fff;
-      stroke-width: 5px;
+      stroke-width: 2px;
     }
   }
 }

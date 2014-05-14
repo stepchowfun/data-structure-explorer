@@ -234,8 +234,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
 
   return {
     setRoot: (target, animate, done) ->
-      console.log('setRoot ' + makeString([target, animate]))
-
       if root_id == target
         if done?
           done()
@@ -244,6 +242,8 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         layoutBFS()
         render(animate)
         if animate
+          if root_id?
+            selectNode(getNode(root_id)).select('circle.node-circle').transition().duration(150).attr('fill', '#eee')
           setTimeout((() ->
             if done?
               done()
@@ -253,8 +253,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
             done()
 
     addNode: (id, data, animate, done) ->
-      console.log('addNode ' + makeString([id, data, animate]))
-
       node = {
         id: id,
         data: data,
@@ -271,6 +269,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
           .transition().duration(ANIMATION_DURATION).attr('opacity', 1)
       node_circle = selection.append('circle')
         .attr('class', 'node-circle')
+        .attr('fill', '#fff')
         .attr('cx', 0)
         .attr('cy', 0)
         if animate
@@ -316,8 +315,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
           done()
 
     removeNode: (id, animate, done) ->
-      console.log('removeNode ' + makeString([id, animate]))
-
       for node, i in node_data
         if node.id == id
           node_data.splice(i, 1)
@@ -343,8 +340,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
           done()
 
     setNodeData: (id, data, animate, done) ->
-      console.log('setNodeData ' + makeString([id, data, animate]))
-
       node = getNode(id)
       node.data = data
       data_entries = [ ]
@@ -375,8 +370,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         done()
 
     addEdge: (source, target, label, animate, done) ->
-      console.log('addEdge ' + makeString([source, target, label, animate]))
-
       source_node = getNode(source)
       target_node = getNode(target)
       edge_data.push({
@@ -455,8 +448,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
           done()
 
     removeEdge: (source, target, label, animate, done) ->
-      console.log('removeEdge ' + makeString([source, target, animate]))
-
       source_node = getNode(source)
       target_node = getNode(target)
       for edge, i in edge_data
