@@ -294,11 +294,11 @@
             </form>
 
             <p class="btn-group no-bottom-margin">
-              <a href="#" class="btn btn-default" data-ng-click="fastBackward(true, false, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || busy_lock }"><span class="glyphicon glyphicon-fast-backward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="fastBackward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || busy_lock }"><span class="glyphicon glyphicon-fast-backward"></span></a>
               <a href="#" class="btn btn-default" data-ng-click="stepBackward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || busy_lock }"><span class="glyphicon glyphicon-step-backward"></span></a>
               <a href="#" class="btn btn-danger" data-ng-click="resetState(null); $event.preventDefault();" data-ng-class="{ 'disabled': !canReset() || busy_lock }"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
               <a href="#" class="btn btn-default" data-ng-click="stepForward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || busy_lock }"><span class="glyphicon glyphicon-step-forward"></span></a>
-              <a href="#" class="btn btn-default" data-ng-click="fastForward(true, false, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || busy_lock }"><span class="glyphicon glyphicon-fast-forward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="fastForward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || busy_lock }"><span class="glyphicon glyphicon-fast-forward"></span></a>
             </p>
           </div>
         </div>
