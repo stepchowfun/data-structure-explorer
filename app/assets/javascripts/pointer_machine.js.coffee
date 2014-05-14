@@ -231,13 +231,13 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
                     throw Error('Cannot delete node ' + node_name + ' because node ' + k + ' points to it.')
             if getField(getCurrentState().opaque_root, 'name') == node_name
               throw Error('Cannot delete node ' + node_name + ' because global.root points to it.')
-            graph_node_data = { }
-            graph_link_data = [ ]
+            old_graph_node_data = { }
+            old_graph_link_data = [ ]
             for key, value of transparent_node
               if getTransparentNode(getCurrentState(), value)?
-                graph_link_data.push([node_name, value.name, key])
+                old_graph_link_data.push([node_name, value.name, key])
               else
-                graph_node_data[key] = value
+                old_graph_node_data[key] = value
             step = {
               repr: makeString(opaque_node) + '.remove()',
               up: ((state, animate, done) ->
@@ -253,7 +253,7 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
                       )
                     else
                       graph.removeNode(node_name, animate, done)
-                  process_graph_link_data(graph_link_data)
+                  process_graph_link_data(old_graph_link_data)
               ),
               down: ((state, animate, done) ->
                 state.transparent_nodes[node_name] = transparent_node
@@ -269,8 +269,8 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
                     else
                       if done?
                         done()
-                  graph.addNode(node_name, graph_node_data, animate, () ->
-                    process_graph_link_data(graph_link_data)
+                  graph.addNode(node_name, old_graph_node_data, animate, () ->
+                    process_graph_link_data(old_graph_link_data)
                   )
               )
             }
