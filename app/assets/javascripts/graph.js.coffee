@@ -452,15 +452,16 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     removeEdge: (source, target, label, animate, done) ->
       source_node = getNode(source)
       target_node = getNode(target)
+      norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
       for edge, i in edge_data
         if edge.source == source and edge.target == target and edge.label == label
           edge_data.splice(i, 1)
           break
       selection = selectEdges().exit()
       if animate
-        selection.transition().duration(ANIMATION_DURATION)
-          .attr('x2', source_node.x)
-          .attr('y2', source_node.y)
+        selection.select('line').transition().duration(ANIMATION_DURATION)
+          .attr('x2', source_node.x + RADIUS * (target_node.x - source_node.x) / norm)
+          .attr('y2', source_node.y + RADIUS * (target_node.y - source_node.y) / norm)
         setTimeout((() ->
           selection.remove()
           layoutBFS()
