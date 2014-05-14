@@ -17,18 +17,28 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
   last_mouse_x = 0
   last_mouse_y = 0
 
-  getWidth = () -> $('#graph').width()
+  getWidth = () ->
+    width = $('#graph').width()
+    if width > 0
+      return width
+    return 200
+
+  getHeight = () ->
+    height = $('#graph').height()
+    if height > 0
+      return height
+    return 200
 
   getHeight = () -> $('#graph').height()
 
   selectNodes = () ->
-    return d3.select('#graph').select('#nodes').selectAll('g').data(node_data, (d) -> d.id)
+    return d3.select('#graph #nodes').selectAll('g').data(node_data, (d) -> d.id)
 
   selectNode = (node) ->
-    return d3.select('#graph').select('#nodes').selectAll('g#' + node.id).data([node], (d) -> d.id)
+    return d3.select('#graph #nodes').select('g#' + node.id)
 
   selectEdges = () ->
-    return d3.select('#graph').select('#edges').selectAll('g').data(edge_data, (d) -> String(d.source) + ':' + String(d.target) + ':' + d.label)
+    return d3.selectAll('#graph #edges').selectAll('g').data(edge_data, (d) -> String(d.source) + ':' + String(d.target) + ':' + d.label)
 
   getNode = (id) ->
     for node in node_data
@@ -188,7 +198,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       selection = selection.transition().duration(ANIMATION_DURATION)
     selection.attr('transform', (d) -> ('translate(' + String(d.x) + ', ' + String(d.y) + ')'))
 
-    selection = selectEdges().selectAll('line')
+    selection = selectEdges().select('line')
     if animate
       selection = selection.transition().duration(ANIMATION_DURATION)
     selection
@@ -226,7 +236,8 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
   $(window).mousemove((event) ->
     last_mouse_x = event.pageX
     last_mouse_y = event.pageY
-    updateViewBox(false)
+    if $('#graph').is(":visible")
+      updateViewBox(false)
   )
 
   return {
@@ -247,6 +258,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
 
     addNode: (id, data, animate, done) ->
       console.log('addNode ' + makeString([id, data, animate]))
+
       node = {
         id: id,
         data: data,
@@ -272,22 +284,20 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         .attr('y', -RADIUS)
       data_group_outline = selection.append('g').attr('class', 'data_outline')
       data_group = selection.append('g').attr('class', 'data')
-      count = 0
-      for k, v of data
-        count += 1
+      data_entries = [ ]
       i = 0
       for k, v of data
-        data_group_outline.append('text')
-          .text(k + ': ' + v)
-          .attr('x', 0)
-          .attr('y', 15 + LINE_HEIGHT * (i - count / 2))
-          .attr('text-anchor', 'middle')
-        data_group.append('text')
-          .text(k + ': ' + v)
-          .attr('x', 0)
-          .attr('y', 15 + LINE_HEIGHT * (i - count / 2))
-          .attr('text-anchor', 'middle')
-        i += 1
+        data_entries.push(k + ': ' + v)
+      data_group_outline.selectAll('text').data(data_entries, (d) -> d).enter().append('text')
+        .text((d) -> d)
+        .attr('x', 0)
+        .attr('y', (d, i) -> (15 + LINE_HEIGHT * (i - data_entries.length / 2)))
+        .attr('text-anchor', 'middle')
+      data_group.selectAll('text').data(data_entries, (d) -> d).enter().append('text')
+        .text((d) -> d)
+        .attr('x', 0)
+        .attr('y', (d, i) -> (15 + LINE_HEIGHT * (i - data_entries.length / 2)))
+        .attr('text-anchor', 'middle')
       setTimeout((() ->
         layoutBFS()
         render(true)
@@ -306,7 +316,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
           break
       selection = selectNodes().exit()
       selection.transition().duration(ANIMATION_DURATION).attr('opacity', 0)
-      selection.selectAll('circle').transition().duration(ANIMATION_DURATION).attr('r', 0)
+      selection.select('circle.node-circle').transition().duration(ANIMATION_DURATION).attr('r', 0)
       setTimeout((() ->
         selection.remove()
         layoutBFS()
@@ -322,27 +332,25 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
 
       node = getNode(id)
       node.data = data
-      selection = selectNode(node)
-      selection.select('g.data_outline').remove()
-      selection.select('g.data').remove()
-      data_group_outline = selection.append('g').attr('class', 'data_outline')
-      data_group = selection.append('g').attr('class', 'data')
-      count = 0
-      for k, v of data
-        count += 1
+      data_entries = [ ]
       i = 0
       for k, v of data
-        data_group_outline.append('text')
-          .text(k + ': ' + v)
-          .attr('x', 0)
-          .attr('y', 15 + LINE_HEIGHT * (i - count / 2))
-          .attr('text-anchor', 'middle')
-        data_group.append('text')
-          .text(k + ': ' + v)
-          .attr('x', 0)
-          .attr('y', 15 + LINE_HEIGHT * (i - count / 2))
-          .attr('text-anchor', 'middle')
-        i += 1
+        data_entries.push(k + ': ' + v)
+      selection = selectNode(node)
+      data_group_outline = selection.select('g.data_outline').selectAll('text').data(data_entries, (d) -> d)
+      data_group = selection.select('g.data').selectAll('text').data(data_entries, (d) -> d)
+      data_group_outline.enter().append('text')
+        .text((d) -> d)
+        .attr('x', 0)
+        .attr('y', (d, i) -> (15 + LINE_HEIGHT * (i - data_entries.length / 2)))
+        .attr('text-anchor', 'middle')
+      data_group_outline.exit().remove()
+      data_group.enter().append('text')
+        .text((d) -> d)
+        .attr('x', 0)
+        .attr('y', (d, i) -> (15 + LINE_HEIGHT * (i - data_entries.length / 2)))
+        .attr('text-anchor', 'middle')
+      data_group.exit().remove()
       if animate
         selection.select('circle.node-circle').transition().duration(150).attr('r', RADIUS * 1.3)
         setTimeout((() ->
