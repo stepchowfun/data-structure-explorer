@@ -34,6 +34,9 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   # global
   ############################################################################
 
+  # reserved words in JavaScript
+  JAVASCRIPT_KEYWORDS = ['break', 'case', 'catch', 'continue', 'debugger', 'default', 'delete', 'do', 'else', 'finally', 'for', 'function', 'if', 'in', 'instanceof', 'new', 'return', 'switch', 'this', 'throw', 'try', 'typeof', 'var', 'void', 'while', 'with']
+
   # models of computation
   $scope.models = models
 
@@ -285,6 +288,9 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     if $scope.new_field_name in $scope.active_data_structure.model_options.fields
       $scope.new_field_error = Error('Already exists.')
       return
+    if $scope.new_field_name in JAVASCRIPT_KEYWORDS
+      $scope.new_field_error = Error('That is a JavaScript keyword.')
+      return
     if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_field_name))
       $scope.new_field_error = Error('Invalid name.')
       return
@@ -356,6 +362,9 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       return
     if $scope.new_operation_name in (operation.name for operation in data_structure.operations)
       $scope.new_operation_error = Error('Already exists.')
+      return
+    if $scope.new_operation_name in JAVASCRIPT_KEYWORDS
+      $scope.new_operation_error = Error('That is a JavaScript keyword.')
       return
     if !(/^[\$_a-zA-Z][\$_a-zA-Z0-9]*$/.test($scope.new_operation_name))
       if '(' in $scope.new_operation_name
