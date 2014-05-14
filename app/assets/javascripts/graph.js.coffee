@@ -32,13 +32,13 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
   getHeight = () -> $('#graph').height()
 
   selectNodes = () ->
-    return d3.select('#graph #nodes').selectAll('g').data(node_data, (d) -> d.id)
+    return d3.select('#graph #nodes').selectAll('g.node').data(node_data, (d) -> d.id)
 
   selectNode = (node) ->
-    return d3.select('#graph #nodes').select('g#' + node.id)
+    return d3.select('#graph #nodes').select('g.node#' + node.id)
 
   selectEdges = () ->
-    return d3.selectAll('#graph #edges').selectAll('g').data(edge_data, (d) -> String(d.source) + ':' + String(d.target) + ':' + d.label)
+    return d3.selectAll('#graph #edges').selectAll('g.edge').data(edge_data, (d) -> String(d.source) + ':' + String(d.target) + ':' + d.label)
 
   getNode = (id) ->
     for node in node_data
@@ -266,7 +266,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         y: -Y_SPACING,
       }
       node_data.push(node)
-      selection = selectNodes().enter().append('g').attr('id', id)
+      selection = selectNodes().enter().append('g').attr('id', id).attr('class', 'node')
       selection
         .attr('transform', 'translate(' + String(node.x) + ', ' + String(node.y) + ')')
         .attr('opacity', 0)
@@ -371,7 +371,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         label: label
       })
 
-      selection = selectEdges().enter().append('g').append('line')
+      selection = selectEdges().enter().append('g').attr('class', 'edge').append('line')
       selection
         .attr('x1', (d) ->
           source_node = getNode(d.source)
