@@ -108,7 +108,7 @@
                       <input type="submit" class="hidden" />
                     </form>
                     <span class="no-wrap">
-                      <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
+                      <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments track by $index"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
                       <span class="compile-success" data-ng-hide="operation.error || rename" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
                       <span data-ng-show="operation.error && !rename">
                         <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
@@ -175,7 +175,7 @@
         <div data-ng-repeat="operation in active_data_structure.operations">
           <div class="form-group">
             <label for="ds-code-{{ operation.name }}">
-              <code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
+              <code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments track by $index"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
               <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
               <span data-ng-show="operation.error">
                 <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
@@ -233,7 +233,7 @@
               <ul class="list-unstyled" class="no-bottom-margin" data-ng-show="active_data_structure.operations.length > 0">
                 <li data-ng-repeat="operation in active_data_structure.operations">
                   <span class="no-wrap">
-                    <code>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
+                    <code>{{ operation.name }}(<span data-ng-repeat="arg in operation.arguments track by $index"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
                     <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
                     <span data-ng-show="operation.error">
                       <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
@@ -279,7 +279,7 @@
                   {{ new_command_error.name }}: {{ new_command_error.message }}
                 </p>
                 <ul data-ng-show="new_command_error && new_command_error.stack_list">
-                  <li data-ng-repeat="line in new_command_error.stack_list"><code>{{ line }}</code></li>
+                  <li data-ng-repeat="line in new_command_error.stack_list track by $index"><code>{{ line }}</code></li>
                 </ul>
               </div>
             </form>
@@ -324,7 +324,7 @@
         <h4 class="modal-title">Confirm delete</h4>
       </div>
       <div class="modal-body">
-        Are you sure you want to delete <code>{{ operation_to_delete.name }}(<span data-ng-repeat="arg in operation_to_delete.arguments"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>?
+        Are you sure you want to delete <code>{{ operation_to_delete.name }}(<span data-ng-repeat="arg in operation_to_delete.arguments track by $index"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>?
       </div>
       <div class="modal-footer">
         <a class="btn btn-default" data-dismiss="modal">Close</a>

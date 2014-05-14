@@ -1,7 +1,7 @@
 graph = angular.module('graph', ['makeString'])
 
 graph.factory('graph', ['makeString', ((makeString) ->
-  ANIMATION_DURATION = 200
+  ANIMATION_DURATION = 300
 
   root = null
   node_data = [ ]
@@ -12,7 +12,7 @@ graph.factory('graph', ['makeString', ((makeString) ->
   getHeight = () -> $('#graph').height()
 
   layoutBFS = () ->
-    for node, i in node_data
+    for node in node_data
       node.x = Math.random() * getWidth()
       node.y = Math.random() * getHeight()
     undefined
@@ -20,101 +20,111 @@ graph.factory('graph', ['makeString', ((makeString) ->
   selectNodes = () ->
     return d3.select('#graph').selectAll('circle').data(node_data, (d) -> d.id)
 
-  render = () ->
-    renderNodes = (selection) ->
-      selection
-        .attr('cx', (d) -> d.x)
-        .attr('cy', (d) -> d.y)
-        .attr('r', (d) -> d.r)
-
-    nodes = selectNodes()
-    renderNodes(nodes)
-    renderNodes(nodes.enter().append('circle'))
-    nodes.exit().remove()
+  render = (animate) ->
+    selection = selectNodes()
+    if animate
+      selection = selection.transition().duration(ANIMATION_DURATION)
+    selection
+      .attr('cx', (d) -> d.x)
+      .attr('cy', (d) -> d.y)
+      .attr('r', (d) -> d.r)
 
   return {
     setRoot: (target, animate, done) ->
+      console.log('setRoot ' + makeString([target, animate]))
+
       root = target
 
       layoutBFS()
-
-      render()
-
-      console.log('setRoot ' + makeString([target, animate]))
-      if done?
-        done()
+      render(true)
+      setTimeout((() ->
+        if done?
+          done()
+      ), ANIMATION_DURATION)
 
     addNode: (id, data, animate, done) ->
+      console.log('addNode ' + makeString([id, data, animate]))
+
       node_data.push({
         id: id,
         data: data,
-        x: 0,
-        y: 0,
+        x: Math.random() * getWidth(),
+        y: Math.random() * getHeight(),
         r: 50
       })
 
-      layoutBFS()
-
+      selection = selectNodes().enter().append('circle')
       render()
+      selection.attr('r', 0)
+      selection.transition().duration(ANIMATION_DURATION).attr('r', (d) -> d.r)
 
-      console.log('addNode ' + makeString([id, data, animate]))
-      if done?
-        done()
+      setTimeout((() ->
+        layoutBFS()
+        render(true)
+        setTimeout((() ->
+          if done?
+            done()
+        ), ANIMATION_DURATION)
+      ), ANIMATION_DURATION)
 
     removeNode: (id, animate, done) ->
+      console.log('removeNode ' + makeString([id, animate]))
+
       for node, i in node_data
         if node.id == id
           node_data.splice(i, 1)
           break
 
-      layoutBFS()
+      selection = selectNodes().exit()
+      selection.transition().duration(ANIMATION_DURATION).attr('r', 0)
 
-      render()
-
-      console.log('removeNode ' + makeString([id, animate]))
-      if done?
-        done()
+      setTimeout((() ->
+        selection.remove()
+        layoutBFS()
+        render(true)
+        setTimeout((() ->
+          if done?
+            done()
+        ), ANIMATION_DURATION)
+      ), ANIMATION_DURATION)
 
     setNodeData: (id, data, animate, done) ->
+      console.log('setNodeData ' + makeString([id, data, animate]))
+
       for node, i in node_data
         if node.id == id
           node_data[i].data = data
           break
 
-      layoutBFS()
+      #
 
-      render()
-
-      console.log('setNodeData ' + makeString([id, data, animate]))
       if done?
         done()
 
     addEdge: (source, target, label, animate, done) ->
+      console.log('addEdge ' + makeString([source, target, label, animate]))
+
       edge_data.push({
         source: source,
         target: target,
         label: label
       })
 
-      layoutBFS()
+      #
 
-      render()
-
-      console.log('addEdge ' + makeString([source, target, label, animate]))
       if done?
         done()
 
     removeEdge: (source, target, animate, done) ->
+      console.log('removeEdge ' + makeString([source, target, animate]))
+      
       for edge, i in edge_data
         if edge.source == source and edge.target == target
           edge_data.splice(i, 1)
           break
 
-      layoutBFS()
+      #
 
-      render()
-
-      console.log('removeEdge ' + makeString([source, target, animate]))
       if done?
         done()
   }
