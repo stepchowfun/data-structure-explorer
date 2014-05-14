@@ -186,7 +186,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       if total == 1
         offset = 0
       else
-        offset = (index / (total - 1) - 0.5) * 0.7
+        offset = Math.asin((index - (total - 1) / 2) * 0.6)
       source_node = getNode(edge.source)
       target_node = getNode(edge.target)
       norm = Math.sqrt(EPSILON + Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))  
@@ -433,10 +433,8 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       edge.chirality = false
       if source_node.x > target_node.x
         edge.chirality = true
-        offset = -offset
       if source_node.x == target_node.x and source_node.y > target_node.y
         edge.chirality = true
-        offset = -offset
       edge_data.push(edge)
       selection = selectEdges().enter().append('g').attr('class', 'edge')
       if animate
