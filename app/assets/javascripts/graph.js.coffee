@@ -238,12 +238,15 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         if done?
           done()
       else
+        old_root_id = root_id
         root_id = target
         layoutBFS()
         render(animate)
         if animate
+          if old_root_id?
+            selectNode(getNode(old_root_id)).select('circle.node-circle').transition().duration(ANIMATION_DURATION).attr('fill', '#fff')
           if root_id?
-            selectNode(getNode(root_id)).select('circle.node-circle').transition().duration(150).attr('fill', '#eee')
+            selectNode(getNode(root_id)).select('circle.node-circle').transition().duration(ANIMATION_DURATION).attr('fill', '#eee')
           setTimeout((() ->
             if done?
               done()
