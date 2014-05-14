@@ -4,7 +4,7 @@ body {
   /* fix some ugly outlines added by some browsers to focused elements */
   a, input, button {
     &:focus {
-      outline: none;
+      outline: none !important;
     }
 
     &::-moz-focus-inner {

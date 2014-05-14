@@ -109,7 +109,7 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
             else
               process_graph_link_data = (remaining_graph_link_data) ->
                 if remaining_graph_link_data.length > 0
-                  graph.removeEdge(remaining_graph_link_data[0][0], remaining_graph_link_data[0][1], animate, () ->
+                  graph.removeEdge(remaining_graph_link_data[0][0], remaining_graph_link_data[0][1], remaining_graph_link_data[0][2], animate, () ->
                     process_graph_link_data(remaining_graph_link_data.slice(1))
                   )
                 else
@@ -177,7 +177,7 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
 
                       removeOldEdge = () ->
                         if old_target?
-                          graph.removeEdge(node_name, old_value.name, animate, updateNodeData)
+                          graph.removeEdge(node_name, old_value.name, field, animate, updateNodeData)
                         else
                           updateNodeData()
 
@@ -207,7 +207,7 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
 
                       removeNewEdge = () ->
                         if new_target?
-                          graph.removeEdge(node_name, value.name, animate, updateNodeData)
+                          graph.removeEdge(node_name, value.name, field, animate, updateNodeData)
                         else
                           updateNodeData()
 
@@ -231,6 +231,13 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
                     throw Error('Cannot delete node ' + opaque_node.name + ' because node ' + k + ' points to it.')
             if getField(getCurrentState().opaque_root, 'name') == opaque_node.name
               throw Error('Cannot delete node ' + opaque_node.name + ' because global.root points to it.')
+            original_graph_node_data = { }
+            original_graph_link_data = [ ]
+            for key, value of transparent_node
+              if getTransparentNode(getCurrentState(), value)?
+                original_graph_link_data.push([node_name, value.name, key])
+              else
+                original_graph_node_data[key] = value
             step = {
               repr: makeString(opaque_node) + '.remove()',
               up: ((state, animate, done) ->
@@ -239,7 +246,14 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
                   if done?
                     done()
                 else
-                  graph.removeNode(opaque_node.name, animate, done)
+                  process_graph_link_data = (remaining_graph_link_data) ->
+                    if remaining_graph_link_data.length > 0
+                      graph.removeEdge(remaining_graph_link_data[0][0], remaining_graph_link_data[0][1], remaining_graph_link_data[0][2], animate, () ->
+                        process_graph_link_data(remaining_graph_link_data.slice(1))
+                      )
+                    else
+                      graph.removeNode(opaque_node.name, animate, done)
+                  process_graph_link_data(original_graph_link_data)
               ),
               down: ((state, animate, done) ->
                 state.transparent_nodes[opaque_node.name] = transparent_node
@@ -247,11 +261,17 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
                   if done?
                     done()
                 else
-                  graph_node_data = { }
-                  for k, v of transparent_node
-                    if !getTransparentNode(state, v)?
-                      graph_node_data[k] = v
-                  graph.addNode(opaque_node.name, graph_node_data, animate, done)
+                  process_graph_link_data = (remaining_graph_link_data) ->
+                    if remaining_graph_link_data.length > 0
+                      graph.addEdge(remaining_graph_link_data[0][0], remaining_graph_link_data[0][1], remaining_graph_link_data[0][2], animate, () ->
+                        process_graph_link_data(remaining_graph_link_data.slice(1))
+                      )
+                    else
+                      if done?
+                        done()
+                  graph.addNode(node_name, original_graph_node_data, animate, () ->
+                    process_graph_link_data(original_graph_link_data)
+                  )
               )
             }
             getCommandSteps().push(step)
