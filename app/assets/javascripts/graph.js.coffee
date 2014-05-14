@@ -102,14 +102,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     preprocessSubtrees = (root) ->
       visited.push(root)
       root.children = (adjacent for adjacent in getAdjacent(root) when !(adjacent in visited))
-      root.children.sort(
-        (a, b) ->
-          if a.id < b.id
-            return -1
-          else if a.id > b.id
-            return 1
-          return 0
-      )
       if root.children.length == 0
         root.width = 1
         root.height = 1
