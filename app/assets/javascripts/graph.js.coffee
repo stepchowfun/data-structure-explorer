@@ -6,6 +6,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
   Y_SPACING = 200
   RADIUS = 60
   LINE_HEIGHT = 20
+  EPSILON = 0.00001
 
   root_id = null
   node_data = [ ]
@@ -59,14 +60,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
 
   getAdjacent = (node) ->
     adjacent = [ ]
-    edge_data.sort(
-      (a, b) ->
-        if a.label < b.label
-          return -1
-        else if a.label > b.label
-          return 1
-        return 0
-    )
     for edge in edge_data
       if edge.source == node.id
         target_node = getNode(edge.target)
@@ -92,6 +85,19 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         if a.id < b.id
           return -1
         else if a.id > b.id
+          return 1
+        return 0
+    )
+
+    edge_data.sort(
+      (a, b) ->
+        if a.label < b.label
+          return -1
+        else if a.label > b.label
+          return 1
+        if a.id < b.id
+          return -1
+        if a.id > b.id
           return 1
         return 0
     )
@@ -150,14 +156,54 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     view_width = total_width * X_SPACING
     view_height = total_height * Y_SPACING
 
+    edge_map_total = { }
     for edge in edge_data
+      key1 = edge.source + ':' + edge.target
+      key2 = edge.target + ':' + edge.source
+      if edge_map_total[key1]?
+        edge_map_total[key1] += 1
+      else
+        edge_map_total[key1] = 1
+      if edge_map_total[key2]?
+        edge_map_total[key2] += 1
+      else
+        edge_map_total[key2] = 1
+
+    edge_map_index = { }
+    for edge in edge_data
+      key1 = edge.source + ':' + edge.target
+      key2 = edge.target + ':' + edge.source
+      edge_map_index[key1] = 0
+      edge_map_index[key2] = 0
+
+    for edge in edge_data
+      key1 = edge.source + ':' + edge.target
+      key2 = edge.target + ':' + edge.source
+      index = edge_map_index[key1]
+      total = edge_map_total[key1]
+      edge_map_index[key1] += 1
+      edge_map_index[key2] += 1
+      if total == 1
+        offset = 0
+      else
+        offset = (index / (total - 1) - 0.5) * 0.7
       source_node = getNode(edge.source)
       target_node = getNode(edge.target)
-      norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-      edge.x1 = source_node.x + RADIUS * (target_node.x - source_node.x) / norm
-      edge.y1 = source_node.y + RADIUS * (target_node.y - source_node.y) / norm
-      edge.x2 = target_node.x - RADIUS * (target_node.x - source_node.x) / norm
-      edge.y2 = target_node.y - RADIUS * (target_node.y - source_node.y) / norm
+      norm = Math.sqrt(EPSILON + Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))  
+      if source_node.x > target_node.x
+        offset = -offset
+      if source_node.x == target_node.x and source_node.y > target_node.y
+        offset = -offset
+      old_x = RADIUS * (target_node.x - source_node.x) / norm
+      old_y = RADIUS * (target_node.y - source_node.y) / norm
+      new_x1 = old_x * Math.cos(offset) - old_y * Math.sin(offset)
+      new_y1 = old_x * Math.sin(offset) + old_y * Math.cos(offset)
+      new_x2 = old_x * Math.cos(-offset) - old_y * Math.sin(-offset)
+      new_y2 = old_x * Math.sin(-offset) + old_y * Math.cos(-offset)
+      edge.x1 = source_node.x + new_x1
+      edge.y1 = source_node.y + new_y1
+      edge.x2 = target_node.x - new_x2
+      edge.y2 = target_node.y - new_y2
 
     undefined
 
@@ -362,7 +408,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     addEdge: (source, target, label, animate, done) ->
       source_node = getNode(source)
       target_node = getNode(target)
-      norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+      norm = Math.sqrt(EPSILON + Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
       edge = {
         source: source,
         target: target,
@@ -408,7 +454,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     removeEdge: (source, target, label, animate, done) ->
       source_node = getNode(source)
       target_node = getNode(target)
-      norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
       for edge, i in edge_data
         if edge.source == source and edge.target == target and edge.label == label
           edge_data.splice(i, 1)
