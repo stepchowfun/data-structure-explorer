@@ -22,6 +22,27 @@ examples.factory('examples', ['models', ((models) ->
       model_options: {
         fields: ['value', 'parent', 'left_child', 'right_child']
       }
+    },
+    {
+      name: 'Linked list',
+      operations: [
+        {
+          name: 'insert',
+          code: 'function insert(value) {\n  global.root = make_node({ value: value, next: global.root });\n}'
+        },
+        {
+          name: 'contains',
+          code: 'function contains(value) {\n  var pointer = global.root;\n  while (pointer !== null) {\n    if (pointer.value === value) {\n      return true;\n    }\n    pointer = pointer.next;\n  }\n  return false;\n}'
+        },
+        {
+          name: 'remove',
+          code: 'function remove(value) {\n  if (global.root !== null) {\n    if (global.root.value === value) {\n      var temp = global.root;\n      global.root = global.root.next;\n      temp.remove();\n      return;\n    }\n  }\n  var pointer = global.root;\n  while (pointer.next !== null) {\n    if (pointer.next.value === value) {\n      var temp = pointer.next;\n      pointer.next = pointer.next.next;\n      temp.remove();\n      return;\n    }\n    pointer = pointer.next;\n  }\n  throw Error("Value does not exist: " + String(value) + ".");\n}'
+        }
+      ],
+      model: 'pointer_machine',
+      model_options: {
+        fields: ['value', 'next']
+      }
     }
   ]
 )])
