@@ -12,6 +12,10 @@ body {
     }
   }
 
+  .no-wrap {
+    white-space: nowrap;
+  }
+
   ul.list-unstyled, ol.list-unstyled {
     padding-left: 0;
   }
@@ -19,10 +23,6 @@ body {
   /* used for return values in REPL */
   ul > li > ul.list-unstyled {
     padding-left: 40px;
-  }
-
-  .no-wrap {
-    white-space: nowrap;
   }
 
   /* the next two rules enable auto-height on CodeMirror editors */
@@ -83,7 +83,6 @@ body {
 
   #command-history {
     font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
-    font-size: 0.93em;
     max-height: 400px;
     overflow: auto;
 
@@ -94,6 +93,10 @@ body {
     .command-step-active {
       font-weight: bold;
       color: #090;
+    }
+
+    .command-step {
+      font-size: 0.85em;
     }
   }
 
