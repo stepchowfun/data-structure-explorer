@@ -50,7 +50,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.operation_to_delete = null
   $scope.modal_title = null
   $scope.modal_message = null
-  $scope.animating = false
+  $scope.busy_semaphore = 0
 
   # switch to a data structure
   $scope.activateDataStructure = (data_structure) ->
@@ -68,7 +68,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.message = (title, message) ->
     $scope.modal_title = title
     $scope.modal_message = message
+    $scope.busy_semaphore += 1
     setTimeout((() ->
+      $scope.$apply ($scope) ->
+        $scope.busy_semaphore -= 1
       $('#message-modal').modal({ })
     ), 1)
 
@@ -117,7 +120,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   # editor
   ############################################################################
 
-  get_arguments = (code, function_name) ->
+  getArguments = (code, function_name) ->
     regex = new RegExp('function(\\s)+' + function_name + '(\\s)*\\(', 'g')
     result = regex.exec(code)
     if !result?
@@ -147,12 +150,12 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         if !data_structure.model_options.fields?
           data_structure.model_options.fields = [ ]
     for operation in data_structure.operations
-      operation.arguments = get_arguments(operation.code, operation.name)
+      operation.arguments = getArguments(operation.code, operation.name)
     data_structure.startUpdate = debounce () ->
       $scope.$apply ($scope) ->
         sandbox(data_structure.operations, models[data_structure.model].api)
         for operation in data_structure.operations
-          operation.arguments = get_arguments(operation.code, operation.name)
+          operation.arguments = getArguments(operation.code, operation.name)
 
   for data_structure in $scope.data_structures
     initializeDataStructure(data_structure)
@@ -227,6 +230,8 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   # load from local storage
   $scope.load = () ->
+    if $scope.busy_semaphore > 0
+      $scope.message('Uh oh', 'The system is currently busy. Please try again later.')
     $scope.resetState () ->
       $scope.$apply ($scope) ->
       localStorage = window['localStorage']
@@ -239,8 +244,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           $scope.data_structures = []
           $scope.activateDataStructure(null)
           watchDataStructures()
+          $scope.busy_semaphore += 1
           setTimeout((() ->
             $scope.$apply(($scope) ->
+              $scope.busy_semaphore -= 1
               $scope.data_structures = ds
               if $scope.data_structures.length > 0
                 $scope.activateDataStructure($scope.data_structures[0])
@@ -300,7 +307,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       $scope.active_data_structure.model_options.fields.splice(index + 1, 0, field)
 
   $scope.prepareRenameField = (field) ->
+    $scope.busy_semaphore += 1
     setTimeout((() ->
+      $scope.$apply ($scope) ->
+        $scope.busy_semaphore -= 1
       element = $('#new-field-name-' + field)
       element.focus()
       element[0].setSelectionRange(0, element.val().length)
@@ -375,7 +385,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       data_structure.operations.splice(index + 1, 0, operation)
 
   $scope.prepareRenameOperation = (operation) ->
+    $scope.busy_semaphore += 1
     setTimeout((() ->
+      $scope.$apply ($scope) ->
+        $scope.busy_semaphore -= 1
       element = $('#new-operation-name-' + operation.name)
       element.focus()
       element[0].setSelectionRange(0, element.val().length)
@@ -413,11 +426,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   input_history_cursor = null
 
   $scope.resetState = (done) ->
-    # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot reset the state while animating.')
-
-    new_done = () ->
+    newDone = () ->
       $scope.$apply ($scope) ->
         $scope.new_command_error = null
         if $scope.active_data_structure?
@@ -434,20 +443,26 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         done()
 
     if $scope.command_history?
-      $scope.fastBackward(false, false, new_done)
+      $scope.fastBackward(false, false, newDone)
     else
-      setTimeout(new_done, 1)
+      $scope.busy_semaphore += 1
+      setTimeout((() ->
+        $scope.$apply ($scope) ->
+          $scope.busy_semaphore -= 1
+        newDone()
+      ), 1)
 
-  setTimeout((() -> $scope.resetState(null)), 1)
+  $scope.busy_semaphore += 1
+  setTimeout((() ->
+    $scope.$apply ($scope) ->
+      $scope.busy_semaphore -= 1
+    $scope.resetState(null)
+  ), 1)
 
   $scope.clearNewCommandError = () ->
     $scope.new_command_error = null
 
   $scope.newCommand = () ->
-    # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot enter new command while animating.')
-
     if !$scope.active_data_structure?
       $scope.new_command_error = Error('Select a data structure first.')
       return
@@ -462,7 +477,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         return
 
     if $scope.computation_model != models[$scope.active_data_structure.model]
-      if !$scope.haveCommandHistory()
+      if $scope.command_history.length == 0
         $scope.resetState(() ->
           $scope.$apply ($scope) ->
             $scope.newCommand()
@@ -472,7 +487,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       return
 
     if !angular.equals($scope.computation_model_options, $scope.active_data_structure.model_options)
-      if !$scope.haveCommandHistory()
+      if $scope.command_history.length == 0
         $scope.resetState(() ->
           $scope.$apply ($scope) ->
             $scope.newCommand()
@@ -501,9 +516,6 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         $scope.fastForward(true, true, () -> $('#new-command-str').focus())
     )
 
-  $scope.haveCommandHistory = () ->
-    return $scope.command_history? and $scope.command_history.length > 0
-
   $scope.stepBackward = (scroll, animate, done) ->
     if !$scope.canStepBackward()
       throw Error('Cannot step backward.')
@@ -517,11 +529,11 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         step_cursor = null
         break
       step_cursor = $scope.command_history[cursor].steps.length - 1
-    $scope.animating = true
+    $scope.busy_semaphore += 1
     $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computation_state, animate, () ->
       setTimeout((() ->
         $scope.$apply ($scope) ->
-          $scope.animating = false
+          $scope.busy_semaphore -= 1
         if scroll
           if $scope.command_history_cursor? and $scope.command_history_step_cursor?
             elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
@@ -530,7 +542,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
           else
             scrollIntoView($('#command-history')[0], $('#empty')[0])
         if done?
-          setTimeout(done, 1)
+          done()
       ), 1)
     )
     $scope.command_history_cursor = cursor
@@ -551,16 +563,16 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       step_cursor = 0
     $scope.command_history_cursor = cursor
     $scope.command_history_step_cursor = step_cursor
-    $scope.animating = true
+    $scope.busy_semaphore += 1
     $scope.command_history[cursor].steps[step_cursor].up($scope.computation_state, animate, () ->
       setTimeout((() ->
         $scope.$apply ($scope) ->
-          $scope.animating = false
+          $scope.busy_semaphore -= 1
         if scroll
           elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
           scrollIntoView($('#command-history')[0], elements[0])
         if done?
-          setTimeout(done, 1)
+          done()
       ), 1)
     )
 
@@ -575,20 +587,19 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         last_cursor = i
         last_step_cursor = j
     $scope.jumpTo(last_cursor, last_step_cursor, scroll, false, done)
+    $scope.busy_semaphore += 1
     setTimeout((() ->
+      $scope.$apply ($scope) ->
+        $scope.busy_semaphore -= 1
       $("#command-history").scrollTop($("#command-history")[0].scrollHeight)
     ), 1)
 
   $scope.canStepBackward = () ->
-    if $scope.animating
-      return false
     if $scope.command_history? and $scope.command_history.length > 0
       return $scope.command_history_cursor != null
     return false
 
   $scope.canStepForward = () ->
-    if $scope.animating
-      return false
     if $scope.command_history? and $scope.command_history.length > 0
       last_cursor = null
       last_step_cursor = null
@@ -606,10 +617,11 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         return true
     return false
 
+  $scope.canReset = () ->
+    return $scope.command_history.length > 0
+
   $scope.jumpTo = (cursor, step_cursor, scroll, animate, done) ->
     # the gui should prevent this, but just in case
-    if $scope.animating
-      throw Error('Cannot start new animation while already animating.')
     if $scope.command_history_cursor?
       if cursor?
         if $scope.command_history_cursor < cursor or ($scope.command_history_cursor == cursor and $scope.command_history_step_cursor < step_cursor)
@@ -638,17 +650,19 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         )
         return
 
-    if scroll and !animate
-      setTimeout((() ->
+    $scope.busy_semaphore += 1
+    setTimeout((() ->
+      $scope.$apply ($scope) ->
+        $scope.busy_semaphore -= 1
+      if scroll and !animate
         if $scope.command_history_cursor? and $scope.command_history_step_cursor?
           elements = $('#step-' + $scope.command_history_cursor.toString() + '-' + $scope.command_history_step_cursor.toString())
           scrollIntoView($('#command-history')[0], elements[0])
         else
           scrollIntoView($('#command-history')[0], $('#empty')[0])
-      ), 1)
-
-    if done?
-      setTimeout(done, 1)
+      if done?
+        done()
+    ), 1)
 
   $scope.commandKeyDown = (event) ->
     if $('#new-command-str').attr('disabled')?
@@ -656,35 +670,40 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
     # up
     if event.keyCode == 38
-      if $scope.haveCommandHistory()
+      if $scope.command_history.length > 0
         if input_history_cursor == null
           input_history_cursor = $scope.command_history.length
         if input_history_cursor > 0
           input_history_cursor -= 1
           $scope.new_command_str = $scope.command_history[input_history_cursor].str
+          $scope.busy_semaphore += 1
           setTimeout((() ->
-              $('#new-command-str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
-            ), 1)
+            $scope.$apply ($scope) ->
+              $scope.busy_semaphore -= 1
+            $('#new-command-str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
+          ), 1)
           event.preventDefault()
       else
         input_history_cursor = null
 
     # down
     if event.keyCode == 40
-      if $scope.haveCommandHistory()
+      if $scope.command_history.length > 0
         if input_history_cursor == null
           input_history_cursor = $scope.command_history.length
         if input_history_cursor < $scope.command_history.length
           input_history_cursor += 1
           if input_history_cursor < $scope.command_history.length
             $scope.new_command_str = $scope.command_history[input_history_cursor].str
+            $scope.busy_semaphore += 1
             setTimeout((() ->
-                $('#new-command-str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
-              ), 1)
+              $scope.$apply ($scope) ->
+                $scope.busy_semaphore -= 1
+              $('#new-command-str')[0].setSelectionRange($scope.new_command_str.length, $scope.new_command_str.length)
+            ), 1)
             event.preventDefault()
           else
             $scope.new_command_str = ''
       else
         input_history_cursor = null
-
 ])
