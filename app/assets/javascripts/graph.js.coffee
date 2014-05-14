@@ -227,7 +227,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
       )
 
-    updateViewBox(true)
+    updateViewBox(animate)
 
   $(window).resize(debounce () ->
     render(true)
@@ -250,11 +250,15 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       else
         root_id = target
         layoutBFS()
-        render(true)
-        setTimeout((() ->
+        render(animate)
+        if animate
+          setTimeout((() ->
+            if done?
+              done()
+          ), ANIMATION_DURATION)
+        else
           if done?
             done()
-        ), ANIMATION_DURATION)
 
     addNode: (id, data, animate, done) ->
       console.log('addNode ' + makeString([id, data, animate]))
@@ -269,14 +273,20 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       selection = selectNodes().enter().append('g').attr('id', id).attr('class', 'node')
       selection
         .attr('transform', 'translate(' + String(node.x) + ', ' + String(node.y) + ')')
-        .attr('opacity', 0)
-        .transition().duration(ANIMATION_DURATION).attr('opacity', 1)
-      selection.append('circle')
+      if animate
+        selection
+          .attr('opacity', 0)
+          .transition().duration(ANIMATION_DURATION).attr('opacity', 1)
+      node_circle = selection.append('circle')
         .attr('class', 'node-circle')
         .attr('cx', 0)
         .attr('cy', 0)
-        .attr('r', 0)
-        .transition().duration(ANIMATION_DURATION).attr('r', RADIUS)
+        if animate
+          node_circle
+            .attr('r', 0)
+            .transition().duration(ANIMATION_DURATION).attr('r', RADIUS)
+        else
+          node_circle.attr('r', RADIUS)
       selection.append('text')
         .attr('class', 'node-name')
         .text(id)
@@ -298,14 +308,20 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         .attr('x', 0)
         .attr('y', (d, i) -> (15 + LINE_HEIGHT * (i - data_entries.length / 2)))
         .attr('text-anchor', 'middle')
-      setTimeout((() ->
-        layoutBFS()
-        render(true)
+      if animate
         setTimeout((() ->
-          if done?
-            done()
+          layoutBFS()
+          render(animate)
+          setTimeout((() ->
+            if done?
+              done()
+          ), ANIMATION_DURATION)
         ), ANIMATION_DURATION)
-      ), ANIMATION_DURATION)
+      else
+        layoutBFS()
+        render(animate)
+        if done?
+          done()
 
     removeNode: (id, animate, done) ->
       console.log('removeNode ' + makeString([id, animate]))
@@ -315,17 +331,24 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
           node_data.splice(i, 1)
           break
       selection = selectNodes().exit()
-      selection.transition().duration(ANIMATION_DURATION).attr('opacity', 0)
-      selection.select('circle.node-circle').transition().duration(ANIMATION_DURATION).attr('r', 0)
-      setTimeout((() ->
+      if animate
+        selection.transition().duration(ANIMATION_DURATION).attr('opacity', 0)
+        selection.select('circle.node-circle').transition().duration(ANIMATION_DURATION).attr('r', 0)
+        setTimeout((() ->
+          selection.remove()
+          layoutBFS()
+          render(animate)
+          setTimeout((() ->
+            if done?
+              done()
+          ), ANIMATION_DURATION)
+        ), ANIMATION_DURATION)
+      else
         selection.remove()
         layoutBFS()
-        render(true)
-        setTimeout((() ->
-          if done?
-            done()
-        ), ANIMATION_DURATION)
-      ), ANIMATION_DURATION)
+        render(animate)
+        if done?
+          done()
 
     setNodeData: (id, data, animate, done) ->
       console.log('setNodeData ' + makeString([id, data, animate]))
@@ -364,13 +387,11 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
 
       source_node = getNode(source)
       target_node = getNode(target)
-
       edge_data.push({
         source: source,
         target: target,
         label: label
       })
-
       selection = selectEdges().enter().append('g').attr('class', 'edge').append('line')
       selection
         .attr('x1', (d) ->
@@ -385,65 +406,90 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
           norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
           return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
         )
-        .attr('x2', (d) ->
-          source_node = getNode(d.source)
-          target_node = getNode(d.target)
-          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-          return source_node.x + RADIUS * (target_node.x - source_node.x) / norm
-        )
-        .attr('y2', (d) ->
-          source_node = getNode(d.source)
-          target_node = getNode(d.target)
-          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-          return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
-        )
-      selection.transition().duration(ANIMATION_DURATION)
-        .attr('x2', (d) ->
-          source_node = getNode(d.source)
-          target_node = getNode(d.target)
-          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-          return target_node.x - RADIUS * (target_node.x - source_node.x) / norm
-        )
-        .attr('y2', (d) ->
-          source_node = getNode(d.source)
-          target_node = getNode(d.target)
-          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-          return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
-        )
-
-      setTimeout((() ->
-        layoutBFS()
-        render(true)
+      if animate
+        selection
+          .attr('x2', (d) ->
+            source_node = getNode(d.source)
+            target_node = getNode(d.target)
+            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+            return source_node.x + RADIUS * (target_node.x - source_node.x) / norm
+          )
+          .attr('y2', (d) ->
+            source_node = getNode(d.source)
+            target_node = getNode(d.target)
+            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+            return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
+          )
+        selection.transition().duration(ANIMATION_DURATION)
+          .attr('x2', (d) ->
+            source_node = getNode(d.source)
+            target_node = getNode(d.target)
+            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+            return target_node.x - RADIUS * (target_node.x - source_node.x) / norm
+          )
+          .attr('y2', (d) ->
+            source_node = getNode(d.source)
+            target_node = getNode(d.target)
+            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+            return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
+          )
+      else
+        selection
+          .attr('x2', (d) ->
+            source_node = getNode(d.source)
+            target_node = getNode(d.target)
+            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+            return target_node.x - RADIUS * (target_node.x - source_node.x) / norm
+          )
+          .attr('y2', (d) ->
+            source_node = getNode(d.source)
+            target_node = getNode(d.target)
+            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+            return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
+          )
+      if animate
         setTimeout((() ->
-          if done?
-            done()
+          layoutBFS()
+          render(animate)
+          setTimeout((() ->
+            if done?
+              done()
+          ), ANIMATION_DURATION)
         ), ANIMATION_DURATION)
-      ), ANIMATION_DURATION)
+      else
+        layoutBFS()
+        render(animate)
+        if done?
+          done()
 
     removeEdge: (source, target, label, animate, done) ->
       console.log('removeEdge ' + makeString([source, target, animate]))
 
       source_node = getNode(source)
       target_node = getNode(target)
-
       for edge, i in edge_data
         if edge.source == source and edge.target == target and edge.label == label
           edge_data.splice(i, 1)
           break
-
       selection = selectEdges().exit()
-      selection.transition().duration(ANIMATION_DURATION)
-        .attr('x2', source_node.x)
-        .attr('y2', source_node.y)
-
-      setTimeout((() ->
+      if animate
+        selection.transition().duration(ANIMATION_DURATION)
+          .attr('x2', source_node.x)
+          .attr('y2', source_node.y)
+        setTimeout((() ->
+          selection.remove()
+          layoutBFS()
+          render(animate)
+          setTimeout((() ->
+            if done?
+              done()
+          ), ANIMATION_DURATION)
+        ), ANIMATION_DURATION)
+      else
         selection.remove()
         layoutBFS()
-        render(true)
-        setTimeout((() ->
-          if done?
-            done()
-        ), ANIMATION_DURATION)
-      ), ANIMATION_DURATION)
+        render(animate)
+        if done?
+          done()
   }
 )])
