@@ -29,8 +29,6 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       return height
     return 200
 
-  getHeight = () -> $('#graph').height()
-
   selectNodes = () ->
     return d3.select('#graph #nodes').selectAll('g.node').data(node_data, (d) -> d.id)
 
