@@ -41,7 +41,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   $scope.data_structures = examples
 
   # other global application state
-  $scope.active_page = 1
+  $scope.active_page = 0
   if $scope.data_structures.length > 0
     $scope.active_data_structure = $scope.data_structures[0]
   else
@@ -55,6 +55,12 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
   # switch to a data structure
   $scope.activateDataStructure = (data_structure) ->
     $scope.active_data_structure = data_structure
+
+  # focus the command prompt
+  $scope.focusCommandPrompt = () ->
+    setTimeout((() ->
+      $('#new-command-str').focus()
+    ), 1)
 
   # a helper to be called on click
   $scope.stopClick = (event) ->

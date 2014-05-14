@@ -23,7 +23,7 @@
           </ul>
         </li>
         <li data-ng-class="{ active: active_page === 0 }"><a href="#" data-ng-click="active_page = 0; $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
-        <li data-ng-class="{ active: active_page === 1 }"><a href="#" data-ng-click="active_page = 1; $event.preventDefault();"><span class="glyphicon glyphicon-globe"></span> Explore</a></li>
+        <li data-ng-class="{ active: active_page === 1 }"><a href="#" data-ng-click="active_page = 1; focusCommandPrompt(); $event.preventDefault();"><span class="glyphicon glyphicon-globe"></span> Explore</a></li>
       </ul>
     </div>
   </div>
@@ -172,6 +172,7 @@
         </div>
       </div>
       <div class="col-sm-8">
+        <div class="jumbo" data-ng-show="active_data_structure.operations.length == 0">Add some operations on the left!</div>
         <div data-ng-repeat="operation in active_data_structure.operations">
           <div class="form-group">
             <label for="ds-code-{{ operation.name }}">
@@ -250,7 +251,8 @@
         <div class="panel panel-default">
           <div class="panel-heading">Visualization</div>
           <div class="panel-body">
-            <svg xmlns="http://www.w3.org/2000/svg" version="1.1" data-ng-show="active_data_structure.model === 'pointer_machine'" id="graph" viewBox="-100 -100 200 200">
+            <div class="jumbo" data-ng-show="command_history.length == 0">Use the prompt on the right!</div>
+            <svg data-ng-show="command_history.length > 0" xmlns="http://www.w3.org/2000/svg" version="1.1" data-ng-show="active_data_structure.model === 'pointer_machine'" id="graph" viewBox="-100 -100 200 200">
               <g id="edges"></g>
               <g id="nodes"></g>
             </svg>
