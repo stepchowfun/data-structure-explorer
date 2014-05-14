@@ -534,7 +534,6 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
         break
       step_cursor = $scope.command_history[cursor].steps.length - 1
     $scope.busy_lock = true
-    console.log '// - ' + $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].repr
     $scope.command_history[$scope.command_history_cursor].steps[$scope.command_history_step_cursor].down($scope.computation_state, animate, () ->
       setTimeout((() ->
         $scope.$apply ($scope) ->
@@ -571,7 +570,6 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     $scope.command_history_cursor = cursor
     $scope.command_history_step_cursor = step_cursor
     $scope.busy_lock = true
-    console.log '// + ' + $scope.command_history[cursor].steps[step_cursor].repr
     $scope.command_history[cursor].steps[step_cursor].up($scope.computation_state, animate, () ->
       setTimeout((() ->
         $scope.$apply ($scope) ->
