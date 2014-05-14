@@ -96,5 +96,31 @@ body {
   #graph {
     width: 100%;
     height: 574px;
+
+    circle {
+      stroke: #bbb;
+      stroke-width: 4px;
+      fill: #fff;
+    }
+
+    line {
+      stroke: #bbb;
+      stroke-width: 4px;
+    }
+
+    text {
+      font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+      font-size: 0.9em;
+      fill: #666;
+
+      &.node-name {
+        fill: #aaa;
+      }
+    }
+
+    g.data_outline text {
+      stroke: #fff;
+      stroke-width: 5px;
+    }
   }
 }

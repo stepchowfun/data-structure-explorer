@@ -596,7 +596,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       for step, j in command.steps
         last_cursor = i
         last_step_cursor = j
-    $scope.jumpTo(last_cursor, last_step_cursor, scroll, false, () ->
+    $scope.jumpTo(last_cursor, last_step_cursor, false, animate, () ->
       $("#command-history").scrollTop($("#command-history")[0].scrollHeight)
       if done?
         done()

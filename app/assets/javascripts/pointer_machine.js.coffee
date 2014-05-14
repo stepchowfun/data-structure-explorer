@@ -78,7 +78,8 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
           if getTransparentNode(getCurrentState(), value)?
             original_graph_link_data.push([node_name, value.name, key])
           else
-            original_graph_node_data[key] = value
+            if value?
+              original_graph_node_data[key] = value
         step = {
           repr: node_name + ' = make_node(' + makeString(data) + ')',
           up: ((state, animate, done) ->
@@ -146,7 +147,18 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
                 old_graph_node_data = { }
                 for k, v of transparent_node
                   if !getTransparentNode(getCurrentState(), v)?
-                    old_graph_node_data[k] = v
+                    if v?
+                      old_graph_node_data[k] = v
+                new_graph_node_data = { }
+                for k, v of transparent_node
+                  if k == field
+                    if !getTransparentNode(getCurrentState(), value)?
+                      if value?
+                        new_graph_node_data[k] = value
+                  else
+                    if !getTransparentNode(getCurrentState(), v)?
+                      if v?
+                        new_graph_node_data[k] = v
                 step = {
                   repr: node_name + '.' + field + ' = ' + makeString(value),
                   up: ((state, animate, done) ->
@@ -167,11 +179,10 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
 
                       updateNodeData = () ->
                         if !old_target? or !new_target?
-                          new_graph_node_data = { }
-                          for k, v of transparent_node
-                            if !getTransparentNode(state, v)?
-                              new_graph_node_data[k] = v
-                          graph.setNodeData(node_name, new_graph_node_data, animate, addNewEdge)
+                          if angular.equals(old_graph_node_data, new_graph_node_data)
+                            addNewEdge()
+                          else
+                            graph.setNodeData(node_name, new_graph_node_data, animate, addNewEdge)
                         else
                           addNewEdge()
 
@@ -201,7 +212,10 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
 
                       updateNodeData = () ->
                         if !old_target? or !new_target?
-                          graph.setNodeData(node_name, old_graph_node_data, animate, addOldEdge)
+                          if angular.equals(old_graph_node_data, new_graph_node_data)
+                            addOldEdge()
+                          else
+                            graph.setNodeData(node_name, old_graph_node_data, animate, addOldEdge)
                         else
                           addOldEdge()
 
@@ -237,7 +251,8 @@ pointer_machine.factory('pointer_machine', ['makeString', 'getField', 'graph', '
               if getTransparentNode(getCurrentState(), value)?
                 old_graph_link_data.push([node_name, value.name, key])
               else
-                old_graph_node_data[key] = value
+                if value?
+                  old_graph_node_data[key] = value
             step = {
               repr: makeString(opaque_node) + '.remove()',
               up: ((state, animate, done) ->

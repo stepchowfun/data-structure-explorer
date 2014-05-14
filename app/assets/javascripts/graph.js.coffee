@@ -2,8 +2,10 @@ graph = angular.module('graph', ['makeString', 'debounce'])
 
 graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
   ANIMATION_DURATION = 300
-  X_SPACING = 150
-  Y_SPACING = 150
+  X_SPACING = 200
+  Y_SPACING = 200
+  RADIUS = 60
+  LINE_HEIGHT = 20
 
   root_id = null
   node_data = [ ]
@@ -20,10 +22,13 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
   getHeight = () -> $('#graph').height()
 
   selectNodes = () ->
-    return d3.select('#graph').selectAll('circle').data(node_data, (d) -> d.id)
+    return d3.select('#graph').select('#nodes').selectAll('g').data(node_data, (d) -> d.id)
+
+  selectNode = (node) ->
+    return d3.select('#graph').select('#nodes').selectAll('g#' + node.id).data([node], (d) -> d.id)
 
   selectEdges = () ->
-    return d3.select('#graph').selectAll('line').data(edge_data, (d) -> String(d.source) + ':' + String(d.target) + ':' + d.label)
+    return d3.select('#graph').select('#edges').selectAll('g').data(edge_data, (d) -> String(d.source) + ':' + String(d.target) + ':' + d.label)
 
   getNode = (id) ->
     for node in node_data
@@ -181,19 +186,36 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     selection = selectNodes()
     if animate
       selection = selection.transition().duration(ANIMATION_DURATION)
-    selection
-      .attr('cx', (d) -> d.x)
-      .attr('cy', (d) -> d.y)
-      .attr('r', (d) -> d.r)
+    selection.attr('transform', (d) -> ('translate(' + String(d.x) + ', ' + String(d.y) + ')'))
 
-    selection = selectEdges()
+    selection = selectEdges().selectAll('line')
     if animate
       selection = selection.transition().duration(ANIMATION_DURATION)
     selection
-      .attr('x1', (d) -> getNode(d.source).x)
-      .attr('y1', (d) -> getNode(d.source).y)
-      .attr('x2', (d) -> getNode(d.target).x)
-      .attr('y2', (d) -> getNode(d.target).y)
+      .attr('x1', (d) ->
+        source_node = getNode(d.source)
+        target_node = getNode(d.target)
+        norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+        return source_node.x + RADIUS * (target_node.x - source_node.x) / norm
+      )
+      .attr('y1', (d) ->
+        source_node = getNode(d.source)
+        target_node = getNode(d.target)
+        norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+        return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
+      )
+      .attr('x2', (d) ->
+        source_node = getNode(d.source)
+        target_node = getNode(d.target)
+        norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+        return target_node.x - RADIUS * (target_node.x - source_node.x) / norm
+      )
+      .attr('y2', (d) ->
+        source_node = getNode(d.source)
+        target_node = getNode(d.target)
+        norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+        return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
+      )
 
     updateViewBox(true)
 
@@ -225,22 +247,47 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
 
     addNode: (id, data, animate, done) ->
       console.log('addNode ' + makeString([id, data, animate]))
-
       node = {
         id: id,
         data: data,
         x: 0,
         y: -Y_SPACING,
-        r: 50
       }
       node_data.push(node)
-
-      selection = selectNodes().enter().append('circle')
-      selection.attr('cx', node.x)
-      selection.attr('cy', node.y)
-      selection.attr('r', 0)
-      selection.transition().duration(ANIMATION_DURATION).attr('r', node.r)
-
+      selection = selectNodes().enter().append('g').attr('id', id)
+      selection
+        .attr('transform', 'translate(' + String(node.x) + ', ' + String(node.y) + ')')
+        .attr('opacity', 0)
+        .transition().duration(ANIMATION_DURATION).attr('opacity', 1)
+      selection.append('circle')
+        .attr('class', 'node-circle')
+        .attr('cx', 0)
+        .attr('cy', 0)
+        .attr('r', 0)
+        .transition().duration(ANIMATION_DURATION).attr('r', RADIUS)
+      selection.append('text')
+        .attr('class', 'node-name')
+        .text(id)
+        .attr('x', -RADIUS)
+        .attr('y', -RADIUS)
+      data_group_outline = selection.append('g').attr('class', 'data_outline')
+      data_group = selection.append('g').attr('class', 'data')
+      count = 0
+      for k, v of data
+        count += 1
+      i = 0
+      for k, v of data
+        data_group_outline.append('text')
+          .text(k + ': ' + v)
+          .attr('x', 0)
+          .attr('y', 15 + LINE_HEIGHT * (i - count / 2))
+          .attr('text-anchor', 'middle')
+        data_group.append('text')
+          .text(k + ': ' + v)
+          .attr('x', 0)
+          .attr('y', 15 + LINE_HEIGHT * (i - count / 2))
+          .attr('text-anchor', 'middle')
+        i += 1
       setTimeout((() ->
         layoutBFS()
         render(true)
@@ -257,10 +304,9 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         if node.id == id
           node_data.splice(i, 1)
           break
-
       selection = selectNodes().exit()
-      selection.transition().duration(ANIMATION_DURATION).attr('r', 0)
-
+      selection.transition().duration(ANIMATION_DURATION).attr('opacity', 0)
+      selection.selectAll('circle').transition().duration(ANIMATION_DURATION).attr('r', 0)
       setTimeout((() ->
         selection.remove()
         layoutBFS()
@@ -274,13 +320,34 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     setNodeData: (id, data, animate, done) ->
       console.log('setNodeData ' + makeString([id, data, animate]))
 
-      for node, i in node_data
-        if node.id == id
-          node_data[i].data = data
-          break
-
-      #
-
+      node = getNode(id)
+      node.data = data
+      selection = selectNode(node)
+      selection.select('g.data_outline').remove()
+      selection.select('g.data').remove()
+      data_group_outline = selection.append('g').attr('class', 'data_outline')
+      data_group = selection.append('g').attr('class', 'data')
+      count = 0
+      for k, v of data
+        count += 1
+      i = 0
+      for k, v of data
+        data_group_outline.append('text')
+          .text(k + ': ' + v)
+          .attr('x', 0)
+          .attr('y', 15 + LINE_HEIGHT * (i - count / 2))
+          .attr('text-anchor', 'middle')
+        data_group.append('text')
+          .text(k + ': ' + v)
+          .attr('x', 0)
+          .attr('y', 15 + LINE_HEIGHT * (i - count / 2))
+          .attr('text-anchor', 'middle')
+        i += 1
+      if animate
+        selection.select('circle.node-circle').transition().duration(150).attr('r', RADIUS * 1.3)
+        setTimeout((() ->
+          selection.select('circle.node-circle').transition().duration(150).attr('r', RADIUS)
+        ), 200)
       if done?
         done()
 
@@ -296,16 +363,45 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         label: label
       })
 
-      selection = selectEdges().enter().append('line')
+      selection = selectEdges().enter().append('g').append('line')
       selection
-        .attr('stroke', 'black')
-        .attr('x1', source_node.x)
-        .attr('y1', source_node.y)
-        .attr('x2', source_node.x)
-        .attr('y2', source_node.y)
+        .attr('x1', (d) ->
+          source_node = getNode(d.source)
+          target_node = getNode(d.target)
+          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+          return source_node.x + RADIUS * (target_node.x - source_node.x) / norm
+        )
+        .attr('y1', (d) ->
+          source_node = getNode(d.source)
+          target_node = getNode(d.target)
+          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+          return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
+        )
+        .attr('x2', (d) ->
+          source_node = getNode(d.source)
+          target_node = getNode(d.target)
+          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+          return source_node.x + RADIUS * (target_node.x - source_node.x) / norm
+        )
+        .attr('y2', (d) ->
+          source_node = getNode(d.source)
+          target_node = getNode(d.target)
+          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+          return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
+        )
       selection.transition().duration(ANIMATION_DURATION)
-        .attr('x2', target_node.x)
-        .attr('y2', target_node.y)
+        .attr('x2', (d) ->
+          source_node = getNode(d.source)
+          target_node = getNode(d.target)
+          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+          return target_node.x - RADIUS * (target_node.x - source_node.x) / norm
+        )
+        .attr('y2', (d) ->
+          source_node = getNode(d.source)
+          target_node = getNode(d.target)
+          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+          return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
+        )
 
       setTimeout((() ->
         layoutBFS()
