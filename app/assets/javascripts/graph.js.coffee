@@ -150,6 +150,15 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     view_width = total_width * X_SPACING
     view_height = total_height * Y_SPACING
 
+    for edge in edge_data
+      source_node = getNode(edge.source)
+      target_node = getNode(edge.target)
+      norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+      edge.x1 = source_node.x + RADIUS * (target_node.x - source_node.x) / norm
+      edge.y1 = source_node.y + RADIUS * (target_node.y - source_node.y) / norm
+      edge.x2 = target_node.x - RADIUS * (target_node.x - source_node.x) / norm
+      edge.y2 = target_node.y - RADIUS * (target_node.y - source_node.y) / norm
+
     undefined
 
   updateViewBox = (animate) ->
@@ -188,34 +197,14 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       selection = selection.transition().duration(ANIMATION_DURATION)
     selection.attr('transform', (d) -> ('translate(' + String(d.x) + ', ' + String(d.y) + ')'))
 
-    selection = selectEdges().select('line')
+    selection = selectEdges().select('line.edge-line')
     if animate
       selection = selection.transition().duration(ANIMATION_DURATION)
     selection
-      .attr('x1', (d) ->
-        source_node = getNode(d.source)
-        target_node = getNode(d.target)
-        norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-        return source_node.x + RADIUS * (target_node.x - source_node.x) / norm
-      )
-      .attr('y1', (d) ->
-        source_node = getNode(d.source)
-        target_node = getNode(d.target)
-        norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-        return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
-      )
-      .attr('x2', (d) ->
-        source_node = getNode(d.source)
-        target_node = getNode(d.target)
-        norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-        return target_node.x - RADIUS * (target_node.x - source_node.x) / norm
-      )
-      .attr('y2', (d) ->
-        source_node = getNode(d.source)
-        target_node = getNode(d.target)
-        norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-        return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
-      )
+      .attr('x1', (d) -> d.x1)
+      .attr('y1', (d) -> d.y1)
+      .attr('x2', (d) -> d.x2)
+      .attr('y2', (d) -> d.y2)
 
     updateViewBox(animate)
 
@@ -373,67 +362,34 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
     addEdge: (source, target, label, animate, done) ->
       source_node = getNode(source)
       target_node = getNode(target)
-      edge_data.push({
+      norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
+      edge = {
         source: source,
         target: target,
-        label: label
-      })
-      selection = selectEdges().enter().append('g').attr('class', 'edge').append('line')
-      selection
+        label: label,
+        x1: source_node.x + RADIUS * (target_node.x - source_node.x) / norm,
+        y1: source_node.y + RADIUS * (target_node.y - source_node.y) / norm,
+        x2: target_node.x - RADIUS * (target_node.x - source_node.x) / norm,
+        y2: target_node.y - RADIUS * (target_node.y - source_node.y) / norm
+      }
+      edge_data.push(edge)
+      selection = selectEdges().enter().append('g').attr('class', 'edge')
+      edge_line = selection.append('line').attr('class', 'edge-line')
+      edge_line
         .attr('marker-end', 'url(#arrow)')
-        .attr('x1', (d) ->
-          source_node = getNode(d.source)
-          target_node = getNode(d.target)
-          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-          return source_node.x + RADIUS * (target_node.x - source_node.x) / norm
-        )
-        .attr('y1', (d) ->
-          source_node = getNode(d.source)
-          target_node = getNode(d.target)
-          norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-          return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
-        )
+        .attr('x1', edge.x1)
+        .attr('y1', edge.y1)
       if animate
-        selection
-          .attr('x2', (d) ->
-            source_node = getNode(d.source)
-            target_node = getNode(d.target)
-            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-            return source_node.x + RADIUS * (target_node.x - source_node.x) / norm
-          )
-          .attr('y2', (d) ->
-            source_node = getNode(d.source)
-            target_node = getNode(d.target)
-            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-            return source_node.y + RADIUS * (target_node.y - source_node.y) / norm
-          )
-        selection.transition().duration(ANIMATION_DURATION)
-          .attr('x2', (d) ->
-            source_node = getNode(d.source)
-            target_node = getNode(d.target)
-            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-            return target_node.x - RADIUS * (target_node.x - source_node.x) / norm
-          )
-          .attr('y2', (d) ->
-            source_node = getNode(d.source)
-            target_node = getNode(d.target)
-            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-            return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
-          )
+        edge_line
+          .attr('x2', edge.x1)
+          .attr('y2', edge.y1)
+        edge_line.transition().duration(ANIMATION_DURATION)
+          .attr('x2', edge.x2)
+          .attr('y2', edge.y2)
       else
-        selection
-          .attr('x2', (d) ->
-            source_node = getNode(d.source)
-            target_node = getNode(d.target)
-            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-            return target_node.x - RADIUS * (target_node.x - source_node.x) / norm
-          )
-          .attr('y2', (d) ->
-            source_node = getNode(d.source)
-            target_node = getNode(d.target)
-            norm = Math.sqrt(Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))
-            return target_node.y - RADIUS * (target_node.y - source_node.y) / norm
-          )
+        edge_line
+          .attr('x2', edge.x2)
+          .attr('y2', edge.y2)
       if animate
         setTimeout((() ->
           layoutBFS()
@@ -460,8 +416,8 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       selection = selectEdges().exit()
       if animate
         selection.select('line').transition().duration(ANIMATION_DURATION)
-          .attr('x2', source_node.x + RADIUS * (target_node.x - source_node.x) / norm)
-          .attr('y2', source_node.y + RADIUS * (target_node.y - source_node.y) / norm)
+          .attr('x2', (d) -> d.x1)
+          .attr('y2', (d) -> d.y1)
         setTimeout((() ->
           selection.remove()
           layoutBFS()
