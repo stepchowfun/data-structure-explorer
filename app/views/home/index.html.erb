@@ -270,9 +270,9 @@
             <form data-ng-submit="newCommand(); $event.preventDefault();">
               <div class="form-group" data-ng-class="{ 'has-error': new_command_error }">
                 <div class="input-group">
-                  <input id="new-command-str" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-change="clearNewCommandError()" placeholder="e.g., insert(5)" data-ng-disabled="busy_semaphore > 0" />
+                  <input id="new-command-str" data-ng-keydown="commandKeyDown($event)" type="text" class="form-control" data-ng-model="new_command_str" data-ng-change="clearNewCommandError()" placeholder="e.g., insert(5)" data-ng-disabled="busy_lock" />
                   <span class="input-group-btn">
-                    <button class="btn btn-default" type="submit" data-ng-disabled="busy_semaphore > 0">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
+                    <button class="btn btn-default" type="submit" data-ng-disabled="busy_lock">Go <span class="glyphicon glyphicon-chevron-right"></span></button>
                   </span>
                 </div>
                 <p data-ng-show="new_command_error">
@@ -285,11 +285,11 @@
             </form>
 
             <p class="btn-group no-bottom-margin">
-              <a href="#" class="btn btn-default" data-ng-click="fastBackward(true, false, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || busy_semaphore > 0 }"><span class="glyphicon glyphicon-fast-backward"></span></a>
-              <a href="#" class="btn btn-default" data-ng-click="stepBackward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || busy_semaphore > 0 }"><span class="glyphicon glyphicon-step-backward"></span></a>
-              <a href="#" class="btn btn-danger" data-ng-click="resetState(null); $event.preventDefault();" data-ng-class="{ 'disabled': !canReset() || busy_semaphore > 0 }"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
-              <a href="#" class="btn btn-default" data-ng-click="stepForward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || busy_semaphore > 0 }"><span class="glyphicon glyphicon-step-forward"></span></a>
-              <a href="#" class="btn btn-default" data-ng-click="fastForward(true, false, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || busy_semaphore > 0 }"><span class="glyphicon glyphicon-fast-forward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="fastBackward(true, false, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || busy_lock }"><span class="glyphicon glyphicon-fast-backward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="stepBackward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepBackward() || busy_lock }"><span class="glyphicon glyphicon-step-backward"></span></a>
+              <a href="#" class="btn btn-danger" data-ng-click="resetState(null); $event.preventDefault();" data-ng-class="{ 'disabled': !canReset() || busy_lock }"><span class="glyphicon glyphicon-repeat"></span> Reset</a>
+              <a href="#" class="btn btn-default" data-ng-click="stepForward(true, true, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || busy_lock }"><span class="glyphicon glyphicon-step-forward"></span></a>
+              <a href="#" class="btn btn-default" data-ng-click="fastForward(true, false, null); $event.preventDefault();" data-ng-class="{ 'disabled': !canStepForward() || busy_lock }"><span class="glyphicon glyphicon-fast-forward"></span></a>
             </p>
           </div>
         </div>
