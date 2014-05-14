@@ -380,6 +380,7 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       })
       selection = selectEdges().enter().append('g').attr('class', 'edge').append('line')
       selection
+        .attr('marker-end', 'url(#arrow)')
         .attr('x1', (d) ->
           source_node = getNode(d.source)
           target_node = getNode(d.target)

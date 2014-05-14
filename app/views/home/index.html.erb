@@ -253,6 +253,11 @@
           <div class="panel-body">
             <div class="jumbo" data-ng-show="command_history.length == 0">Use the prompt on the right!</div>
             <svg data-ng-show="command_history.length > 0" xmlns="http://www.w3.org/2000/svg" version="1.1" data-ng-show="active_data_structure.model === 'pointer_machine'" id="graph" viewBox="-100 -100 200 200">
+              <defs>
+                <marker id="arrow" markerWidth="5" markerHeight="5" viewBox="-6 -6 12 12" refX="2" refY="0" markerUnits="strokeWidth" orient="auto">
+                  <polygon points="-5,0 -5,3 5,0 -5,-3" fill="#bbb" />
+                </marker>
+              </defs>
               <g id="edges"></g>
               <g id="nodes"></g>
             </svg>
