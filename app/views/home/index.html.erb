@@ -104,7 +104,7 @@
                 <li data-ng-repeat="operation in active_data_structure.operations" data-ng-init="rename = false">
                   <div class="dropdown">
                     <form data-ng-show="rename" data-ng-submit="renameOperation(operation, new_operation_name); rename = false; $event.preventDefault();">
-                      <input type="text" id="new-operation-name-{{ operation.name }}" class="form-control inline-block" data-ng-model="new_operation_name" data-ng-blur="renameOperation(operation, new_operation_name); rename = false;" placeholder="e.g., insert" />
+                      <input type="text" class="new-operation-name-{{ operation.name }} form-control inline-block" data-ng-model="new_operation_name" data-ng-blur="renameOperation(operation, new_operation_name); rename = false;" placeholder="e.g., insert" />
                       <input type="submit" class="hidden" />
                     </form>
                     <span class="no-wrap">
@@ -173,15 +173,29 @@
       </div>
       <div class="col-sm-8">
         <div class="jumbo" data-ng-show="active_data_structure.operations.length == 0">Add some operations on the left!</div>
-        <div data-ng-repeat="operation in active_data_structure.operations">
+        <div data-ng-repeat="operation in active_data_structure.operations" data-ng-init="rename = false">
           <div class="form-group">
             <label for="ds-code-{{ operation.name }}">
-              <code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments track by $index"><span ng-hide="$first">, </span>{{ arg }}</span>)</code>
-              <span class="compile-success" data-ng-hide="operation.error" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
-              <span data-ng-show="operation.error">
-                <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
-                <span class="compile-error" data-ng-hide="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
-              </span>
+              <div class="dropdown">
+                <form data-ng-show="rename" data-ng-submit="renameOperation(operation, new_operation_name); rename = false; $event.preventDefault();">
+                  <input type="text" class="new-operation-name-{{ operation.name }} form-control inline-block" data-ng-model="new_operation_name" data-ng-blur="renameOperation(operation, new_operation_name); rename = false;" placeholder="e.g., insert" />
+                  <input type="submit" class="hidden" />
+                </form>
+                <span class="no-wrap">
+                  <a data-ng-hide="rename" data-toggle="dropdown" href="#"><code>{{ operation.name }}(<span data-ng-show="operation.arguments === null">&hellip;</span><span data-ng-repeat="arg in operation.arguments track by $index"><span ng-hide="$first">, </span>{{ arg }}</span>)</code></a>
+                  <span class="compile-success" data-ng-hide="operation.error || rename" data-toggle="tooltip" data-placement="right" title="Compiled successfully."><span class="glyphicon glyphicon-ok"></span></span>
+                  <span data-ng-show="operation.error && !rename">
+                    <span class="compile-error" data-ng-show="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}<br />{{ operation.error.stack_list.join('<br />') }}"><span class="glyphicon glyphicon-remove"></span></span>
+                    <span class="compile-error" data-ng-hide="operation.error.stack_list" data-toggle="tooltip" data-placement="right" data-html="true" title="{{ operation.error.name }}: {{ operation.error.message }}"><span class="glyphicon glyphicon-remove"></span></span>
+                  </span>
+                  <ul class="dropdown-menu">
+                    <li><a href="#" data-ng-click="moveOperationUp(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$first"><span class="glyphicon glyphicon-arrow-up"></span> Move up</a></li>
+                    <li><a href="#" data-ng-click="moveOperationDown(active_data_structure, operation); $event.preventDefault();" data-ng-hide="$last"><span class="glyphicon glyphicon-arrow-down"></span> Move down</a></li>
+                    <li><a href="#" data-ng-click="rename = true; new_operation_name = operation.name; prepareRenameOperation(operation); $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Rename</a></li>
+                    <li><a href="#" data-toggle="modal" data-target="#confirm-operation-delete-modal" data-ng-click="prepareDeleteOperation(operation)"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>
+                  </ul>
+                </span>
+              </div>
             </label>
             <div class="replace-with-codemirror"></div>
             <textarea id="ds-code-{{ operation.name }}" class="hidden" data-ng-model="operation.code" data-ng-trim="false"></textarea>

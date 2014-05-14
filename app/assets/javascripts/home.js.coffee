@@ -404,9 +404,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
     setTimeout((() ->
       $scope.$apply ($scope) ->
         $scope.busy_lock = false
-      element = $('#new-operation-name-' + operation.name)
-      element.focus()
-      element[0].setSelectionRange(0, element.val().length)
+      elements = $('.new-operation-name-' + operation.name)
+      elements.focus()
+      for e in elements
+        e.setSelectionRange(0, $(e).val().length)
     ), 1)
 
   $scope.renameOperation = (operation, new_operation_name) ->
