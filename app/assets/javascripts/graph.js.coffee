@@ -202,10 +202,10 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
       target_node = getNode(edge.target)
       norm = Math.sqrt(EPSILON + Math.pow(target_node.x - source_node.x, 2) + Math.pow(target_node.y - source_node.y, 2))  
       edge.chirality = false
-      if source_node.x > target_node.x
+      if source_node.x < target_node.x
         edge.chirality = true
         offset = -offset
-      if source_node.x == target_node.x and source_node.y > target_node.y
+      if source_node.x == target_node.x and source_node.y < target_node.y
         edge.chirality = true
         offset = -offset
       old_x = RADIUS * (target_node.x - source_node.x) / norm
@@ -442,9 +442,9 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
         y2: target_node.y - RADIUS * (target_node.y - source_node.y) / norm
       }
       edge.chirality = false
-      if source_node.x > target_node.x
+      if source_node.x < target_node.x
         edge.chirality = true
-      if source_node.x == target_node.x and source_node.y > target_node.y
+      if source_node.x == target_node.x and source_node.y < target_node.y
         edge.chirality = true
       edge_data.push(edge)
       selection = selectEdges().enter().append('g').attr('class', 'edge')
