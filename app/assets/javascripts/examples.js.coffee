@@ -102,7 +102,7 @@ examples.factory('examples', ['models', ((models) ->
         },
         {
          name: 'insert',
-         code: 'function insert(value) {\n  var current_node = global.root;\n  var current_parent;\n  while (current_node !== null) {\n    current_parent = current_node;\n    if (value < current_node.value) {\n      current_node = current_node.left_child;\n    } else {\n      current_node = current_node.right_child;\n    }\n  }\n  current_node = make_node({"value": value});\n  if (current_parent !== null) {\n    current_node.parent = current_parent;\n    if (current_node.value < current_parent.value) {\n      current_parent.left_child = current_node; \n    } else {\n      current_parent.right_child = current_node; \n    }\n  } else {\n    global.root = current_node; \n  }\n  splay(current_node);\n}'
+         code: 'function insert(value) {\n  var current_node = global.root;\n  var current_parent;\n  while (current_node !== null) {\n    current_parent = current_node;\n    if (value < current_node.value) {\n      current_node = current_node.left_child;\n    } else {\n      current_node = current_node.right_child;\n    }\n  }\n  current_node = make_node({"value": value});\n  if (current_parent) {\n    current_node.parent = current_parent;\n    if (current_node.value < current_parent.value) {\n      current_parent.left_child = current_node; \n    } else {\n      current_parent.right_child = current_node; \n    }\n  } else {\n    global.root = current_node; \n  }\n  splay(current_node);\n}'
         },
         {
          name: 'remove',
