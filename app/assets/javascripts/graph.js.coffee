@@ -60,17 +60,28 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
 
   getAdjacent = (node) ->
     adjacent = [ ]
+    suffix = [ ]
+    for edge in edge_data
+      if edge.source == node.id and /left/g.test(edge.label)
+        target_node = getNode(edge.target)
+        if !(target_node in adjacent or target_node in suffix)
+          adjacent.push(target_node)
+        continue
+      if edge.source == node.id and /right/g.test(edge.label)
+        target_node = getNode(edge.target)
+        if !(target_node in adjacent or target_node in suffix)
+          suffix.push(target_node)
     for edge in edge_data
       if edge.source == node.id
         target_node = getNode(edge.target)
-        if !(target_node in adjacent)
+        if !(target_node in adjacent or target_node in suffix)
           adjacent.push(target_node)
     for edge in edge_data
       if edge.target == node.id
         source_node = getNode(edge.source)
-        if !(source_node in adjacent)
+        if !(target_node in adjacent or target_node in suffix)
           adjacent.push(source_node)
-    return adjacent
+    return adjacent.concat(suffix)
 
   layoutBFS = () ->
     if node_data.length == 0

@@ -28,7 +28,7 @@ examples.factory('examples', ['models', ((models) ->
       operations: [
         {
           name: 'insert',
-          code: 'function insert(value) {\n  global.root = make_node({ value: value, next: global.root });\n}'
+          code: 'function insert(value) {\n  global.root = make_node({\n    value: value,\n    next: global.root\n  });\n}'
         },
         {
           name: 'contains',
