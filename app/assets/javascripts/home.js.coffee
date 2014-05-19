@@ -26,10 +26,10 @@ $ ->
   )
 
 # application module
-cherries = angular.module('cherries', ['ngSanitize', 'models', 'examples', 'debounce', 'makeString', 'sandbox'])
+cherries = angular.module('cherries', ['ngSanitize', 'models', 'examples', 'debounce', 'makeString', 'sandbox', 'graph'])
 
 # application controller
-cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'examples', 'debounce', 'makeString', 'sandbox', ($scope, models, runCommand, examples, debounce, makeString, sandbox) ->
+cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'examples', 'debounce', 'makeString', 'sandbox', 'graph', ($scope, models, runCommand, examples, debounce, makeString, sandbox, graph) ->
   ############################################################################
   # global
   ############################################################################
@@ -72,6 +72,10 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
 
   # a helper that makes a string out of anything
   $scope.makeString = makeString
+
+  # call this when the visualization changes size
+  $scope.updateViewBox = () ->
+    setTimeout(graph.updateViewBox, 1)
 
   # a helper for showing a message in a modal
   $scope.message = (title, message) ->
@@ -123,7 +127,7 @@ cherries.controller('CherriesController', ['$scope', 'models', 'runCommand', 'ex
       codemirrors = codemirrors.filter((e) -> jQuery.contains(document, e.getWrapperElement()))
       for codemirror in codemirrors
         codemirror.refresh()
-  ), 50), null, false)
+  ), 20), null, false)
 
   ############################################################################
   # editor

@@ -23,7 +23,7 @@
           </ul>
         </li>
         <li data-ng-class="{ active: active_page === 0 }"><a href="#" data-ng-click="active_page = 0; $event.preventDefault();"><span class="glyphicon glyphicon-edit"></span> Edit</a></li>
-        <li data-ng-class="{ active: active_page === 1 }"><a href="#" data-ng-click="active_page = 1; focusCommandPrompt(); $event.preventDefault();"><span class="glyphicon glyphicon-globe"></span> Explore</a></li>
+        <li data-ng-class="{ active: active_page === 1 }"><a href="#" data-ng-click="active_page = 1; updateViewBox(); focusCommandPrompt(); $event.preventDefault();"><span class="glyphicon glyphicon-globe"></span> Explore</a></li>
       </ul>
     </div>
   </div>

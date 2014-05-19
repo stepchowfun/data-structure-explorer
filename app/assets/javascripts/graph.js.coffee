@@ -284,11 +284,13 @@ graph.factory('graph', ['makeString', 'debounce', ((makeString, debounce) ->
   $(window).mousemove((event) ->
     last_mouse_x = event.pageX
     last_mouse_y = event.pageY
-    if $('#graph').is(":visible")
-      updateViewBox(false)
+    updateViewBox(false)
   )
 
   return {
+    updateViewBox: () ->
+      updateViewBox(false)
+
     setRoot: (target, animate, done) ->
       if root_id == target
         if done?
