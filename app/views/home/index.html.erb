@@ -152,7 +152,7 @@
               <ul class="no-bottom-margin">
                 <li>
                   <p class="no-bottom-margin"><code>node = make_node(data)</code></p>
-                  <p>Create a new node. Optionally, a <code>data</code> object may be provided which is used to initialize the fields of the node. At attempt to initialize fields that are not listed above is an error.</p>
+                  <p>Create a new node. Optionally, a <code>data</code> object may be provided which is used to initialize the fields of the node. An attempt to initialize fields that are not listed above is an error.</p>
                 </li>
                 <li>
                   <p class="no-bottom-margin"><code>node.remove()</code></p>
@@ -160,11 +160,11 @@
                 </li>
                 <li>
                   <p class="no-bottom-margin"><code>node.field</code></p>
-                  <p>Read from or write to a field of a node. At attempt to read from or write to a field not listed above is an error.</p>
+                  <p>Read from or write to a field of a node. An attempt to read from or write to a field not listed above is an error.</p>
                 </li>
                 <li>
                   <p class="no-bottom-margin"><code>global.root</code></p>
-                  <p class="no-bottom-margin">The global entry point into the data structure. This pointer may be written to and read from. At attempt to assign this pointer to anything other than a node or <code>null</code> is an error.</p>
+                  <p class="no-bottom-margin">The global entry point into the data structure. This pointer may be written to and read from. An attempt to assign this pointer to anything other than a node or <code>null</code> is an error.</p>
                 </li>
               </ul>
             </div>
@@ -278,7 +278,7 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-3"> 
+      <div class="col-sm-3">
         <div class="panel panel-default">
           <div class="panel-heading">Command history</div>
           <div class="panel-body">
